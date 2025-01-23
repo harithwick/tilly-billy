@@ -113,6 +113,7 @@ export function OrganisationTab() {
         <div className="space-y-2">
           <Label>Organization Logo</Label>
           <ImageUpload
+            imageType="logo"
             value={settings.logoUrl || undefined}
             onChange={(url) => setSettings({ ...settings, logoUrl: url })}
             className="w-full"

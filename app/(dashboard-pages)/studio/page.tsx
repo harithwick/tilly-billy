@@ -25,8 +25,17 @@ import { LoadingState } from "@/lib/components/loading-state";
 import { Save, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Header } from "@/lib/components/studio/header";
+import { Suspense } from "react";
 
 export default function StudioPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <StudioContent />
+    </Suspense>
+  );
+}
+
+function StudioContent() {
   const [date, setDate] = useState<Date>();
   const [items, setItems] = useState<
     Array<{
@@ -278,8 +287,6 @@ export default function StudioPage() {
             </div>
           </div>
         </div>
-
-        {/* Notes */}
         <div>
           <Label className="text-gray-600 mb-2">Notes:</Label>
           <Textarea

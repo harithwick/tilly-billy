@@ -13,5 +13,3 @@ export const timezoneList = moment.tz.names().map((zone: string) => {
     label: `${zone.replace("_", " ")} (${formattedOffset})`,
   };
 });
-
-console.log(timezoneList);

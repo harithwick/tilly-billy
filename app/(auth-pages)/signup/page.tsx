@@ -63,9 +63,7 @@ function SignUpForm() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
-      signupWithEmail(values.email, values.password);
-
-      toast.success("Account created successfully!");
+      await signupWithEmail(values.email, values.password, values.name);
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to create account"

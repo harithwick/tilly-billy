@@ -46,9 +46,14 @@ function LoginForm() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const message = searchParams.get("message");
-    if (message) {
-      toast.error(message);
+    const errorMessage = searchParams.get("error");
+    if (errorMessage) {
+      toast.error(errorMessage);
+    }
+
+    const successMessage = searchParams.get("message");
+    if (successMessage) {
+      toast.success(successMessage);
     }
   }, [searchParams]);
 

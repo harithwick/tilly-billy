@@ -19,20 +19,27 @@ export async function loginWithEmail(
       email: email,
       password: password,
     };
+    console.log("loginDetails", loginDetails);
 
-    const { error } = await supabase.auth.signInWithPassword(loginDetails);
-    console.log("signInWithPassword", error?.message);
-    if (!error) {
+    const { data, error } = await supabase.auth.signInWithPassword(
+      loginDetails
+    );
+
+    if (error) {
+      console.log("signInWithPassword", error);
+      loginError = error;
+    } else if (!error) {
       // Get user's organizations
-      const { data, error } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
 
-      if (!error) {
-        const supabaseUser = data.user;
-
+      if (!error && user) {
         const { data: orgs } = await supabase
           .from("view_organizations_users")
           .select("supabase_uid")
-          .eq("user_id", supabaseUser.id)
+          .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(1)
           .single();
@@ -49,16 +56,14 @@ export async function loginWithEmail(
         }
       }
     }
-
-    loginError = error;
   } catch (error) {
     console.log("ACTIONS ERROR", error);
   } finally {
     if (loginError) {
       if (loginError.message) {
-        redirectUrl = "/login?message=" + loginError.message;
+        redirectUrl = "/login?error=" + loginError.message;
       } else {
-        redirectUrl = "/login?message=Error Occured";
+        redirectUrl = "/login?error=Error Occured";
       }
     } else {
       // check fi there are any query params for redirect
@@ -76,20 +81,55 @@ export async function loginWithEmail(
   redirect(redirectUrl);
 }
 
-export async function signupWithEmail(email: string, password: string) {
+export async function signupWithEmail(
+  email: string,
+  password: string,
+  name: string
+) {
   const supabase = await createSupabaseServerClient(cookies());
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
   const data = {
     email: email,
-    password: email,
+    password: password,
+    options: {
+      data: {
+        name: name,
+      },
+    },
   };
 
-  const { error } = await supabase.auth.signUp(data);
+  const { error: signUpError } = await supabase.auth.signUp(data);
 
-  if (error) {
-    redirect("/error");
+  if (signUpError) {
+    redirect("/signup?error=" + signUpError.message);
+    return;
   }
-  redirect("/login");
+
+  const {
+    data: { user },
+    error: getUserError,
+  } = await supabase.auth.getUser();
+
+  if (getUserError) {
+    redirect("/signup?error=" + getUserError.message);
+    return;
+  }
+
+  // create a user in the database
+  const { data: userData, error: userError } = await supabase
+    .from("users")
+    .insert({
+      supabase_uid: user?.id,
+      name: name,
+      email: email,
+    });
+
+  if (userError) {
+    redirect("/signup?error=" + userError.message);
+    return;
+  }
+
+  redirect("/login?message=Signup successful. Please login.");
 }

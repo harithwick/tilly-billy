@@ -39,7 +39,7 @@
     "@radix-ui/react-toggle-group": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
     "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.47.10",
+    "@supabase/supabase-js": "^2.48.1",
     "@tabler/icons": "^3.28.1",
     "@tabler/icons-react": "^3.28.1",
     "@types/cookies": "^0.9.0",

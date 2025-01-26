@@ -252,6 +252,9 @@ export default function ClientsPage() {
       </Tabs>
       <CreateClientModal
         open={createModalOpen}
+        onSuccess={() => {
+          triggerRefresh();
+        }}
         onOpenChange={(open) => {
           setCreateModalOpen(open);
           if (!open) {

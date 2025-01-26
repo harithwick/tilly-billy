@@ -1,7 +1,10 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
-import { getOrganizationIdFromUuid } from "@/lib/utils/organizations";
+import {
+  getOrganizationIdFromUuid,
+  getUserIdFromSupabaseId,
+} from "@/lib/utils/organizations";
 
 export async function GET(request: Request) {
   try {
@@ -73,37 +76,29 @@ export async function POST(request: Request) {
     }
     const { ...data } = await request.json();
 
-    // Get organization ID from UUID
-    const { data: org, error: orgError } = await supabase
-      .from("organizations")
-      .select("id")
-      .eq("uuid", activeOrgUuid)
-      .single();
+    const organizationId = await getOrganizationIdFromUuid(
+      supabase,
+      activeOrgUuid
+    );
 
-    if (orgError || !org) {
-      console.error("Error finding organization:", orgError);
-      return NextResponse.json(
-        { error: "Organization not found" },
-        { status: 404 }
-      );
-    }
+    // get the user id from the user object
+    const userId = await getUserIdFromSupabaseId(supabase, user.id);
+
+    console.log(data);
 
     const { data: client, error } = await supabase
       .from("clients")
       .insert([
         {
-          organization_id: org.id,
+          org_id: organizationId,
           name: data.name,
-          email: data.email || null,
-          company: data.company || null,
+          email: data.email,
+          company_name: data.company || null,
           phone: data.phone || null,
           website: data.website || null,
-          vat_number: data.vatNumber || null,
-          billing_address: data.billingAddress || null,
-          shipping_address: data.shippingAddress || null,
-          payment_terms: data.paymentTerms || 30,
-          notes: data.notes || null,
+          tax_number: data.vatNumber || null,
           status: data.status || "active",
+          created_by: userId,
         },
       ])
       .select()

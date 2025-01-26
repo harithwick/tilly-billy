@@ -2,6 +2,31 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { SupabaseClient } from "@supabase/supabase-js";
 
+export async function setActiveOrganization(
+  supabase: any,
+  user: any,
+  cookieStore: any
+) {
+  const { data: orgs, error: orgsError } = await supabase
+    .from("view_organization_users")
+    .select("supabase_uid, uuid")
+    .eq("supabase_uid", user.id)
+    .order("created_at", { ascending: false });
+
+  if (orgsError) {
+    throw orgsError;
+  }
+
+  if (orgs && orgs.length > 0) {
+    cookieStore.set("activeOrgUuid", orgs[0].uuid, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+    });
+  }
+}
+
 export async function getOrganizationIdFromUuid(
   supabase: SupabaseClient,
   uuid: string

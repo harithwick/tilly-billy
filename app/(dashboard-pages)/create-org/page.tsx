@@ -52,6 +52,9 @@ export default function CreateOrgPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       currency: "USD",
+      name: "",
+      email: "",
+      logo: "",
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     },
   });

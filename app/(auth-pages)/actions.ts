@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { Console } from "console";
+import { setActiveOrganization } from "@/lib/utils/organizations";
 
 export async function loginWithEmail(
   email: string,
@@ -35,25 +36,11 @@ export async function loginWithEmail(
         error,
       } = await supabase.auth.getUser();
 
-      if (!error && user) {
-        const { data: orgs } = await supabase
-          .from("view_organizations_users")
-          .select("supabase_uid")
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .single();
+      let cookieStore = await cookies();
+      cookieStore.delete("activeOrgUuid");
 
-        if (orgs?.supabase_uid) {
-          // Set active org UUID in cookie
-          let cookieStore = await cookies();
-          cookieStore.set("activeOrgUuid", orgs.supabase_uid, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/",
-          });
-        }
+      if (!error && user) {
+        await setActiveOrganization(supabase, user, cookieStore);
       }
     }
   } catch (error) {

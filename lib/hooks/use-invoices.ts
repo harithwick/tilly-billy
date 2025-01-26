@@ -18,7 +18,7 @@ export function useInvoices() {
         const url = new URL("/api/dashboard/invoices", window.location.origin);
 
         const response = await fetch(url, {
-          cache: "no-store",
+          cache: "force-cache",
         });
 
         if (!response.ok) {

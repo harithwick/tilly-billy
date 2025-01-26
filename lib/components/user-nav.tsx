@@ -18,10 +18,12 @@ import {
 import { Settings, User, CreditCard, LogOut } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
+import Cookies from "js-cookie";
 
 export function UserNav() {
   const supabaseSignOut = () => {
     supabase.auth.signOut();
+    Cookies.remove("activeOrgUuid");
     window.location.href = "/";
   };
 

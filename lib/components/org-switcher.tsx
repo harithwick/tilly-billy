@@ -19,6 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Organization } from "@/lib/types";
 import { useRefreshStore } from "../stores/use-refresh-store";
 import { limitCharacters } from "@/lib/utils";
+import { useState, useEffect } from "react";
 
 interface OrgSwitcherProps {
   className?: string;
@@ -27,14 +28,10 @@ interface OrgSwitcherProps {
 
 export function OrgSwitcher({ className, organizations }: OrgSwitcherProps) {
   const [open, setOpen] = React.useState(false);
-  const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
   let activeOrgUuid = Cookies.get("activeOrgUuid") || null;
-  console.log("OrgSwitcher Cookies activeOrgUuid", activeOrgUuid);
-  let selectedOrg = null;
-
-  if (organizations.length > 0 && activeOrgUuid) {
-    selectedOrg = organizations.find((org) => org.uuid === activeOrgUuid);
-  }
+  const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
+  let selectedOrg =
+    organizations.find((org) => org.uuid === activeOrgUuid) || null;
 
   if (organizations.length === 0 || !selectedOrg) {
     return (
@@ -101,6 +98,7 @@ export function OrgSwitcher({ className, organizations }: OrgSwitcherProps) {
             <CommandSeparator />
             <CommandGroup>
               <CommandItem
+                className="cursor-pointer"
                 onSelect={() => {
                   setOpen(false);
                   window.location.href = "/create-org";

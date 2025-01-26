@@ -15,7 +15,9 @@ export function useProducts() {
       try {
         setLoading(true);
         const url = new URL("/api/dashboard/products", window.location.origin);
-        const response = await fetch(url);
+        const response = await fetch(url, {
+          cache: "force-cache",
+        });
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.error || "Failed to fetch products");

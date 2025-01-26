@@ -1,6 +1,8 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
+import { setActiveOrganization } from "@/lib/utils/organizations";
+import { redirect } from "next/navigation";
 
 export async function GET(request: Request) {
   try {
@@ -9,44 +11,34 @@ export async function GET(request: Request) {
     let cookieStore = await cookies();
     let activeOrgUuid = cookieStore.get("activeOrgUuid")?.value;
 
-    const { data: organizations, error } = await supabase
-      .from("organizations")
-      .select(
-        `
-        id,
-        name,
-        uuid,
-        email,
-        logo_url,
-        currency
-      `
-      )
-      .order("created_at", { ascending: false });
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (error) {
-      console.error("Error fetching organizations:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch organizations" },
-        { status: 500 }
-      );
+    if (!user) {
+      return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    if (organizations && organizations[0].uuid && !activeOrgUuid) {
-      // Set active org UUID in cookie
-      let cookieStore = await cookies();
+    if (!activeOrgUuid) {
+      await setActiveOrganization(supabase, user, cookieStore);
+    }
 
-      // check if the cookie store is already set within the cookie
+    const { data: orgs, error: orgsError } = await supabase
+      .from("view_organization_users")
+      .select("*")
+      .eq("supabase_uid", user.id)
+      .order("created_at", { ascending: false });
 
-      cookieStore.set("activeOrgUuid", organizations[0].uuid, {
-        httpOnly: false,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-      });
+    if (orgsError) {
+      throw orgsError;
+    }
+
+    if (orgs && orgs.length === 0) {
+      return NextResponse.redirect(new URL("/create-org", request.url));
     }
 
     return NextResponse.json({
-      organizations,
+      organizations: orgs,
     });
   } catch (error) {
     console.error("Error fetching dashboard data:", error);

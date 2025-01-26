@@ -14,7 +14,9 @@ export function useClients() {
     async function fetchClients() {
       try {
         setLoading(true);
-        const responseData = await fetch("/api/dashboard/clients");
+        const responseData = await fetch("/api/dashboard/clients", {
+          cache: "force-cache",
+        });
 
         if (!responseData.ok) {
           const errorData = await responseData.json();

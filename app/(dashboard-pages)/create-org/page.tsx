@@ -63,7 +63,7 @@ export default function CreateOrgPage() {
     setLoading(true);
     console.log("data", data);
     try {
-      const response = await fetch("/api/organizations", {
+      const response = await fetch("/api/organization", {
         method: "POST",
         body: JSON.stringify(data),
       });

@@ -14,13 +14,12 @@ export async function POST(request: Request) {
 
     // get the active organization UUID from the cookie
     let cookieStore = await cookies();
-    const activeOrgUuid = cookieStore.get("activeOrgUuid")?.value;
 
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user || !activeOrgUuid) {
+    if (!user) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
@@ -54,6 +53,9 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    // add the new organization to the cookie
+    cookieStore.set("activeOrgUuid", data.uuid);
 
     return NextResponse.json(data);
   } catch (error) {

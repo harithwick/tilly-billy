@@ -23,6 +23,7 @@ import { LoadingState } from "@/lib/components/loading-state";
 import { cn, capitalizeWords } from "@/lib/utils";
 import { deleteClient } from "@/lib/api/clients";
 import { useClients } from "@/lib/hooks/use-clients";
+import Link from "next/link";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
 import {
   DropdownMenu,
@@ -183,7 +184,11 @@ export default function ClientsPage() {
                       .filter((c) => c.status === status)
                       .map((client) => (
                         <TableRow key={client.id}>
-                          <TableCell>{client.name}</TableCell>
+                          <TableCell>
+                            <Link href={`/dashboard/client/${client.id}`}>
+                              {client.name}
+                            </Link>
+                          </TableCell>
                           <TableCell className="hidden md:table-cell">
                             {client.email || "-"}
                           </TableCell>

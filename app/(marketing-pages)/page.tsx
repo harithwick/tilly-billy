@@ -2,7 +2,6 @@ import { Button } from "@/lib/components/ui/button";
 import { ArrowRight, Code2, DollarSign, Github, Zap } from "lucide-react";
 import Link from "next/link";
 import { ContainerScroll } from "@/lib/components/ui/container-scroll-animation";
-import Footer from "@/lib/components/marketing/footer";
 import OpenSource from "@/lib/components/marketing/open-source";
 import Pricing from "@/lib/components/marketing/pricing";
 import {
@@ -12,6 +11,8 @@ import {
 import { Hero } from "@/lib/components/marketing/hero";
 import { BackgroundBeams } from "@/lib/components/ui/background-beams";
 import SiteHeader from "@/components/ui/site-header";
+import CallToAction1 from "@/lib/components/marketing/call-to-action-1";
+import FeaturesSectionDemo from "@/lib/components/marketing/features-section-demo-3";
 
 export default function Home() {
   const cards = data.map((card, index) => (
@@ -21,10 +22,11 @@ export default function Home() {
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <Hero />
+      <FeaturesSectionDemo />
       <Carousel items={cards} />
+      <CallToAction1 />
       <Pricing />
       <OpenSource />
-      <Footer />
     </div>
   );
 }

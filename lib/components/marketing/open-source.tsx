@@ -11,7 +11,7 @@ export default function OpenSource() {
           <BackgroundBeams />
         </div>
         <div className="max-w-2xl mx-auto p-4 z-10">
-          <h1 className="relative z-10 text-4xl md:text-7xl  bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-neutral-600 text-center font-sans font-bold">
+          <h1 className="relative z-10 text-4xl md:text-7xl  bg-clip-text text-transparent bg-gradient-to-b from-neutral-200 to-[#facc15] text-center font-sans font-bold">
             Proudly Open Source
           </h1>
           <p className="text-neutral-500 mt-5 max-w-lg mx-auto my-2 text-lg text-center relative z-10">

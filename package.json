@@ -41,7 +41,7 @@
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.48.1",
     "@tabler/icons": "^3.28.1",
-    "@tabler/icons-react": "^3.28.1",
+    "@tabler/icons-react": "^3.29.0",
     "@types/cookies": "^0.9.0",
     "@types/node": "20.6.2",
     "@types/react": "18.2.22",
@@ -50,6 +50,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
+    "cobe": "^0.6.3",
     "cookies": "^0.9.1",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.3.0",
@@ -84,6 +85,7 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.16",
     "@types/js-cookie": "^3.0.6",
     "@types/uuid": "^9.0.8",
     "node-polyfill-webpack-plugin": "^4.1.0",

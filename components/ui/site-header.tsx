@@ -22,6 +22,12 @@ export default function SiteHeader({ className }: { className?: string }) {
           item="Pricing"
           link="#pricing-section"
         ></MenuItem>
+        <MenuItem
+          setActive={setActive}
+          active={active}
+          item="Blog"
+          link="/blog"
+        ></MenuItem>
         {/* <MenuItem setActive={setActive} active={active} item="Services">
           <div className="flex flex-col space-y-4 text-sm">
             <HoveredLink href="/web-dev">Web Development</HoveredLink>

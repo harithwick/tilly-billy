@@ -139,7 +139,6 @@ export default function ProfilePage() {
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="danger">Danger Zone</TabsTrigger>
         </TabsList>
-
         <TabsContent value="profile">
           <Card>
             <CardHeader>

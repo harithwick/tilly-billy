@@ -14,6 +14,18 @@ import SiteHeader from "@/components/ui/site-header";
 import CallToAction1 from "@/lib/components/marketing/call-to-action-1";
 import FeaturesSectionDemo from "@/lib/components/marketing/features-section-demo-3";
 
+export const metadata = {
+  title: "Tilly Billy - Open SourceInvoice Generator",
+  description:
+    "Tilly Billy is an open source invoice generator that helps you create invoices for your clients.",
+  openGraph: {
+    title: "Tilly Billy - Open SourceInvoice Generator",
+    description:
+      "Tilly Billy is an open source invoice generator that helps you create invoices for your clients.",
+    // images: ["/path-to-og-image.jpg"],
+  },
+};
+
 export default function Home() {
   const cards = data.map((card, index) => (
     <Card key={card.src} card={card} index={index} />
@@ -22,7 +34,7 @@ export default function Home() {
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <Hero />
-      <FeaturesSectionDemo />
+      {/* <FeaturesSectionDemo /> */}
       <Carousel items={cards} />
       <CallToAction1 />
       <Pricing />

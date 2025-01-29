@@ -20,7 +20,7 @@ export default function SiteHeader({ className }: { className?: string }) {
           setActive={setActive}
           active={active}
           item="Pricing"
-          link="#pricing-section"
+          link="/pricing"
         ></MenuItem>
         <MenuItem
           setActive={setActive}

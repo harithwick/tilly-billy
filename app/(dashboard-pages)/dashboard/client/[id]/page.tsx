@@ -21,7 +21,14 @@ import {
 } from "@/lib/components/ui/avatar";
 import { LoadingState } from "@/lib/components/loading-state";
 import { Client, Invoice } from "@/lib/types";
-export default function ClientPage({ params }: { params: { id: string } }) {
+
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default function ClientPage({ params }: PageProps) {
   const [client, setClient] = useState<Client | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);

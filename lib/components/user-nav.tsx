@@ -39,12 +39,20 @@ export function UserNav() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
+        <DropdownMenuGroup>
+          <DropdownMenuItem>
+            <Link href="/profile?tab=profile" className="flex items-center">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem>
-            <Link href="/profile" className="flex items-center">
-              <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
+            <Link href="/profile?tab=billing" className="flex items-center">
+              <CreditCard className="mr-2 h-4 w-4" />
+              <span>Billing</span>
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>

@@ -137,6 +137,7 @@ export default function ProfilePage() {
       <Tabs defaultValue="profile" className="space-y-4">
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="billing">Billing</TabsTrigger>
           <TabsTrigger value="danger">Danger Zone</TabsTrigger>
         </TabsList>
         <TabsContent value="profile">
@@ -196,6 +197,16 @@ export default function ProfilePage() {
           </Card>
         </TabsContent>
 
+        <TabsContent value="billing">
+          <Card>
+            <CardHeader>
+              <CardTitle>Billing</CardTitle>
+              <CardDescription>
+                Update your billing information.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </TabsContent>
         <TabsContent value="danger">
           <Card className="border-destructive">
             <CardHeader>

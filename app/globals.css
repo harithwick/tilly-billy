@@ -16,6 +16,20 @@
   }
 }
 
+@media print {
+  @page {
+    margin: 20mm;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
 
 @layer base {
   :root {
@@ -73,7 +87,6 @@
     --chart-5: 340 75% 55%;
   }
 }
-
 
 @layer base {
   * {

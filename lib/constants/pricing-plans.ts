@@ -1,46 +1,3 @@
-export const pricingPlans = [
-  {
-    title: "Generous Free Tier",
-    monthlyPrice: 0,
-    yearlyPrice: 0,
-    description: "Generous free tier for everyday needs",
-    features: [
-      "Unlimited Invoices",
-      "1 Client",
-      "1 Currency",
-      "1 Organization",
-    ],
-    actionLabel: "Get Started",
-  },
-  {
-    title: "Indie ",
-    monthlyPrice: 6.99,
-    yearlyPrice: 69.99,
-    description: "Perfect for owners of small & medium businessess",
-    features: [
-      "Unlimited Invoices",
-      "Unlimited Clients",
-      "Unlimited Currencies",
-      "Unlimited Organizations",
-    ],
-    actionLabel: "Get Started",
-    popular: true,
-  },
-  {
-    title: "Enterprise",
-    price: "Custom",
-    description: "Dedicated support and infrastructure to fit your needs",
-    features: [
-      "Example Feature Number 1",
-      "Example Feature Number 2",
-      "Example Feature Number 3",
-      "Super Exclusive Feature",
-    ],
-    actionLabel: "Contact Sales",
-    exclusive: true,
-  },
-];
-
 export interface PricingInformation {
   id: string;
   name: string;
@@ -48,6 +5,8 @@ export interface PricingInformation {
   costUnitMonthly?: string;
   costUnitYearly?: string;
   href: string;
+  stripePriceIdMonthly?: string;
+  stripePriceIdYearly?: string;
   priceLabel?: string;
   priceMonthly: number | string;
   priceYearly: number | string;
@@ -84,6 +43,8 @@ export const plans: PricingInformation[] = [
     costUnitYearly: "/ year",
     href: "/profile?tab=billing",
     priceLabel: "",
+    stripePriceIdMonthly: "price_1Qn6NkBOi65YTMm133g2SbdC",
+    stripePriceIdYearly: "price_1Qn6OpBOi65YTMm1hipIdYrI",
     priceMonthly: "$9.99",
     priceYearly: "$6.99",
     description: "For production applications with the power to scale.",
@@ -104,6 +65,8 @@ export const plans: PricingInformation[] = [
     costUnitYearly: "/ year",
     href: "/profile?tab=billing",
     priceLabel: "",
+    stripePriceIdMonthly: "price_1Qn6PiBOi65YTMm1QZzRohTf",
+    stripePriceIdYearly: "price_1Qn6QyBOi65YTMm1s1WAKptD",
     priceMonthly: "$12.99",
     priceYearly: "$9.99",
     description:

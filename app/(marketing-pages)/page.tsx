@@ -3,7 +3,6 @@ import { ArrowRight, Code2, DollarSign, Github, Zap } from "lucide-react";
 import Link from "next/link";
 import { ContainerScroll } from "@/lib/components/ui/container-scroll-animation";
 import OpenSource from "@/lib/components/marketing/open-source";
-import Pricing from "@/lib/components/marketing/pricing";
 import {
   Carousel,
   Card,
@@ -37,7 +36,6 @@ export default function Home() {
       {/* <FeaturesSectionDemo /> */}
       <Carousel items={cards} />
       <CallToAction1 />
-      <Pricing />
       <OpenSource />
     </div>
   );

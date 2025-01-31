@@ -1,7 +1,7 @@
 "use client";
 
 import PricingPlans from "@/lib/components/marketing/pricing-plans";
-
+import { PricingTable } from "@/lib/components/marketing/pricing-table";
 export default function page() {
   return (
     <div className="py-40 md:py-50">
@@ -20,6 +20,7 @@ export default function page() {
         </div>
       </div>
       <PricingPlans />
+      <PricingTable />
     </div>
   );
 }

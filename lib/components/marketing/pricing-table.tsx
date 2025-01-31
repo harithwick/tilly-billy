@@ -1,73 +1,142 @@
+import { Fragment } from "react";
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/lib/components/ui/table";
+  IconPricingIncludedCheck,
+  IconPricingInfo,
+  IconPricingMinus,
+} from "./pricing-icons";
+import { plans, planFeatures } from "@/lib/constants/pricing-plans";
+import { HelpCircle } from "lucide-react";
 
-const invoices = [
-  {
-    feature: "INV001",
-    free: "Paid",
-    pro: "$250.00",
-  },
-  {
-    feature: "INV002",
-    free: "Pending",
-    pro: "$150.00",
-  },
-  {
-    feature: "INV003",
-    free: "Unpaid",
-    pro: "$350.00",
-  },
-  {
-    feature: "INV004",
-    free: "Paid",
-    pro: "$450.00",
-  },
-  {
-    feature: "INV005",
-    free: "Paid",
-    pro: "$550.00",
-  },
-  {
-    feature: "INV006",
-    free: "Pending",
-    pro: "$200.00",
-  },
-  {
-    feature: "INV007",
-    free: "Unpaid",
-    pro: "$300.00",
-  },
-];
-
-export function PricingTable() {
+export const PricingTable = (props: any) => {
   return (
-    <Table className="max-w-5xl py-4 mx-auto">
-      <TableHeader>
-        <TableRow>
-          <TableHead>sdfsdf</TableHead>
-          <TableHead>sdf</TableHead>
-          <TableHead className="text-lg xl:text-xl 2xl:text-2xl uppercase  font-normal items-center">
-            Pro
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {invoices.map((feature) => (
-          <TableRow key={feature.feature}>
-            <TableCell className="font-medium">{feature.feature}</TableCell>
-            <TableCell>{feature.free}</TableCell>
-            <TableCell>{feature.pro}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
+      <table className="h-px w-full table-fixed mt-40">
+        <thead className="bg-background sticky top-[62px] z-10">
+          <tr>
+            <th
+              className="text-foreground w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
+              scope="col"
+            >
+              <span>Feature by</span>
+              <span
+                className="h-0.25 absolute bottom-0 left-0 w-full"
+                style={{ height: "1px" }}
+              />
+            </th>
+            <th
+              className="text-foreground px-6 pt-2 pb-2 text-left text-xl"
+              scope="col"
+            >
+              <span>Free</span>
+              <span
+                className="h-0.25 absolute bottom-0 left-0 w-full"
+                style={{ height: "1px" }}
+              />
+            </th>
+            <th
+              className="text-foreground px-6 pt-2 pb-2 text-left text-xl"
+              scope="col"
+            >
+              <span>Pro</span>
+              <span
+                className="h-0.25 absolute bottom-0 left-0 w-full"
+                style={{ height: "1px" }}
+              />
+            </th>
+            <th
+              className="text-foreground px-6 pt-2 pb-2 text-left text-xl"
+              scope="col"
+            >
+              <span>Team</span>
+              <span
+                className="h-0.25 absolute bottom-0 left-0 w-full"
+                style={{ height: "1px" }}
+              />
+            </th>
+          </tr>
+        </thead>
+
+        <tbody className="border-default divide-border divide-y first:divide-y-0">
+          <tr
+            className="divide-border -scroll-mt-5"
+            style={{ borderTop: "none" }}
+          >
+            <td className="bg-background px-6 py-5 free"></td>
+            <td className="bg-background px-6 py-5 pro"></td>
+            <td className="bg-background px-6 py-5 team"></td>
+            <td className="bg-background px-6 py-5 enterprise"></td>
+          </tr>
+
+          {planFeatures.map((feat: any, i: number) => {
+            return (
+              <Fragment key={feat.title}>
+                <tr className="divide-border" key={i}>
+                  <th
+                    className={`text-foreground flex items-center px-6 py-5 last:pb-24 text-left text-xs font-normal `}
+                    scope="row"
+                  >
+                    <span>{feat.title}</span>
+                    {feat.tooltips?.main && (
+                      <span
+                        className="text-muted hover:text-foreground ml-2 cursor-pointer transition-colors"
+                        data-tip={feat.tooltips.main}
+                      >
+                        <HelpCircle size={14} strokeWidth={2} />
+                      </span>
+                    )}
+                  </th>
+
+                  {Object.entries(feat.plans).map((entry: any, i) => {
+                    const planName = entry[0];
+                    const planValue = entry[1];
+
+                    return (
+                      <td
+                        key={i}
+                        className={[
+                          `pl-6 pr-2 tier-${planName}`,
+                          typeof planValue === "boolean" ? "text-center" : "",
+                        ].join(" ")}
+                      >
+                        {typeof planValue === "boolean" &&
+                        planValue === true ? (
+                          <IconPricingIncludedCheck plan={planValue} />
+                        ) : typeof planValue === "boolean" &&
+                          planValue === false ? (
+                          <div className="text-muted">
+                            <IconPricingMinus plan={planValue} />
+                          </div>
+                        ) : (
+                          <div className="text-foreground text-xs flex flex-col justify-center">
+                            <span className="flex items-center gap-2">
+                              {feat.tooltips?.[planName] && (
+                                <span
+                                  className="shrink-0 hover:text-background-overlay-default cursor-pointer transition-colors"
+                                  data-tip={feat.tooltips[planName]}
+                                >
+                                  <IconPricingInfo />
+                                </span>
+                              )}
+                              {typeof planValue === "string"
+                                ? planValue
+                                : planValue[0]}
+                            </span>
+                            {typeof planValue !== "string" && (
+                              <span className="text-lighter leading-4">
+                                {planValue[1]}
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              </Fragment>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
-}
+};

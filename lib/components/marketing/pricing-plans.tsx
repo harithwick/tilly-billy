@@ -1,12 +1,18 @@
-import { plans } from "@/lib/constants/pricing-plans";
+import { plans, planFeatures } from "@/lib/constants/pricing-plans";
 import Link from "next/link";
+import { Fragment } from "react";
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 import { Badge } from "@/lib/components/ui/badge";
 import { Button } from "@/lib/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/lib/components/ui/tabs";
 import { useState } from "react";
-
+import { HelpCircle } from "lucide-react";
+import {
+  IconPricingIncludedCheck,
+  IconPricingInfo,
+  IconPricingMinus,
+} from "./pricing-icons";
 export default function PricingPlans() {
   const [billingInterval, setBillingInterval] = useState<"monthly" | "yearly">(
     "yearly"
@@ -67,7 +73,15 @@ export default function PricingPlans() {
                         {plan.name}
                       </h3>
                       {plan.nameBadge && (
-                        <Badge variant="secondary">{plan.nameBadge}</Badge>
+                        <Badge
+                          variant={
+                            plan.nameBadge === "Generous"
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
+                          {plan.nameBadge}
+                        </Badge>
                       )}
                     </div>
                   </div>
@@ -83,7 +97,7 @@ export default function PricingPlans() {
                   <div
                     className={cn(
                       "text-foreground flex items-baseline text-5xl font-normal lg:text-4xl xl:text-4xl border-b border-default lg:min-h-[155px]",
-                      plan.priceLabel
+                      plan.priceLabelMonthly
                         ? "py-6 lg:pb-0 pt-6"
                         : "py-8 lg:pb-0 lg:pt-10"
                     )}
@@ -91,11 +105,17 @@ export default function PricingPlans() {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-end gap-2">
                         <div>
-                          {plan.priceLabel && (
-                            <p className="text-foreground-lighter ml-1 text-[13px] leading-4 font-normal">
-                              {plan.priceLabel}
-                            </p>
-                          )}
+                          {billingInterval === "monthly"
+                            ? plan.priceLabelMonthly && (
+                                <p className="text-foreground-lighter ml-1 text-[13px] leading-4 font-normal">
+                                  {plan.priceLabelMonthly}
+                                </p>
+                              )
+                            : plan.priceLabelYearly && (
+                                <p className="text-foreground-lighter ml-1 text-[13px] leading-4 font-normal">
+                                  {plan.priceLabelYearly}
+                                </p>
+                              )}
 
                           <div className="flex items-end">
                             <p className={`mt-2 pb-1 text-4xl`}>{price}</p>

@@ -34,8 +34,9 @@ import {
   TableRow,
 } from "@/lib/components/ui/table";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
-
+import { useRouter } from "next/navigation";
 export default function InvoicesPage() {
+  const router = useRouter();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(
     null
@@ -58,7 +59,7 @@ export default function InvoicesPage() {
   const handleTemplateSelect = (templateId: string) => {
     // TODO: Create new invoice with selected template
     console.log("Selected template:", templateId);
-    window.location.href = "/studio";
+    router.push("/studio");
   };
 
   const handleDeleteClick = async (invoiceId: number) => {

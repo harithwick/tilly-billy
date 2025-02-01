@@ -19,12 +19,15 @@ import { Settings, User, CreditCard, LogOut } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
 import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export function UserNav() {
+  const router = useRouter();
+
   const supabaseSignOut = () => {
     supabase.auth.signOut();
     Cookies.remove("activeOrgUuid");
-    window.location.href = "/";
+    router.push("/");
   };
 
   return (

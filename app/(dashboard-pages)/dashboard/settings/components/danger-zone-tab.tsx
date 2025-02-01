@@ -21,7 +21,10 @@ import {
   DialogTitle,
 } from "@/lib/components/ui/dialog";
 import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
+
 export function DangerZoneTab() {
+  const router = useRouter();
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -41,7 +44,7 @@ export function DangerZoneTab() {
         throw new Error("Failed to delete organization");
       }
       Cookies.remove("activeOrgUuid");
-      window.location.href = "/dashboard";
+      router.push("/dashboard");
     } catch (error) {
       console.error("Error deleting organization:", error);
     } finally {

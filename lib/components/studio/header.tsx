@@ -5,8 +5,9 @@ import Link from "next/link";
 import { Button } from "@/lib/components/ui/button";
 import { ConfirmationModal } from "@/lib/components/confirmation-dialog";
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
 export function Header() {
+  const router = useRouter();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [loadingModal, setLoadingModal] = useState(false);
 
@@ -16,7 +17,7 @@ export function Header() {
         "Any unsaved changes will be lost. Are you sure you want to leave?"
       )
     ) {
-      window.location.href = "/";
+      router.push("/");
     }
   }
 

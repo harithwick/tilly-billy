@@ -32,16 +32,16 @@ const formSchema = z.object({
 });
 
 export default function SignUpPage() {
+  const router = useRouter();
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <SignUpForm />
+      <SignUpForm router={router} />
     </Suspense>
   );
 }
 
-function SignUpForm() {
+function SignUpForm({ router }: { router: any }) {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -64,6 +64,7 @@ function SignUpForm() {
     setLoading(true);
     try {
       await signupWithEmail(values.email, values.password, values.name);
+      router.push("/dashboard");
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to create account"

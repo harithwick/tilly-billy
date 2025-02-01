@@ -33,16 +33,16 @@ const formSchema = z.object({
 });
 
 export default function LoginPagePage() {
+  const router = useRouter();
   return (
     <Suspense fallback={<p>Loading...</p>}>
-      <LoginForm />
+      <LoginForm router={router} />
     </Suspense>
   );
 }
 
-function LoginForm() {
+function LoginForm({ router }: { router: any }) {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -68,7 +68,7 @@ function LoginForm() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
-      await loginWithEmail(values.email, values.password, window.location.href);
+      await loginWithEmail(values.email, values.password, router.push);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to sign in");
     } finally {

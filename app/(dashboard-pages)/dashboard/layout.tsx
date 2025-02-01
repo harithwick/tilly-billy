@@ -28,7 +28,7 @@ export default function DashboardLayout({
         console.log("dashboard response", response);
 
         if (response.redirected) {
-          window.location.href = response.url;
+          router.push(response.url);
           return;
         }
 

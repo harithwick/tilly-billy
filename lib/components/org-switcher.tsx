@@ -20,6 +20,7 @@ import { Organization } from "@/lib/types";
 import { useRefreshStore } from "../stores/use-refresh-store";
 import { limitCharacters } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface OrgSwitcherProps {
   className?: string;
@@ -28,6 +29,7 @@ interface OrgSwitcherProps {
 
 export function OrgSwitcher({ className, organizations }: OrgSwitcherProps) {
   const [open, setOpen] = React.useState(false);
+  const router = useRouter();
   let activeOrgUuid = Cookies.get("activeOrgUuid") || null;
   const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
   let selectedOrg =
@@ -39,7 +41,7 @@ export function OrgSwitcher({ className, organizations }: OrgSwitcherProps) {
         variant="outline"
         className={cn("w-52 justify-between", className)}
         onClick={() => {
-          window.location.href = "/create-org";
+          router.push("/create-org");
         }}
       >
         New Organization
@@ -101,7 +103,7 @@ export function OrgSwitcher({ className, organizations }: OrgSwitcherProps) {
                 className="cursor-pointer"
                 onSelect={() => {
                   setOpen(false);
-                  window.location.href = "/create-org";
+                  router.push("/create-org");
                 }}
               >
                 <PlusCircle className="mr-2 h-4 w-4" />

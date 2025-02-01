@@ -34,6 +34,7 @@ import {
 import { currencies } from "@/lib/constants/currencies";
 import { timezoneList } from "@/lib/constants/timezones";
 import { Code2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   name: z.string().min(2, "Company name must be at least 2 characters"),
@@ -46,6 +47,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function CreateOrgPage() {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<FormValues>({
@@ -73,7 +75,7 @@ export default function CreateOrgPage() {
         throw new Error(error.message || "Failed to create organization");
       }
 
-      window.location.href = "/dashboard";
+      router.push("/dashboard");
     } catch (error) {
       console.error("Error creating organization:", error);
       toast.error(

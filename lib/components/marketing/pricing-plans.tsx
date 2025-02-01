@@ -41,7 +41,7 @@ export default function PricingPlans() {
         <div className="mx-auto max-w-md grid lg:max-w-none mt-24 lg:grid-cols-2 xl:grid-cols-3 gap-4 xl:gap-0">
           {plans.map((plan) => {
             const isProPlan = plan.name === "Pro";
-            const isTeamPlan = plan.name === "Team";
+            const isBusinessPlan = plan.name === "Business";
             const price =
               billingInterval === "monthly"
                 ? plan.priceMonthly
@@ -58,7 +58,7 @@ export default function PricingPlans() {
                   "flex flex-col border xl:border-r-0 last:border-r bg-surface-75 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl",
                   isProPlan &&
                     "border-foreground-muted !border-2 !rounded-xl xl:-my-8",
-                  isTeamPlan && "xl:border-l-0"
+                  isBusinessPlan && "xl:border-l-0"
                 )}
               >
                 <div

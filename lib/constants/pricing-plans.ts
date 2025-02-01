@@ -66,8 +66,8 @@ export const plans: PricingInformation[] = [
     cta: "Get Started",
   },
   {
-    id: "tier_team",
-    name: "Team",
+    id: "tier_business",
+    name: "Business",
     nameBadge: "",
     costUnitMonthly: "/ Month",
     costUnitYearly: "/ Month",
@@ -97,7 +97,7 @@ export const planFeatures = [
     plans: {
       free: "Unlimited",
       pro: "Unlimited",
-      enterprise: "Unlimited",
+      business: "Unlimited",
     },
   },
   {
@@ -105,7 +105,7 @@ export const planFeatures = [
     plans: {
       free: "Unlimited",
       pro: "Unlimited",
-      enterprise: "Unlimited",
+      business: "Unlimited",
     },
   },
   {
@@ -113,7 +113,7 @@ export const planFeatures = [
     plans: {
       free: "1",
       pro: "Unlimited",
-      enterprise: "Unlimited",
+      business: "Unlimited",
     },
   },
 
@@ -122,7 +122,7 @@ export const planFeatures = [
     plans: {
       free: true,
       pro: true,
-      enterprise: true,
+      business: true,
     },
   },
   {
@@ -130,7 +130,7 @@ export const planFeatures = [
     plans: {
       free: "1",
       pro: "Unlimited",
-      enterprise: "Unlimited",
+      business: "Unlimited",
     },
   },
   {
@@ -138,7 +138,7 @@ export const planFeatures = [
     plans: {
       free: "1",
       pro: "Unlimited",
-      enterprise: "Unlimited",
+      business: "Unlimited",
     },
   },
   {
@@ -146,7 +146,7 @@ export const planFeatures = [
     plans: {
       free: false,
       pro: true,
-      enterprise: true,
+      business: true,
     },
   },
   {
@@ -154,7 +154,7 @@ export const planFeatures = [
     plans: {
       free: true,
       pro: true,
-      enterprise: true,
+      business: true,
     },
   },
   {
@@ -162,7 +162,7 @@ export const planFeatures = [
     plans: {
       free: false,
       pro: true,
-      enterprise: true,
+      business: true,
     },
   },
   {
@@ -170,7 +170,7 @@ export const planFeatures = [
     plans: {
       free: "Community",
       pro: "Priority",
-      enterprise: "Priority",
+      business: "Priority",
     },
   },
   {
@@ -178,7 +178,15 @@ export const planFeatures = [
     plans: {
       free: "Unlimited",
       pro: "Unlimited",
-      enterprise: "Unlimited",
+      business: "Unlimited",
+    },
+  },
+  {
+    title: "Real Time Webhooks",
+    plans: {
+      free: "Coming Soon",
+      pro: "Coming Soon",
+      business: "Coming Soon",
     },
   },
   {
@@ -186,7 +194,7 @@ export const planFeatures = [
     plans: {
       free: "Coming Soon",
       pro: "Coming Soon",
-      enterprise: "Coming Soon",
+      business: "Coming Soon",
     },
   },
 ];

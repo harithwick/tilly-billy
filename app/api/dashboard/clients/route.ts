@@ -5,60 +5,42 @@ import {
   getOrganizationIdFromUuid,
   getUserIdFromSupabaseId,
 } from "@/lib/utils/organizations";
+import { apiRouteHandler } from "@/lib/api/route-handler";
 
-export async function GET(request: Request) {
-  try {
-    const supabase = await createSupabaseServerClient(cookies());
-
-    // get the active organization UUID from the cookie
-    let cookieStore = await cookies();
-    const activeOrgUuid = cookieStore.get("activeOrgUuid")?.value;
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user || !activeOrgUuid) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-
+export const GET = apiRouteHandler({
+  authRequired: true,
+  orgUuidRequired: true,
+  handler: async (request: Request, { user, supabase, activeOrgUuid }) => {
     const organizationId = await getOrganizationIdFromUuid(
       supabase,
-      activeOrgUuid
+      activeOrgUuid!
     );
+
+    throw new Error("test");
 
     const { data: clients, error } = await supabase
       .from("clients")
       .select(
         `
-        id, name, email, status, created_at, org_id
-      `
+      id, name, email, status, created_at, org_id
+    `
       )
       .eq("org_id", organizationId)
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Database error:", error);
-      return NextResponse.json(
-        { error: "Failed to fetch clients" },
-        { status: 500 }
-      );
+      throw new Error("Failed to fetch clients");
     }
 
     // Transform the data to include invoice count
-    const transformedClients = clients.map((client) => ({
+    const transformedClients = clients.map((client: any) => ({
       ...client,
       invoice_count: 0,
     }));
 
     return NextResponse.json(transformedClients);
-  } catch (error) {
-    console.error("Error fetching clients:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
+  },
+});
 
 export async function POST(request: Request) {
   try {

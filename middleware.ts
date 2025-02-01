@@ -47,9 +47,6 @@ export async function middleware(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    console.log("MIDDLEWARE PATH", request.nextUrl.pathname);
-    console.log("MIDDLEWARE USER", user);
-
     // Check if the path requires the user to be logged in
     const requiresAuth = authRequiredPaths.some((path) =>
       request.nextUrl.pathname.startsWith(path)
@@ -57,15 +54,12 @@ export async function middleware(request: NextRequest) {
 
     // check if the path requires the user to be logged in
     if (!user && requiresAuth) {
-      console.log("loggedRequiredPaths");
       // pass in the current URL so the user can be redirected back after logging in
       let currentUrlBase64 = Buffer.from(request.nextUrl.pathname).toString(
         "base64"
       );
       const url = request.nextUrl.clone();
-      console.log("URL 1", url);
       url.pathname = "/login" + `?redirect=${currentUrlBase64}`;
-      console.log("URL 2", url);
       return NextResponse.redirect(
         new URL("/login" + `?redirect=${currentUrlBase64}`, request.url)
       );
@@ -86,7 +80,6 @@ export async function middleware(request: NextRequest) {
 
     return supabaseResponse;
   } catch (error) {
-    console.error("Auth middleware error:", error);
     return NextResponse.redirect(new URL("/login", request.url));
   }
 }

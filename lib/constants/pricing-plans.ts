@@ -78,7 +78,7 @@ export const plans: PricingInformation[] = [
     stripePriceIdYearly: "price_1Qn6QyBOi65YTMm1s1WAKptD",
     priceMonthly: "$12.99",
     priceYearly: "$9.99",
-    description: "",
+    description: "All your business invoicing needs",
     features: [
       "Unlimited Organizations",
       "Multi Currency Support",
@@ -93,37 +93,100 @@ export const plans: PricingInformation[] = [
 
 export const planFeatures = [
   {
-    title: "Total Users",
-    tooltips: { main: "The maximum number of users your project can have" },
+    title: "Invoices",
     plans: {
       free: "Unlimited",
       pro: "Unlimited",
-      team: "Unlimited",
+      enterprise: "Unlimited",
     },
-    usage_based: false,
   },
   {
-    title: "MAUs",
-    tooltips: {
-      main: "Users who log in or refresh their token count towards MAU.\nBilling is based on the sum of distinct users requesting your API throughout the billing period. Resets every billing cycle.",
-    },
+    title: "Products & Services",
     plans: {
-      free: "50,000 included",
-      pro: ["100,000 included", "then $0.00325 per MAU"],
-      team: ["100,000 included", "then $0.00325 per MAU"],
+      free: "Unlimited",
+      pro: "Unlimited",
+      enterprise: "Unlimited",
     },
-    usage_based: true,
   },
   {
-    title: "MAUs",
-    tooltips: {
-      main: "Users who log in or refresh their token count towards MAU.\nBilling is based on the sum of distinct users requesting your API throughout the billing period. Resets every billing cycle.",
+    title: "Clients",
+    plans: {
+      free: "1",
+      pro: "Unlimited",
+      enterprise: "Unlimited",
     },
+  },
+
+  {
+    title: "Customize Themes",
     plans: {
       free: true,
-      pro: ["100,000 included", "then $0.00325 per MAU"],
-      team: ["100,000 included", "then $0.00325 per MAU"],
+      pro: true,
+      enterprise: true,
     },
-    usage_based: true,
+  },
+  {
+    title: "Currency Support",
+    plans: {
+      free: "1",
+      pro: "Unlimited",
+      enterprise: "Unlimited",
+    },
+  },
+  {
+    title: "Organizations",
+    plans: {
+      free: "1",
+      pro: "Unlimited",
+      enterprise: "Unlimited",
+    },
+  },
+  {
+    title: "Email Invoices",
+    plans: {
+      free: false,
+      pro: true,
+      enterprise: true,
+    },
+  },
+  {
+    title: "Download Invoices",
+    plans: {
+      free: true,
+      pro: true,
+      enterprise: true,
+    },
+  },
+  {
+    title: "Recurring Invoices",
+    plans: {
+      free: false,
+      pro: true,
+      enterprise: true,
+    },
+  },
+  {
+    title: "Email Support",
+    plans: {
+      free: "Community",
+      pro: "Priority",
+      enterprise: "Priority",
+    },
+  },
+  {
+    title: "Analytics",
+    plans: {
+      free: "Unlimited",
+      pro: "Unlimited",
+      enterprise: "Unlimited",
+    },
+  },
+  {
+    title: "API Access",
+    plans: {
+      free: "Coming Soon",
+      pro: "Coming Soon",
+      enterprise: "Coming Soon",
+    },
   },
 ];

@@ -11,47 +11,17 @@ export const PricingTable = (props: any) => {
   return (
     <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
       <table className="h-px w-full table-fixed mt-40">
-        <thead className="bg-background sticky top-[62px] z-10">
+        <thead className="z-10">
           <tr>
-            <th
-              className="text-foreground w-1/3 px-6 pt-2 pb-2 text-left text-sm font-normal"
-              scope="col"
-            >
-              <span>Feature by</span>
-              <span
-                className="h-0.25 absolute bottom-0 left-0 w-full"
-                style={{ height: "1px" }}
-              />
-            </th>
-            <th
-              className="text-foreground px-6 pt-2 pb-2 text-left text-xl"
-              scope="col"
-            >
+            <th className="text-foreground md:w-1/3 w-1/4 px-6 pt-2 pb-2 text-left"></th>
+            <th className="text-foreground px-6 pt-2 pb-2 text-left md:text-2xl text-lg">
               <span>Free</span>
-              <span
-                className="h-0.25 absolute bottom-0 left-0 w-full"
-                style={{ height: "1px" }}
-              />
             </th>
-            <th
-              className="text-foreground px-6 pt-2 pb-2 text-left text-xl"
-              scope="col"
-            >
+            <th className="text-foreground px-6 pt-2 pb-2 text-left md:text-2xl text-lg">
               <span>Pro</span>
-              <span
-                className="h-0.25 absolute bottom-0 left-0 w-full"
-                style={{ height: "1px" }}
-              />
             </th>
-            <th
-              className="text-foreground px-6 pt-2 pb-2 text-left text-xl"
-              scope="col"
-            >
-              <span>Team</span>
-              <span
-                className="h-0.25 absolute bottom-0 left-0 w-full"
-                style={{ height: "1px" }}
-              />
+            <th className="text-foreground px-6 pt-2 pb-2 text-left md:text-2xl text-lg">
+              <span>Enterprise</span>
             </th>
           </tr>
         </thead>
@@ -63,27 +33,18 @@ export const PricingTable = (props: any) => {
           >
             <td className="bg-background px-6 py-5 free"></td>
             <td className="bg-background px-6 py-5 pro"></td>
-            <td className="bg-background px-6 py-5 team"></td>
             <td className="bg-background px-6 py-5 enterprise"></td>
           </tr>
 
           {planFeatures.map((feat: any, i: number) => {
             return (
               <Fragment key={feat.title}>
-                <tr className="divide-border" key={i}>
+                <tr className="divide-border md:text-lg text-sm" key={i}>
                   <th
-                    className={`text-foreground flex items-center px-6 py-5 last:pb-24 text-left text-xs font-normal `}
+                    className={`text-foreground flex items-center px-6 py-5 last:pb-24 text-left font-normal `}
                     scope="row"
                   >
-                    <span>{feat.title}</span>
-                    {feat.tooltips?.main && (
-                      <span
-                        className="text-muted hover:text-foreground ml-2 cursor-pointer transition-colors"
-                        data-tip={feat.tooltips.main}
-                      >
-                        <HelpCircle size={14} strokeWidth={2} />
-                      </span>
-                    )}
+                    {feat.title}
                   </th>
 
                   {Object.entries(feat.plans).map((entry: any, i) => {
@@ -107,7 +68,7 @@ export const PricingTable = (props: any) => {
                             <IconPricingMinus plan={planValue} />
                           </div>
                         ) : (
-                          <div className="text-foreground text-xs flex flex-col justify-center">
+                          <div className="text-foreground flex flex-col justify-center">
                             <span className="flex items-center gap-2">
                               {feat.tooltips?.[planName] && (
                                 <span

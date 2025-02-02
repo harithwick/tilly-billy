@@ -27,7 +27,8 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/lib/components/ui/tabs";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Mail, Github } from "lucide-react";
+import { GoogleIcon } from "@/lib/constants/custom-icons";
 import { Alert, AlertDescription } from "@/lib/components/ui/alert";
 import {
   Dialog,
@@ -38,8 +39,11 @@ import {
   DialogTitle,
 } from "@/lib/components/ui/dialog";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
+import { User } from "@supabase/supabase-js";
+import { HTMLAttributes } from "react";
+import { plans } from "@/lib/constants/pricing-plans";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -50,7 +54,19 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
+  const [authMethods, setAuthMethods] = useState<{
+    email?: boolean;
+    google?: boolean;
+    github?: boolean;
+  }>({});
+  const [currentSubscription, setCurrentSubscription] = useState<string | null>(
+    null
+  );
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Get tab from URL or default to 'profile'
+  const defaultTab = searchParams.get("tab") || "profile";
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -69,6 +85,32 @@ export default function ProfilePage() {
         }
         const data = await response.json();
         form.reset(data);
+
+        // Get auth methods and subscription
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) {
+          const methods: typeof authMethods = {};
+
+          // Check for email/password
+          if (user.email) {
+            methods.email = true;
+          }
+
+          // Check for OAuth providers
+          console.log(user.identities);
+          user.identities?.forEach((identity) => {
+            if (identity.provider === "google") methods.google = true;
+            if (identity.provider === "github") methods.github = true;
+          });
+
+          setAuthMethods(methods);
+
+          // Get subscription from user metadata
+          const subscription = user.user_metadata?.currentSubscription || null;
+          setCurrentSubscription(subscription);
+        }
       } catch (error) {
         toast.error("Failed to load profile");
       }
@@ -80,12 +122,17 @@ export default function ProfilePage() {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
+      const updateData = {
+        fullName: values.fullName,
+        email: values.email,
+      };
+
       const response = await fetch("/api/profile", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(updateData),
       });
 
       if (!response.ok) {
@@ -134,7 +181,7 @@ export default function ProfilePage() {
         </p>
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-4">
+      <Tabs defaultValue={defaultTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="billing">Billing</TabsTrigger>
@@ -186,6 +233,30 @@ export default function ProfilePage() {
                     )}
                   />
 
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-medium">Connected Accounts</h3>
+                    <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+                      {authMethods.email && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Mail className="h-4 w-4" />
+                          <span>Email/Password</span>
+                        </div>
+                      )}
+                      {authMethods.google && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <GoogleIcon />
+                          <span>Google</span>
+                        </div>
+                      )}
+                      {authMethods.github && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Github className="h-4 w-4" />
+                          <span>GitHub</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="flex justify-end">
                     <Button type="submit" disabled={loading}>
                       {loading ? "Saving..." : "Save Changes"}
@@ -202,9 +273,83 @@ export default function ProfilePage() {
             <CardHeader>
               <CardTitle>Billing</CardTitle>
               <CardDescription>
-                Update your billing information.
+                View and manage your subscription.
               </CardDescription>
             </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Current Plan</h3>
+                  <p className="text-2xl font-bold capitalize">
+                    {currentSubscription || "Free"}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {currentSubscription
+                      ? `You are currently on the ${currentSubscription} plan.`
+                      : "You are currently on the free plan."}
+                  </p>
+                </div>
+
+                {currentSubscription && (
+                  <div className="flex flex-col space-y-2">
+                    <Button asChild>
+                      <a
+                        href="https://billing.stripe.com/p/login/test_28o5kq7Ol8Qf3GE288"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Manage Plan
+                      </a>
+                    </Button>
+                  </div>
+                )}
+
+                {!currentSubscription && (
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-medium">Available Plans</h3>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {plans
+                        .filter((plan) => plan.name !== "Free")
+                        .map((plan) => (
+                          <Card key={plan.id} className="flex flex-col">
+                            <CardHeader>
+                              <CardTitle className="flex items-center justify-between">
+                                {plan.name}
+                                {plan.nameBadge && (
+                                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                                    {plan.nameBadge}
+                                  </span>
+                                )}
+                              </CardTitle>
+                              <CardDescription>
+                                {plan.description}
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent className="border-t pt-4 space-y-2">
+                              <Button
+                                className="w-full"
+                                variant="outline"
+                                asChild
+                              >
+                                <a
+                                  href="/pricing"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  View Features
+                                </a>
+                              </Button>
+                              <Button className="w-full">
+                                Upgrade to {plan.name}
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
           </Card>
         </TabsContent>
         <TabsContent value="danger">

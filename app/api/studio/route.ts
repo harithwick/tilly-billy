@@ -16,7 +16,6 @@ export const GET = apiRouteHandler({
         supabase,
         activeOrgUuid!
       );
-      console.log("organizationId", organizationId);
       // Get active clients
       const { data: clients, error: clientsError } = await supabase
         .from("clients")
@@ -72,9 +71,7 @@ export const GET = apiRouteHandler({
 
         invoice = invoiceData;
       }
-      console.log(clients);
-      console.log(products);
-      console.log(invoice);
+
       return NextResponse.json({
         clients,
         products,

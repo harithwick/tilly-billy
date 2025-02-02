@@ -44,6 +44,7 @@ import { supabase } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { HTMLAttributes } from "react";
 import { plans } from "@/lib/constants/pricing-plans";
+import { getStripePortalLink } from "@/lib/constants/stripe";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -225,9 +226,16 @@ export default function ProfilePage() {
                           <Input
                             type="email"
                             placeholder="john@example.com"
+                            disabled={authMethods.google || authMethods.github}
                             {...field}
                           />
                         </FormControl>
+                        {(authMethods.google || authMethods.github) && (
+                          <p className="text-sm text-muted-foreground">
+                            Email cannot be changed when using Google or GitHub
+                            authentication
+                          </p>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
@@ -294,7 +302,7 @@ export default function ProfilePage() {
                   <div className="flex flex-col space-y-2">
                     <Button asChild>
                       <a
-                        href="https://billing.stripe.com/p/login/test_28o5kq7Ol8Qf3GE288"
+                        href={getStripePortalLink(form.getValues("email"))}
                         target="_blank"
                         rel="noopener noreferrer"
                       >

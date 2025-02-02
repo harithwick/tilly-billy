@@ -3,48 +3,42 @@ import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { setActiveOrganization } from "@/lib/utils/organizations";
 import { redirect } from "next/navigation";
+import { apiRouteHandler } from "@/lib/api/route-handler";
 
-export async function GET(request: Request) {
-  try {
-    const supabase = await createSupabaseServerClient(cookies());
-    const { searchParams } = new URL(request.url);
-    let cookieStore = await cookies();
-    let activeOrgUuid = cookieStore.get("activeOrgUuid")?.value;
+export const GET = apiRouteHandler({
+  authRequired: true,
+  orgUuidRequired: false,
+  handler: async (request, { supabaseUser, supabase, activeOrgUuid }) => {
+    try {
+      let cookieStore = await cookies();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+      if (!activeOrgUuid) {
+        await setActiveOrganization(supabase, supabaseUser, cookieStore);
+      }
 
-    if (!user) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      const { data: orgs, error: orgsError } = await supabase
+        .from("view_organization_users")
+        .select("*")
+        .eq("supabase_uid", supabaseUser!.id)
+        .order("created_at", { ascending: false });
+
+      if (orgsError) {
+        throw orgsError;
+      }
+
+      if (orgs && orgs.length === 0) {
+        return NextResponse.redirect(new URL("/create-org", request.url));
+      }
+
+      return NextResponse.json({
+        organizations: orgs,
+      });
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+      return NextResponse.json(
+        { error: "Internal server error" },
+        { status: 500 }
+      );
     }
-
-    if (!activeOrgUuid) {
-      await setActiveOrganization(supabase, user, cookieStore);
-    }
-
-    const { data: orgs, error: orgsError } = await supabase
-      .from("view_organization_users")
-      .select("*")
-      .eq("supabase_uid", user.id)
-      .order("created_at", { ascending: false });
-
-    if (orgsError) {
-      throw orgsError;
-    }
-
-    if (orgs && orgs.length === 0) {
-      return NextResponse.redirect(new URL("/create-org", request.url));
-    }
-
-    return NextResponse.json({
-      organizations: orgs,
-    });
-  } catch (error) {
-    console.error("Error fetching dashboard data:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
+  },
+});

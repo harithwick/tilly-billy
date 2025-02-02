@@ -10,13 +10,14 @@ import { apiRouteHandler } from "@/lib/api/route-handler";
 export const GET = apiRouteHandler({
   authRequired: true,
   orgUuidRequired: true,
-  handler: async (request: Request, { user, supabase, activeOrgUuid }) => {
+  handler: async (
+    request: Request,
+    { supabaseUser, supabase, activeOrgUuid }
+  ) => {
     const organizationId = await getOrganizationIdFromUuid(
       supabase,
       activeOrgUuid!
     );
-
-    throw new Error("test");
 
     const { data: clients, error } = await supabase
       .from("clients")
@@ -43,63 +44,63 @@ export const GET = apiRouteHandler({
 });
 
 export async function POST(request: Request) {
-  try {
-    const supabase = await createSupabaseServerClient(cookies());
+  return apiRouteHandler({
+    authRequired: true,
+    orgUuidRequired: true,
+    handler: async (
+      request: Request,
+      { supabaseUser, supabase, activeOrgUuid }
+    ) => {
+      try {
+        const { ...data } = await request.json();
 
-    // get the active organization UUID from the cookie
-    let cookieStore = await cookies();
-    const activeOrgUuid = cookieStore.get("activeOrgUuid")?.value;
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+        const organizationId = await getOrganizationIdFromUuid(
+          supabase,
+          activeOrgUuid!
+        );
 
-    if (!user || !activeOrgUuid) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-    const { ...data } = await request.json();
+        // get the user id from the user object
+        const userId = await getUserIdFromSupabaseId(
+          supabase,
+          supabaseUser!.id
+        );
 
-    const organizationId = await getOrganizationIdFromUuid(
-      supabase,
-      activeOrgUuid
-    );
+        console.log(data);
 
-    // get the user id from the user object
-    const userId = await getUserIdFromSupabaseId(supabase, user.id);
+        const { data: client, error } = await supabase
+          .from("clients")
+          .insert([
+            {
+              org_id: organizationId,
+              name: data.name,
+              email: data.email,
+              company_name: data.company || null,
+              phone: data.phone || null,
+              website: data.website || null,
+              tax_number: data.vatNumber || null,
+              status: data.status || "active",
+              created_by: userId,
+            },
+          ])
+          .select()
+          .single();
 
-    console.log(data);
+        if (error) {
+          console.error("Error creating client:", error);
+          return NextResponse.json(
+            { error: "Failed to create client" },
+            { status: 500 }
+          );
+        }
 
-    const { data: client, error } = await supabase
-      .from("clients")
-      .insert([
-        {
-          org_id: organizationId,
-          name: data.name,
-          email: data.email,
-          company_name: data.company || null,
-          phone: data.phone || null,
-          website: data.website || null,
-          tax_number: data.vatNumber || null,
-          status: data.status || "active",
-          created_by: userId,
-        },
-      ])
-      .select()
-      .single();
-
-    if (error) {
-      console.error("Error creating client:", error);
-      return NextResponse.json(
-        { error: "Failed to create client" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json(client);
-  } catch (error) {
-    console.error("Error creating client:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
+        return NextResponse.json(client);
+      } catch (error) {
+        console.error("Error creating client:", error);
+        return NextResponse.json(
+          { error: "Internal server error" },
+          { status: 500 }
+        );
+      }
+    },
+  });
 }

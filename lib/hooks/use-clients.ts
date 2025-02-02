@@ -15,7 +15,7 @@ export function useClients() {
       try {
         setLoading(true);
         const responseData = await fetch("/api/dashboard/clients", {
-          cache: "force-cache",
+          cache: "no-cache",
         });
 
         if (!responseData.ok) {

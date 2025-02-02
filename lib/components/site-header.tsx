@@ -1,13 +1,19 @@
 import Link from "next/link";
 import { Button } from "@/lib/components/ui/button";
 import { Code2, Github } from "lucide-react";
+import { Pacifico } from "next/font/google";
+
+const pacifico = Pacifico({
+  subsets: ["latin"],
+  weight: ["400"],
+});
 
 export function SiteHeader() {
   return (
     <header className="border-b z-100">
       <div className="container flex h-16 mx-auto items-center justify-between px-4">
         <div className="flex items-center gap-2">
-          <span className="text-xl font-thin">Tilly Billy</span>
+          <span className={`text-xl ${pacifico.className}`}>Tilly Billy</span>
         </div>
         <nav className="flex items-center gap-4">
           <Link href="/dashboard">

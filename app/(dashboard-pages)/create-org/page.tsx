@@ -35,6 +35,12 @@ import { currencies } from "@/lib/constants/currencies";
 import { timezoneList } from "@/lib/constants/timezones";
 import { Code2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Pacifico } from "next/font/google";
+
+const pacifico = Pacifico({
+  subsets: ["latin"],
+  weight: ["400"],
+});
 
 const formSchema = z.object({
   name: z.string().min(2, "Company name must be at least 2 characters"),
@@ -91,7 +97,9 @@ export default function CreateOrgPage() {
       <header className="sticky top-0 z-50 border-b bg-background">
         <div className="container flex h-16 items-center justify-between px-4 mx-auto">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-thin">Tilly Billy</span>
+            <span className={`text-xl font-thin ${pacifico.className}`}>
+              Tilly Billy
+            </span>
           </div>
           <div className="flex items-center gap-4"></div>
         </div>

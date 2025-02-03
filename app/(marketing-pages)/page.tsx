@@ -9,7 +9,6 @@ import {
 } from "@/lib/components/marketing/apple-cards-carousel";
 import { Hero } from "@/lib/components/marketing/hero";
 import { BackgroundBeams } from "@/lib/components/ui/background-beams";
-import { SiteHeader } from "@/components/ui/site-header";
 import CallToAction1 from "@/lib/components/marketing/call-to-action-1";
 import FeaturesSectionDemo from "@/lib/components/marketing/features-section-demo-3";
 

@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { SiteHeader } from "@/components/ui/site-header";
 import Footer from "@/lib/components/marketing/footer";
-
-const inter = Inter({ subsets: ["latin"] });
+import { SiteHeader } from "@/lib/components/marketing/site-header";
 
 export const metadata: Metadata = {
   title: "Tilly Billy",

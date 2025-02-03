@@ -1,6 +1,16 @@
 "use client";
 
-import { Book, Menu, Sunset, Trees, Zap } from "lucide-react";
+import {
+  Book,
+  Briefcase,
+  Code,
+  Hammer,
+  Menu,
+  Sunset,
+  Trees,
+  UserRoundPlus,
+  Zap,
+} from "lucide-react";
 
 import {
   Accordion,
@@ -123,8 +133,38 @@ const SiteHeader = ({
       ],
     },
     {
-      title: "Pricing",
+      title: "Use Cases",
       url: "#",
+      items: [
+        {
+          title: "Small Business",
+          description: "Manage your small business with Tilly Billy",
+          icon: <Briefcase className="size-5 shrink-0 mt-2" />,
+          url: "#",
+        },
+        {
+          title: "Freelancers & Self-Employed Individuals",
+          description: "Manage your freelancing business with Tilly Billy",
+          icon: <UserRoundPlus className="size-5 shrink-0 mt-1" />,
+          url: "#",
+        },
+        {
+          title: "Construction & Trades",
+          description: "Manage your construction business with Tilly Billy",
+          icon: <Hammer className="size-5 shrink-0 mt-1" />,
+          url: "#",
+        },
+        {
+          title: "Developers & Tech Startups",
+          description: "Manage your tech startup with Tilly Billy",
+          icon: <Code className="size-5 shrink-0 mt-1" />,
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Pricing",
+      url: "/pricing",
     },
     {
       title: "Blog",

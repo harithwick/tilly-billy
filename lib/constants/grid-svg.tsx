@@ -1,6 +1,6 @@
-export const GridSVG = () => (
+export const GridSVG = ({ className }: { className?: string }) => (
   <svg
-    className="z-1 pointer-events-none absolute inset-[unset] left-1/2 top-0 w-[1200px] -translate-x-1/2 text-neutral-300 [mask-image:radial-gradient(black,transparent)] max-sm:opacity-70"
+    className={`z-1 pointer-events-none absolute inset-[unset] left-1/2 top-0 w-[1200px] -translate-x-1/2 text-neutral-300 [mask-image:radial-gradient(black,transparent)] max-sm:opacity-70 ${className}`}
     width="100%"
     height="100%"
   >
@@ -17,7 +17,7 @@ export const GridSVG = () => (
           d="M 80 0 L 0 0 0 80"
           fill="transparent"
           stroke="currentColor"
-          stroke-width="1"
+          strokeWidth="1"
         ></path>
       </pattern>
     </defs>

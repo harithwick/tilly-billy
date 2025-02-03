@@ -40,6 +40,15 @@ import { useRefreshStore } from "@/lib/stores/use-refresh-store";
 import Link from "next/link";
 import { Plus, FileText, DollarSign, Clock } from "lucide-react";
 import { EmptyState } from "@/lib/components/empty-state";
+import { ChevronRight, Home } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/lib/components/ui/breadcrumb";
 
 interface PageProps {
   params: {
@@ -112,6 +121,28 @@ export default function ClientPage({ params }: PageProps) {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/dashboard">
+              <Home className="h-4 w-4" />
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator>
+            <ChevronRight className="h-4 w-4" />
+          </BreadcrumbSeparator>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/dashboard/clients">Clients</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator>
+            <ChevronRight className="h-4 w-4" />
+          </BreadcrumbSeparator>
+          <BreadcrumbItem>
+            <BreadcrumbPage>{client.name}</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       <Card>
         <CardHeader>
           <CardTitle>{client.name}</CardTitle>

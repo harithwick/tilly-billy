@@ -14,6 +14,8 @@ import Link from "next/link";
 import { RevenueChart } from "@/lib/components/dashboard/revenue-chart";
 import { ClientGrowth } from "@/lib/components/dashboard/client-growth";
 import { formatCurrency } from "@/lib/utils";
+import { Chart1 } from "@/lib/components/charts/chart1";
+import { Chart2 } from "@/lib/components/charts/chart2";
 
 export default function DashboardPage() {
   const { metrics, loading, error } = useDashboardMetrics();
@@ -43,6 +45,8 @@ export default function DashboardPage() {
           </Link>
         </Button>
       </div>
+      <Chart1 />
+      <Chart2 />
       {/* <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

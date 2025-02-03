@@ -1,78 +1,326 @@
 "use client";
-import { useState } from "react";
-import { HoveredLink, Menu, MenuItem, ProductItem } from "../ui/navbar-menu";
-import { cn } from "@/lib/utils";
 
-export default function SiteHeader({ className }: { className?: string }) {
-  const [active, setActive] = useState<string | null>(null);
-  return (
-    <div
-      className={cn("fixed top-4 inset-x-0 max-w-2xl mx-auto z-50", className)}
-    >
-      <Menu setActive={setActive}>
-        <MenuItem
-          setActive={setActive}
-          active={active}
-          item="Dashboard"
-          link="/dashboard"
-        ></MenuItem>
-        <MenuItem
-          setActive={setActive}
-          active={active}
-          item="Pricing"
-          link="/pricing"
-        ></MenuItem>
-        <MenuItem
-          setActive={setActive}
-          active={active}
-          item="Blog"
-          link="/blog"
-        ></MenuItem>
-        {/* <MenuItem setActive={setActive} active={active} item="Services">
-          <div className="flex flex-col space-y-4 text-sm">
-            <HoveredLink href="/web-dev">Web Development</HoveredLink>
-            <HoveredLink href="/interface-design">Interface Design</HoveredLink>
-            <HoveredLink href="/seo">Search Engine Optimization</HoveredLink>
-            <HoveredLink href="/branding">Branding</HoveredLink>
-          </div>
-        </MenuItem>
-        <MenuItem setActive={setActive} active={active} item="Products">
-          <div className="  text-sm grid grid-cols-2 gap-10 p-4">
-            <ProductItem
-              title="Algochurn"
-              href="https://algochurn.com"
-              src="https://assets.aceternity.com/demos/algochurn.webp"
-              description="Prepare for tech interviews like never before."
-            />
-            <ProductItem
-              title="Tailwind Master Kit"
-              href="https://tailwindmasterkit.com"
-              src="https://assets.aceternity.com/demos/tailwindmasterkit.webp"
-              description="Production ready Tailwind css components for your next project"
-            />
-            <ProductItem
-              title="Moonbeam"
-              href="https://gomoonbeam.com"
-              src="https://assets.aceternity.com/demos/Screenshot+2024-02-21+at+11.51.31%E2%80%AFPM.png"
-              description="Never write from scratch again. Go from idea to blog in minutes."
-            />
-            <ProductItem
-              title="Rogue"
-              href="https://userogue.com"
-              src="https://assets.aceternity.com/demos/Screenshot+2024-02-21+at+11.47.07%E2%80%AFPM.png"
-              description="Respond to government RFPs, RFIs and RFQs 10x faster using AI"
-            />
-          </div>
-        </MenuItem>
-        <MenuItem setActive={setActive} active={active} item="Pricing">
-          <div className="flex flex-col space-y-4 text-sm">
-            <HoveredLink href="/hobby">Hobby</HoveredLink>
-            <HoveredLink href="/individual">Individual</HoveredLink>
-            <HoveredLink href="/team">Team</HoveredLink>
-            <HoveredLink href="/enterprise">Enterprise</HoveredLink>
-          </div>
-        </MenuItem> */}
-      </Menu>
-    </div>
-  );
+import { Book, Menu, Sunset, Trees, Zap } from "lucide-react";
+
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/lib/components/ui/accordion";
+import { Button } from "@/lib/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/lib/components/ui/navigation-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/lib/components/ui/sheet";
+import Link from "next/link";
+import { Pacifico } from "next/font/google";
+
+const pacifico = Pacifico({
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
+interface MenuItem {
+  title: string;
+  url: string;
+  description?: string;
+  icon?: JSX.Element;
+  items?: MenuItem[];
 }
+
+interface Navbar1Props {
+  menu?: MenuItem[];
+  mobileExtraLinks?: {
+    name: string;
+    url: string;
+  }[];
+  auth?: {
+    login: {
+      text: string;
+      url: string;
+    };
+    signup: {
+      text: string;
+      url: string;
+    };
+  };
+}
+
+const SiteHeader = ({
+  menu = [
+    { title: "Home", url: "#" },
+    {
+      title: "Products",
+      url: "#",
+      items: [
+        {
+          title: "Blog",
+          description: "The latest industry news, updates, and info",
+          icon: <Book className="size-5 shrink-0" />,
+          url: "#",
+        },
+        {
+          title: "Company",
+          description: "Our mission is to innovate and empower the world",
+          icon: <Trees className="size-5 shrink-0" />,
+          url: "#",
+        },
+        {
+          title: "Careers",
+          description: "Browse job listing and discover our workspace",
+          icon: <Sunset className="size-5 shrink-0" />,
+          url: "#",
+        },
+        {
+          title: "Support",
+          description:
+            "Get in touch with our support team or visit our community forums",
+          icon: <Zap className="size-5 shrink-0" />,
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Resources",
+      url: "#",
+      items: [
+        {
+          title: "Help Center",
+          description: "Get all the answers you need right here",
+          icon: <Zap className="size-5 shrink-0" />,
+          url: "#",
+        },
+        {
+          title: "Contact Us",
+          description: "We are here to help you with any questions you have",
+          icon: <Sunset className="size-5 shrink-0" />,
+          url: "#",
+        },
+        {
+          title: "Status",
+          description: "Check the current status of our services and APIs",
+          icon: <Trees className="size-5 shrink-0" />,
+          url: "#",
+        },
+        {
+          title: "Terms of Service",
+          description: "Our terms and conditions for using our services",
+          icon: <Book className="size-5 shrink-0" />,
+          url: "#",
+        },
+      ],
+    },
+    {
+      title: "Pricing",
+      url: "#",
+    },
+    {
+      title: "Blog",
+      url: "#",
+    },
+  ],
+  mobileExtraLinks = [
+    { name: "Press", url: "#" },
+    { name: "Contact", url: "#" },
+    { name: "Imprint", url: "#" },
+    { name: "Sitemap", url: "#" },
+  ],
+  auth = {
+    login: { text: "Log in", url: "#" },
+    signup: { text: "Sign up", url: "#" },
+  },
+}: Navbar1Props) => {
+  return (
+    // the nav bar is fixed to the top of the page
+    <section className="py-4 bg- opacity-100 border-b w-full">
+      <div className="container mx-auto px-4">
+        <nav className="hidden justify-between lg:flex">
+          <div className="flex items-center gap-6">
+            <a href="/" className="flex items-center gap-2">
+              <span className={`text-xl ${pacifico.className}`}>
+                Tilly Billy
+              </span>
+            </a>
+            <div className="flex items-center">
+              <NavigationMenu>
+                <NavigationMenuList>
+                  {menu.map((item) => renderMenuItem(item))}
+                </NavigationMenuList>
+              </NavigationMenu>
+            </div>
+          </div>
+          <div className="flex gap-2 z-1000">
+            <NavigationMenu>
+              <a
+                className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-accent-foreground"
+                href={"/login"}
+              >
+                Login
+              </a>
+              <a
+                className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-accent-foreground"
+                href={"/signup"}
+              >
+                Signup
+              </a>
+            </NavigationMenu>
+          </div>
+        </nav>
+        <div className="block lg:hidden">
+          <div className="flex items-center justify-between">
+            <a href="/" className="flex items-center gap-2">
+              <span className={`text-xl ${pacifico.className}`}>
+                Tilly Billy
+              </span>
+            </a>
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Menu className="size-4" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent className="overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle>
+                    <a href="/" className="flex items-center gap-2">
+                      <span className={`text-xl ${pacifico.className}`}>
+                        Tilly Billy
+                      </span>
+                    </a>
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="my-6 flex flex-col gap-6">
+                  <Accordion
+                    type="single"
+                    collapsible
+                    className="flex w-full flex-col gap-4"
+                  >
+                    {menu.map((item) => renderMobileMenuItem(item))}
+                  </Accordion>
+                  <div className="border-t py-4">
+                    <div className="grid grid-cols-2 justify-start">
+                      {mobileExtraLinks.map((link, idx) => (
+                        <a
+                          key={idx}
+                          className="inline-flex h-10 items-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-accent-foreground"
+                          href={link.url}
+                        >
+                          {link.name}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-3">
+                    <Button asChild variant="outline">
+                      <a href={auth.login.url}>{auth.login.text}</a>
+                    </Button>
+                    <Button asChild>
+                      <a href={auth.signup.url}>{auth.signup.text}</a>
+                    </Button>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const renderMenuItem = (item: MenuItem) => {
+  if (item.items) {
+    return (
+      <NavigationMenuItem key={item.title} className="text-muted-foreground">
+        <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
+        <NavigationMenuContent>
+          <ul className="w-80 p-3">
+            <NavigationMenuLink>
+              {item.items.map((subItem) => (
+                <li key={subItem.title}>
+                  <a
+                    className="flex select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-muted hover:text-accent-foreground"
+                    href={subItem.url}
+                  >
+                    {subItem.icon}
+                    <div>
+                      <div className="text-sm font-semibold">
+                        {subItem.title}
+                      </div>
+                      {subItem.description && (
+                        <p className="text-sm leading-snug text-muted-foreground">
+                          {subItem.description}
+                        </p>
+                      )}
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </NavigationMenuLink>
+          </ul>
+        </NavigationMenuContent>
+      </NavigationMenuItem>
+    );
+  }
+
+  return (
+    <a
+      key={item.title}
+      className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-accent-foreground"
+      href={item.url}
+    >
+      {item.title}
+    </a>
+  );
+};
+
+const renderMobileMenuItem = (item: MenuItem) => {
+  if (item.items) {
+    return (
+      <AccordionItem key={item.title} value={item.title} className="border-b-0">
+        <AccordionTrigger className="py-0 font-semibold hover:no-underline">
+          {item.title}
+        </AccordionTrigger>
+        <AccordionContent className="mt-2">
+          {item.items.map((subItem) => (
+            <a
+              key={subItem.title}
+              className="flex select-none gap-4 rounded-md p-3 leading-none outline-none transition-colors hover:bg-muted hover:text-accent-foreground"
+              href={subItem.url}
+            >
+              {subItem.icon}
+              <div>
+                <div className="text-sm font-semibold">{subItem.title}</div>
+                {subItem.description && (
+                  <p className="text-sm leading-snug text-muted-foreground">
+                    {subItem.description}
+                  </p>
+                )}
+              </div>
+            </a>
+          ))}
+        </AccordionContent>
+      </AccordionItem>
+    );
+  }
+
+  return (
+    <a key={item.title} href={item.url} className="font-semibold">
+      {item.title}
+    </a>
+  );
+};
+
+export { SiteHeader };

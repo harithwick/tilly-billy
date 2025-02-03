@@ -12,7 +12,7 @@ export default function StudioLayout({
 }) {
   return (
     <div className="flex min-h-screen flex-col">
-      <main className="flex-1 bg-gray-50">{children}</main>
+      <main className="flex-1">{children}</main>
     </div>
   );
 }

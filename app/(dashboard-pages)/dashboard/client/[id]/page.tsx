@@ -9,18 +9,37 @@ import {
   CardTitle,
 } from "@/lib/components/ui/card";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/lib/components/ui/tabs";
-import {
   Avatar,
   AvatarFallback,
   AvatarImage,
 } from "@/lib/components/ui/avatar";
 import { LoadingState } from "@/lib/components/loading-state";
 import { Client, Invoice } from "@/lib/types";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "@/lib/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/lib/components/ui/dropdown-menu";
+import { Button } from "@/lib/components/ui/button";
+import { MoreVertical } from "lucide-react";
+import { formatCurrency, formatDate } from "@/lib/utils";
+import { capitalizeWords } from "@/lib/utils";
+import { ConfirmDelete } from "@/lib/components/confirm-delete";
+import { deleteInvoice } from "@/lib/api/invoices";
+import { toast } from "sonner";
+import { useRefreshStore } from "@/lib/stores/use-refresh-store";
+import Link from "next/link";
+import { Plus, FileText, DollarSign, Clock } from "lucide-react";
+import { EmptyState } from "@/lib/components/empty-state";
 
 interface PageProps {
   params: {
@@ -29,20 +48,36 @@ interface PageProps {
 }
 
 export default function ClientPage({ params }: PageProps) {
+  const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
   const [client, setClient] = useState<Client | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
-    // let clientId = params.id;
+    const fetchClientData = async () => {
+      try {
+        let paramResolved = await params;
+        let id = paramResolved.id;
+        const response = await fetch(`/api/dashboard/client/${id}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch client data");
+        }
+        const data = await response.json();
+        console.log("data", data);
+        setClient(data.client);
+        setInvoices(data.invoices);
+      } catch (error) {
+        console.error("Error fetching client data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    try {
-      //TODO: fetch client data
-    } catch (error) {
-      console.error("Error fetching client data:", error);
-    } finally {
-      setLoading(false);
-    }
+    fetchClientData();
   }, []);
 
   if (loading) {
@@ -53,105 +88,203 @@ export default function ClientPage({ params }: PageProps) {
     return <div>Client not found</div>;
   }
 
+  const handleDeleteClick = async (invoiceId: number) => {
+    setSelectedInvoiceId(invoiceId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedInvoiceId) return;
+
+    try {
+      await deleteInvoice(selectedInvoiceId.toString());
+      toast.success("Invoice deleted successfully");
+      triggerRefresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete invoice"
+      );
+    } finally {
+      setDeleteDialogOpen(false);
+      setSelectedInvoiceId(null);
+    }
+  };
+
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center space-x-4">
-        <Avatar className="h-16 w-16">
-          <AvatarImage src={`https://avatar.vercel.sh/${client.name}`} />
-          <AvatarFallback>
-            {client.name.substring(0, 2).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+      <Card>
+        <CardHeader>
+          <CardTitle>{client.name}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            {client.company && (
+              <div>
+                <p className="font-semibold">Company</p>
+                <p>{client.company}</p>
+              </div>
+            )}
+            {client.phone && (
+              <div>
+                <p className="font-semibold">Phone</p>
+                <p>{client.phone}</p>
+              </div>
+            )}
+            {client.email && (
+              <div>
+                <p className="font-semibold">Address</p>
+                <p>{client.email}</p>
+              </div>
+            )}
+            <div>
+              <p className="font-semibold">Client Since</p>
+              <p>{new Date(client.createdAt).toLocaleDateString()}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">{client.name}</h1>
-          <p className="text-gray-500">{client.email}</p>
+          <h2 className="text-3xl font-bold tracking-tight">Invoices</h2>
         </div>
+        <Button asChild>
+          <Link href="/studio">
+            <Plus className="mr-2 h-4 w-4" />
+            Create Invoice
+          </Link>
+        </Button>
       </div>
 
-      <Tabs defaultValue="details" className="w-full">
-        <TabsList>
-          <TabsTrigger value="details">Client Details</TabsTrigger>
-          <TabsTrigger value="invoices">Invoices</TabsTrigger>
-        </TabsList>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Invoices
+            </CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{invoices.length}</div>
+            <p className="text-xs text-muted-foreground">
+              {
+                invoices.filter(
+                  (inv) =>
+                    new Date(inv.createdAt).getMonth() === new Date().getMonth()
+                ).length
+              }{" "}
+              created this month
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Amount</CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {formatCurrency(
+                invoices.reduce((sum, inv) => sum + inv.total, 0)
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              From {invoices.length} invoices
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Pending Payment
+            </CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {formatCurrency(
+                invoices
+                  .filter((inv) => inv.status === "pending")
+                  .reduce((sum, inv) => sum + inv.total, 0)
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {invoices.filter((inv) => inv.status === "pending").length}{" "}
+              invoices pending
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
-        <TabsContent value="details">
-          <Card>
-            <CardHeader>
-              <CardTitle>Client Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {client.company && (
-                <div>
-                  <p className="font-semibold">Company</p>
-                  <p>{client.company}</p>
-                </div>
-              )}
-              {client.phone && (
-                <div>
-                  <p className="font-semibold">Phone</p>
-                  <p>{client.phone}</p>
-                </div>
-              )}
-              {client.email && (
-                <div>
-                  <p className="font-semibold">Address</p>
-                  <p>{client.email}</p>
-                </div>
-              )}
-              <div>
-                <p className="font-semibold">Client Since</p>
-                <p>{new Date(client.createdAt).toLocaleDateString()}</p>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="invoices">
-          <Card>
-            <CardHeader>
-              <CardTitle>Invoices</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {invoices.length === 0 ? (
-                <p>No invoices found for this client.</p>
-              ) : (
-                <div className="space-y-4">
+      {invoices.length === 0 ? (
+        <EmptyState
+          icon={FileText}
+          title="No invoices yet"
+          description="Create your first invoice to get started."
+          actionLabel="Create Invoice"
+          onAction={() => {}}
+        />
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Invoices</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Invoice #</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="w-[50px]"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
                   {invoices.map((invoice) => (
-                    <div
-                      key={invoice.id}
-                      className="flex items-center justify-between p-4 border rounded-lg"
-                    >
-                      <div>
-                        <p className="font-semibold">#{invoice.id}</p>
-                        <p className="text-sm text-gray-500">
-                          {/* Due: {new Date(invoice.).toLocaleDateString()} */}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold">
-                          {/* ${invoice.amount.toFixed(2)} */}
-                        </p>
-                        <span
-                          className={`text-sm px-2 py-1 rounded-full ${
-                            invoice.status === "paid"
-                              ? "bg-green-100 text-green-800"
-                              : invoice.status === "pending"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {invoice.status.charAt(0).toUpperCase() +
-                            invoice.status.slice(1)}
-                        </span>
-                      </div>
-                    </div>
+                    <TableRow key={invoice.id}>
+                      <TableCell>{invoice.invoiceNumber}</TableCell>
+                      <TableCell>
+                        {formatDate(new Date(invoice.issueDate))}
+                      </TableCell>
+                      <TableCell>{formatCurrency(invoice.total)}</TableCell>
+                      <TableCell>{capitalizeWords(invoice.status)}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>Edit</DropdownMenuItem>
+                            <DropdownMenuItem>View PDF</DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() =>
+                                handleDeleteClick(Number(invoice.id))
+                              }
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <ConfirmDelete
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+      />
     </div>
   );
 }

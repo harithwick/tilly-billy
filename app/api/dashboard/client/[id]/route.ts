@@ -1,60 +1,54 @@
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextResponse, NextRequest } from "next/server";
+import { cookies } from "next/headers";
 import { apiRouteHandler } from "@/lib/api/route-handler";
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  return apiRouteHandler({
-    authRequired: true,
-    orgUuidRequired: true,
-    handler: async (
-      request: Request,
-      { supabaseUser, supabase, activeOrgUuid }
-    ) => {
-      try {
-        let searchParams = new URL(request.url).searchParams;
-        let id = searchParams.get("id");
+export const GET = apiRouteHandler({
+  authRequired: true,
+  orgUuidRequired: true,
+  requiredParams: ["id"],
+  handler: async (
+    request: Request,
+    { supabaseUser, supabase, activeOrgUuid, params }
+  ) => {
+    try {
+      let id = params!.id;
 
-        const { data: client, error } = await supabase
-          .from("clients")
-          .select(
-            `
-        *,
-        invoices (
-          id,
-          status
-        )
-      `
-          )
-          .eq("id", id)
-          .single();
+      const { data: client, error } = await supabase
+        .from("clients")
+        .select("*")
+        .eq("id", id)
+        .single();
 
-        if (error) {
-          return NextResponse.json(
-            { error: "Failed to fetch client" },
-            { status: 500 }
-          );
-        }
-
-        if (!client) {
-          return NextResponse.json(
-            { error: "Client not found" },
-            { status: 404 }
-          );
-        }
-
-        return NextResponse.json(client);
-      } catch (error) {
-        console.error("Error fetching client:", error);
+      if (error) {
         return NextResponse.json(
-          { error: "Internal server error" },
+          { error: "Failed to fetch client" },
           { status: 500 }
         );
       }
-    },
-  });
-}
+
+      if (!client) {
+        return NextResponse.json(
+          { error: "Client not found" },
+          { status: 404 }
+        );
+      }
+
+      const { data: invoices, error: invoicesError } = await supabase
+        .from("invoices")
+        .select("id, status")
+        .eq("client_id", id);
+
+      return NextResponse.json({ client, invoices });
+    } catch (error) {
+      console.error("Error fetching client:", error);
+      return NextResponse.json(
+        { error: "Internal server error" },
+        { status: 500 }
+      );
+    }
+  },
+});
 
 export async function PATCH(
   request: Request,

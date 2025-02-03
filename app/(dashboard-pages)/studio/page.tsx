@@ -103,209 +103,202 @@ function StudioContent() {
   const total = subtotal + tax;
 
   return (
-    <div>
-      <Header />
-      <div className="mx-auto max-w-[850px] p-8 mt-8 bg-white rounded-lg shadow-lg">
-        <div className="flex justify-between items-start mb-12">
+    <div className="container mx-auto py-6">
+      <div className="flex items-center mb-6">
+        <Link
+          href="/invoices"
+          className="flex items-center text-muted-foreground hover:text-primary"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Invoices
+        </Link>
+        <h1 className="text-2xl font-semibold ml-6">Create Invoice</h1>
+      </div>
+
+      <div className="grid grid-cols-2 gap-8">
+        {/* Left side - Form */}
+        <div className="space-y-6">
           <div>
-            <Input
-              className="text-3xl font-bold border-0 p-0 max-w-[300px]"
-              placeholder="Your Company"
-            />
-            <Textarea
-              className="text-gray-600 mt-2 border-0 p-0 resize-none"
-              placeholder="123 Business Street&#10;City, State 12345&#10;contact@company.com"
-              rows={3}
-            />
-          </div>
-          <div className="text-right">
-            <Input
-              className="text-4xl font-bold border-0 p-0 max-w-[300px] placeholder:text-right mb-4"
-              placeholder="INVOICE"
-            />
-            <div className="space-y-1">
-              <div className="flex items-center justify-end gap-2">
-                <span className="text-gray-600">Invoice #:</span>
-                <Input className="w-32 text-right" placeholder="INV-001" />
-              </div>
-              <div className="flex items-center justify-end gap-2">
-                <span className="text-gray-600">Date:</span>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-32 justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="end">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
+            <h2 className="text-lg font-medium mb-4">Invoice Details</h2>
+
+            {/* People Section */}
+            <div className="mb-6">
+              <Label className="mb-2">People</Label>
+              <ClientSelector
+                clients={data?.clients || []}
+                onClientSelect={setSelectedClient}
+              />
+            </div>
+
+            {/* Subject */}
+            <div className="mb-6">
+              <Label htmlFor="subject">Subject</Label>
+              <Input id="subject" placeholder="Service per June 2023" />
+            </div>
+
+            {/* Due Date */}
+            <div className="mb-6">
+              <Label>Due Date</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Currency */}
+            <div className="mb-6">
+              <Label>Currency</Label>
+              <select className="w-full p-2 border rounded-md">
+                <option value="IDR">IDR - Indonesian Rupiah</option>
+                <option value="USD">USD - US Dollar</option>
+                <option value="EUR">EUR - Euro</option>
+              </select>
             </div>
           </div>
-        </div>
 
-        {/* Bill To Section */}
-        <div className="mb-12">
-          <h2 className="text-gray-600 font-medium mb-2">Bill To:</h2>
-          <ClientSelector
-            clients={data?.clients || []}
-            onClientSelect={(client) => {
-              setSelectedClient(client);
-            }}
-          />
-          {selectedClient && (
-            <div className="mt-4 text-gray-600">
-              <p className="font-medium">{selectedClient.company}</p>
-              <p className="whitespace-pre-line">{selectedClient.address}</p>
-              <p>{selectedClient.email}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Items Table */}
-        <div className="mb-8">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4">Description</th>
-                <th className="text-right py-3 px-4">Quantity</th>
-                <th className="text-right py-3 px-4">Rate</th>
-                <th className="text-right py-3 px-4">Amount</th>
-                <th className="w-10"></th>
-              </tr>
-            </thead>
-            <tbody>
+          {/* Products Card */}
+          <Card className="p-6">
+            <h2 className="text-lg font-medium mb-4">Product</h2>
+            <div className="space-y-4">
               {items.map((item, index) => (
-                <tr key={index} className="border-b border-gray-100">
-                  <td className="py-3 px-4">
+                <div key={index} className="flex gap-4 items-start">
+                  <div className="flex-1">
                     <ProductSelector
                       products={data?.products || []}
                       onProductSelect={(product) => {
                         const newItems = [...items];
-                        // newItems[index] = {
-                        //   description: product.name,
-                        //   quantity: 1,
-                        //   rate: product.price,
-                        //   amount: product.price,
-                        // };
-                        setItems(newItems);
-                      }}
-                    />
-                  </td>
-                  <td className="py-3 px-4">
-                    <Input
-                      type="number"
-                      className="w-24 text-right"
-                      value={item.quantity}
-                      onChange={(e) => {
-                        const quantity = Number(e.target.value);
-                        const newItems = [...items];
                         newItems[index] = {
                           ...item,
-                          quantity,
-                          amount: quantity * item.rate,
+                          description: product.name,
+                          rate: product.price || 0,
+                          amount: (product.price || 0) * item.quantity,
                         };
                         setItems(newItems);
                       }}
                     />
-                  </td>
-                  <td className="py-3 px-4">
-                    <Input
-                      type="number"
-                      className="w-24 text-right"
-                      value={item.rate}
-                      onChange={(e) => {
-                        const rate = Number(e.target.value);
-                        const newItems = [...items];
-                        newItems[index] = {
-                          ...item,
-                          rate,
-                          amount: item.quantity * rate,
-                        };
-                        setItems(newItems);
-                      }}
-                    />
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="w-24 text-right">
-                      ${item.amount.toFixed(2)}
-                    </div>
-                  </td>
-                  <td className="py-3 px-4">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeItem(index)}
-                    >
-                      <Trash2 className="h-4 w-4 text-gray-400" />
-                    </Button>
-                  </td>
-                </tr>
+                  </div>
+                  <Input
+                    type="number"
+                    className="w-20"
+                    value={item.quantity}
+                    onChange={(e) => {
+                      const quantity = Number(e.target.value);
+                      const newItems = [...items];
+                      newItems[index] = {
+                        ...item,
+                        quantity,
+                        amount: quantity * item.rate,
+                      };
+                      setItems(newItems);
+                    }}
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeItem(index)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               ))}
-            </tbody>
-          </table>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={addItem}
-            className="mt-4"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Item
-          </Button>
+              <Button variant="outline" className="w-full" onClick={addItem}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add New Line
+              </Button>
+            </div>
+          </Card>
         </div>
 
-        {/* Totals */}
-        <div className="flex justify-end mb-8">
-          <div className="w-80">
-            <div className="flex justify-between py-2">
-              <span className="text-gray-600">Subtotal:</span>
-              <span className="font-medium">${subtotal.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between py-2">
-              <span className="text-gray-600">Tax (10%):</span>
-              <span className="font-medium">${tax.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between py-2 border-t border-gray-200">
-              <span className="text-gray-800 font-bold">Total:</span>
-              <span className="text-gray-800 font-bold">
-                ${total.toFixed(2)}
-              </span>
-            </div>
-          </div>
-        </div>
+        {/* Right side - Preview */}
         <div>
-          <Label className="text-gray-600 mb-2">Notes:</Label>
-          <Textarea
-            placeholder="Thank you for your business!"
-            className="w-full resize-none"
-            rows={3}
-          />
+          <Card className="p-6 bg-gray-50 border-none">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-medium">Preview</h2>
+              <div className="flex gap-2">
+                <Button variant="outline">
+                  <span className="mr-2">PDF</span>
+                </Button>
+                <Button variant="outline">
+                  <span className="mr-2">Email</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* Invoice Preview Content */}
+            <div className="border rounded-lg p-6">
+              <div className="mb-6">
+                <h3 className="text-lg font-bold mb-2">INV2398-08-087</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Due date</p>
+                    <p>{date ? format(date, "d MMMM yyyy") : "Not set"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Subject</p>
+                    <p>Service per June 2023</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Items Table */}
+              <table className="w-full mb-6">
+                <thead>
+                  <tr className="text-left border-b">
+                    <th className="py-2">DESCRIPTION</th>
+                    <th className="py-2 text-right">QTY</th>
+                    <th className="py-2 text-right">UNIT PRICE</th>
+                    <th className="py-2 text-right">AMOUNT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {items.map((item, index) => (
+                    <tr key={index}>
+                      <td className="py-2">{item.description}</td>
+                      <td className="py-2 text-right">{item.quantity}</td>
+                      <td className="py-2 text-right">{item.rate}</td>
+                      <td className="py-2 text-right">{item.amount}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Totals */}
+              <div className="border-t pt-4">
+                <div className="flex justify-between mb-2">
+                  <span>Subtotal</span>
+                  <span>{subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between mb-2">
+                  <span>Tax (10%)</span>
+                  <span>{tax.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between font-bold">
+                  <span>Total</span>
+                  <span>{total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
-      <ConfirmationModal
-        open={confirmOpen}
-        onOpenChange={setConfirmOpen}
-        onConfirm={handleConfirm}
-        title="Are you sure?"
-        description="This action cannot be undone."
-        actionLabel="Delete"
-        variant="destructive"
-        loading={loadingModal}
-      />
     </div>
   );
 }

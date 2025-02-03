@@ -9,10 +9,9 @@ type ApiHandler = (
     supabaseUser: User | null;
     supabase: any;
     activeOrgUuid: string | null;
-    params?: { [key: string]: string };
+    params: { [key: string]: string } | null;
   }
 ) => Promise<NextResponse> | NextResponse;
-
 export function apiRouteHandler({
   authRequired = true,
   orgUuidRequired = true,
@@ -32,7 +31,6 @@ export function apiRouteHandler({
       const supabase = await createSupabaseServerClient(cookies());
 
       let cookieStore = await cookies();
-
       const activeOrgUuid = cookieStore.has("activeOrgUuid")
         ? cookieStore.get("activeOrgUuid")!.value
         : null;
@@ -41,11 +39,21 @@ export function apiRouteHandler({
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
 
+      let resolvedParams: { [key: string]: string } | null =
+        context && context.params ? await context!.params : null;
+
       if (requiredParams.length > 0) {
+        if (!resolvedParams) {
+          return NextResponse.json(
+            { error: "Missing required parameters" },
+            { status: 400 }
+          );
+        }
+
         for (const param of requiredParams) {
-          if (!context?.params[param]) {
+          if (!resolvedParams[param]) {
             return NextResponse.json(
-              { error: "Missing required parameter" },
+              { error: `Missing required parameter: ${param}` },
               { status: 400 }
             );
           }
@@ -53,7 +61,6 @@ export function apiRouteHandler({
       }
 
       let user: User | null = null;
-
       if (authRequired) {
         const {
           data: { user: authUser },
@@ -66,12 +73,22 @@ export function apiRouteHandler({
         user = authUser;
       }
 
-      return await handler(request, {
+      const response = await handler(request, {
         supabaseUser: user,
         supabase,
         activeOrgUuid,
-        params: context?.params,
+        params: resolvedParams,
       });
+
+      // Ensure a response is always returned
+      if (!response) {
+        return NextResponse.json(
+          { error: "Handler did not return a response" },
+          { status: 500 }
+        );
+      }
+
+      return response;
     } catch (error) {
       console.error("API Error:", error);
       return NextResponse.json(

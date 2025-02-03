@@ -54,6 +54,7 @@ export async function loginWithEmail(
       }
     } else {
       // check fi there are any query params for redirect
+      console.log("currentURL", currentURL);
       const { searchParams } = new URL(currentURL);
       const redirectBase64 = searchParams.get("redirect");
 
@@ -64,8 +65,7 @@ export async function loginWithEmail(
       }
     }
   }
-  console.log("REDIRECTING TO", redirectUrl);
-  redirect(redirectUrl);
+  return redirectUrl;
 }
 
 export async function signupWithEmail(
@@ -74,7 +74,7 @@ export async function signupWithEmail(
   name: string
 ) {
   const supabase = await createSupabaseServerClient(cookies());
-
+  let redirectUrl = "/signup";
   // type-casting here for convenience
   // in practice, you should validate your inputs
   const data = {
@@ -90,7 +90,7 @@ export async function signupWithEmail(
   const { error: signUpError } = await supabase.auth.signUp(data);
 
   if (signUpError) {
-    redirect("/signup?error=" + signUpError.message);
+    redirectUrl = "/signup?error=" + signUpError.message;
     return;
   }
 
@@ -100,7 +100,7 @@ export async function signupWithEmail(
   } = await supabase.auth.getUser();
 
   if (getUserError) {
-    redirect("/signup?error=" + getUserError.message);
+    redirectUrl = "/signup?error=" + getUserError.message;
     return;
   }
 
@@ -114,9 +114,10 @@ export async function signupWithEmail(
     });
 
   if (userError) {
-    redirect("/signup?error=" + userError.message);
+    redirectUrl = "/signup?error=" + userError.message;
     return;
   }
 
-  redirect("/login?message=Signup successful. Please login.");
+  redirectUrl = "/login?message=Signup successful. Please login.";
+  return redirectUrl;
 }

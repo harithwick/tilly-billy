@@ -68,7 +68,12 @@ function LoginForm({ router }: { router: any }) {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
-      await loginWithEmail(values.email, values.password, router.push);
+      let redirectUrl = await loginWithEmail(
+        values.email,
+        values.password,
+        window.location.href
+      );
+      router.push(redirectUrl);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to sign in");
     } finally {

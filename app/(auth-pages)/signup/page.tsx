@@ -63,8 +63,12 @@ function SignUpForm({ router }: { router: any }) {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true);
     try {
-      await signupWithEmail(values.email, values.password, values.name);
-      router.push("/dashboard");
+      let redirectUrl = await signupWithEmail(
+        values.email,
+        values.password,
+        values.name
+      );
+      router.push(redirectUrl);
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to create account"

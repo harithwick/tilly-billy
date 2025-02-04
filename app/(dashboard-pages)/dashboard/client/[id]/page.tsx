@@ -49,14 +49,17 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/lib/components/ui/breadcrumb";
-
-interface PageProps {
+import { useParams } from "next/navigation";
+type PageProps = {
   params: {
     id: string;
   };
-}
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
 
-export default function ClientPage({ params }: PageProps) {
+export default function ClientPage() {
+  const params = useParams<{ id: string }>();
+
   const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
   const [client, setClient] = useState<Client | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -69,8 +72,7 @@ export default function ClientPage({ params }: PageProps) {
   useEffect(() => {
     const fetchClientData = async () => {
       try {
-        let paramResolved = await params;
-        let id = paramResolved.id;
+        const id = params.id;
         const response = await fetch(`/api/dashboard/client/${id}`);
         if (!response.ok) {
           throw new Error("Failed to fetch client data");
@@ -87,7 +89,7 @@ export default function ClientPage({ params }: PageProps) {
     };
 
     fetchClientData();
-  }, []);
+  }, [params.id]);
 
   if (loading) {
     return <LoadingState />;

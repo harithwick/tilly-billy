@@ -1,12 +1,12 @@
+"use client";
+
 import { notFound } from "next/navigation";
 import { BlogHeader } from "@/lib/components/marketing/blog-header";
 import { blogPosts } from "@/lib/constants/blog-posts";
+import { useParams } from "next/navigation";
 
-export default async function BlogPost({
-  params,
-}: {
-  params: { slug: string };
-}) {
+export default async function BlogPost() {
+  const params = useParams<{ slug: string }>();
   const post = blogPosts[params.slug as keyof typeof blogPosts];
 
   if (!post) {

@@ -11,6 +11,7 @@ import { Hero } from "@/lib/components/marketing/hero";
 import { BackgroundBeams } from "@/lib/components/ui/background-beams";
 import CallToAction1 from "@/lib/components/marketing/call-to-action-1";
 import FeaturesSectionDemo from "@/lib/components/marketing/features-section-demo-3";
+import { UseCasesCards } from "@/lib/components/marketing/user-cases-cards";
 
 export const metadata = {
   title: "Tilly Billy - Open SourceInvoice Generator",
@@ -32,16 +33,15 @@ export default function Home() {
     <div className="flex min-h-screen flex-col">
       <Hero />
       {/* <FeaturesSectionDemo /> */}
-      <Carousel items={cards} />
+      <UseCasesCards items={cards} />
       <CallToAction1 />
       <OpenSource />
     </div>
   );
 }
-
 const data = [
   {
-    category: "Artificial Intelligence",
+    category: "",
     title: "You can do more with AI.",
     src: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?q=80&w=3556&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     content: <p>asdfasdf</p>,

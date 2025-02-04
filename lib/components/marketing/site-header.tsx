@@ -70,7 +70,7 @@ interface Navbar1Props {
 
 const SiteHeader = ({
   menu = [
-    { title: "Home", url: "#" },
+    { title: "Home", url: "/" },
     {
       title: "Products",
       url: "#",
@@ -137,38 +137,34 @@ const SiteHeader = ({
       url: "#",
       items: [
         {
-          title: "Small Business",
-          description: "Manage your small business with Tilly Billy",
-          icon: <Briefcase className="size-5 shrink-0 mt-2" />,
-          url: "#",
-        },
-        {
           title: "Freelancers & Self-Employed Individuals",
           description: "Manage your freelancing business with Tilly Billy",
           icon: <UserRoundPlus className="size-5 shrink-0 mt-1" />,
-          url: "#",
+          url: "/freelancers",
+        },
+        {
+          title: "Small Business",
+          description: "Manage your small business with Tilly Billy",
+          icon: <Briefcase className="size-5 shrink-0 mt-2" />,
+          url: "/small-business",
         },
         {
           title: "Construction & Trades",
           description: "Manage your construction business with Tilly Billy",
           icon: <Hammer className="size-5 shrink-0 mt-1" />,
-          url: "#",
+          url: "/construction",
         },
         {
           title: "Developers & Tech Startups",
           description: "Manage your tech startup with Tilly Billy",
           icon: <Code className="size-5 shrink-0 mt-1" />,
-          url: "#",
+          url: "/developers",
         },
       ],
     },
     {
       title: "Pricing",
       url: "/pricing",
-    },
-    {
-      title: "Blog",
-      url: "#",
     },
   ],
   mobileExtraLinks = [

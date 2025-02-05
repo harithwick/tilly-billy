@@ -5,7 +5,9 @@ import {
   Briefcase,
   Code,
   Hammer,
+  History,
   Menu,
+  Phone,
   Sunset,
   Trees,
   UserRoundPlus,
@@ -45,6 +47,7 @@ const pacifico = Pacifico({
 interface MenuItem {
   title: string;
   url: string;
+  subCategory?: string;
   description?: string;
   icon?: JSX.Element;
   items?: MenuItem[];
@@ -72,32 +75,19 @@ const SiteHeader = ({
   menu = [
     { title: "Home", url: "/" },
     {
-      title: "Products",
+      title: "Invoicing",
       url: "#",
       items: [
         {
-          title: "Blog",
-          description: "The latest industry news, updates, and info",
-          icon: <Book className="size-5 shrink-0" />,
+          subCategory: "Features",
+          title: "Recurring Invoices",
+          icon: <History className="size-5 shrink-0" />,
           url: "#",
         },
         {
-          title: "Company",
-          description: "Our mission is to innovate and empower the world",
-          icon: <Trees className="size-5 shrink-0" />,
-          url: "#",
-        },
-        {
-          title: "Careers",
-          description: "Browse job listing and discover our workspace",
-          icon: <Sunset className="size-5 shrink-0" />,
-          url: "#",
-        },
-        {
-          title: "Support",
-          description:
-            "Get in touch with our support team or visit our community forums",
-          icon: <Zap className="size-5 shrink-0" />,
+          subCategory: "Support",
+          title: "Contact Us",
+          icon: <Phone className="size-5 shrink-0" />,
           url: "#",
         },
       ],
@@ -108,27 +98,18 @@ const SiteHeader = ({
       items: [
         {
           title: "Help Center",
-          description: "Get all the answers you need right here",
           icon: <Zap className="size-5 shrink-0" />,
           url: "#",
         },
         {
           title: "Contact Us",
-          description: "We are here to help you with any questions you have",
           icon: <Sunset className="size-5 shrink-0" />,
-          url: "#",
-        },
-        {
-          title: "Status",
-          description: "Check the current status of our services and APIs",
-          icon: <Trees className="size-5 shrink-0" />,
-          url: "#",
+          url: "/contact",
         },
         {
           title: "Terms of Service",
-          description: "Our terms and conditions for using our services",
           icon: <Book className="size-5 shrink-0" />,
-          url: "#",
+          url: "/terms",
         },
       ],
     },
@@ -138,25 +119,21 @@ const SiteHeader = ({
       items: [
         {
           title: "Freelancers & Self-Employed Individuals",
-          description: "Manage your freelancing business with Tilly Billy",
           icon: <UserRoundPlus className="size-5 shrink-0 mt-1" />,
           url: "/freelancers",
         },
         {
           title: "Small Business",
-          description: "Manage your small business with Tilly Billy",
           icon: <Briefcase className="size-5 shrink-0 mt-2" />,
           url: "/small-business",
         },
         {
           title: "Construction & Trades",
-          description: "Manage your construction business with Tilly Billy",
           icon: <Hammer className="size-5 shrink-0 mt-1" />,
           url: "/construction",
         },
         {
           title: "Developers & Tech Startups",
-          description: "Manage your tech startup with Tilly Billy",
           icon: <Code className="size-5 shrink-0 mt-1" />,
           url: "/developers",
         },
@@ -278,34 +255,96 @@ const SiteHeader = ({
 
 const renderMenuItem = (item: MenuItem) => {
   if (item.items) {
+    // Separate items into those with and without subcategories
+    const categorizedItems = item.items.reduce(
+      (acc, item) => {
+        if (item.subCategory) {
+          const category = item.subCategory;
+          if (!acc.withCategory[category]) {
+            acc.withCategory[category] = [];
+          }
+          acc.withCategory[category].push(item);
+        } else {
+          acc.withoutCategory.push(item);
+        }
+        return acc;
+      },
+      {
+        withCategory: {} as Record<string, MenuItem[]>,
+        withoutCategory: [] as MenuItem[],
+      }
+    );
+
     return (
       <NavigationMenuItem key={item.title} className="text-muted-foreground">
         <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
         <NavigationMenuContent>
-          <ul className="w-80 p-3">
-            <NavigationMenuLink>
-              {item.items.map((subItem) => (
-                <li key={subItem.title}>
-                  <a
-                    className="flex select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-muted hover:text-accent-foreground"
-                    href={subItem.url}
-                  >
-                    {subItem.icon}
-                    <div>
-                      <div className="text-sm font-semibold">
-                        {subItem.title}
-                      </div>
-                      {subItem.description && (
-                        <p className="text-sm leading-snug text-muted-foreground">
-                          {subItem.description}
-                        </p>
-                      )}
-                    </div>
-                  </a>
-                </li>
-              ))}
-            </NavigationMenuLink>
-          </ul>
+          <div className="flex gap-6 p-4">
+            {/* Render items with subcategories */}
+            {Object.entries(categorizedItems.withCategory).map(
+              ([category, items]) => (
+                <div key={category} className="flex-1">
+                  <div className="mb-3 text-sm font-medium text-muted-foreground">
+                    {category}
+                  </div>
+                  <ul className="w-64">
+                    <NavigationMenuLink>
+                      {items.map((subItem) => (
+                        <li key={subItem.title}>
+                          <a
+                            className="flex select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-muted hover:text-accent-foreground"
+                            href={subItem.url}
+                          >
+                            {subItem.icon}
+                            <div>
+                              <div className="text-sm font-semibold">
+                                {subItem.title}
+                              </div>
+                              {subItem.description && (
+                                <p className="text-sm leading-snug text-muted-foreground">
+                                  {subItem.description}
+                                </p>
+                              )}
+                            </div>
+                          </a>
+                        </li>
+                      ))}
+                    </NavigationMenuLink>
+                  </ul>
+                </div>
+              )
+            )}
+
+            {/* Render items without subcategories */}
+            {categorizedItems.withoutCategory.length > 0 && (
+              <div className="flex-1">
+                <ul className="w-64">
+                  <NavigationMenuLink>
+                    {categorizedItems.withoutCategory.map((subItem) => (
+                      <li key={subItem.title}>
+                        <a
+                          className="flex select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-muted hover:text-accent-foreground"
+                          href={subItem.url}
+                        >
+                          {subItem.icon}
+                          <div>
+                            <div className="text-sm font-semibold">
+                              {subItem.title}
+                            </div>
+                            {subItem.description && (
+                              <p className="text-sm leading-snug text-muted-foreground">
+                                {subItem.description}
+                              </p>
+                            )}
+                          </div>
+                        </a>
+                      </li>
+                    ))}
+                  </NavigationMenuLink>
+                </ul>
+              </div>
+            )}
+          </div>
         </NavigationMenuContent>
       </NavigationMenuItem>
     );

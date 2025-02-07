@@ -23,15 +23,16 @@ import { Product } from "@/lib/types";
 interface ProductSelectorProps {
   products: Product[];
   onProductSelect: (product: Product) => void;
+  value?: string;
 }
 
 export function ProductSelector({
   products,
   onProductSelect,
+  value,
 }: ProductSelectorProps) {
   const [open, setOpen] = React.useState(false);
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
   const [search, setSearch] = React.useState("");
 
   const filteredProducts = React.useMemo(() => {
@@ -45,17 +46,15 @@ export function ProductSelector({
   }, [search]);
 
   const selectedProduct = React.useMemo(
-    () => products.find((product) => product.id.toString() === value),
+    () => products.find((product) => product.name === value),
     [value]
   );
 
   const handleSelect = React.useCallback(
     (currentValue: string) => {
-      setValue(currentValue);
-      const product = products.find((p) => p.id.toString() === currentValue);
-      if (product) {
-        onProductSelect(product);
-      }
+      onProductSelect(
+        products.find((p) => p.id.toString() === currentValue) as Product
+      );
       setOpen(false);
     },
     [onProductSelect]

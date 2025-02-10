@@ -47,3 +47,25 @@ export async function deleteClient(id: string): Promise<void> {
     throw new Error(errorData.error || "Failed to delete client");
   }
 }
+
+export async function archiveClient(id: string): Promise<void> {
+  const response = await fetch(`/api/dashboard/client/${id}/archive`, {
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to archive client");
+  }
+}
+
+export async function unarchiveClient(id: string): Promise<void> {
+  const response = await fetch(`/api/dashboard/client/${id}/unarchive`, {
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || "Failed to unarchive client");
+  }
+}

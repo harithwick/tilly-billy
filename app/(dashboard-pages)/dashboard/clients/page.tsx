@@ -21,7 +21,11 @@ import { ConfirmDelete } from "@/lib/components/confirm-delete";
 import { CreateClientModal } from "@/lib/components/clients/create-client-modal";
 import { LoadingState } from "@/lib/components/loading-state";
 import { cn, capitalizeWords } from "@/lib/utils";
-import { deleteClient } from "@/lib/api/clients";
+import {
+  deleteClient,
+  archiveClient,
+  unarchiveClient,
+} from "@/lib/api/clients";
 import { useClients } from "@/lib/hooks/use-clients";
 import Link from "next/link";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
@@ -81,6 +85,30 @@ export default function ClientsPage() {
     } finally {
       setDeleteDialogOpen(false);
       setSelectedClientId(null);
+    }
+  };
+
+  const handleArchiveClick = async (clientId: number) => {
+    try {
+      await archiveClient(clientId.toString());
+      toast.success("Client archived successfully");
+      triggerRefresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to archive client"
+      );
+    }
+  };
+
+  const handleUnarchiveClick = async (clientId: number) => {
+    try {
+      await unarchiveClient(clientId.toString());
+      toast.success("Client unarchived successfully");
+      triggerRefresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to unarchive client"
+      );
     }
   };
 
@@ -225,12 +253,19 @@ export default function ClientsPage() {
                                 >
                                   Edit
                                 </DropdownMenuItem>
-                                {status !== "archived" && (
+                                {status === "archived" ? (
                                   <DropdownMenuItem
-                                    onClick={() => {
-                                      // TODO: Implement status change
-                                      console.log("Change status to archived");
-                                    }}
+                                    onClick={() =>
+                                      handleUnarchiveClick(Number(client.id))
+                                    }
+                                  >
+                                    Unarchive
+                                  </DropdownMenuItem>
+                                ) : (
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleArchiveClick(Number(client.id))
+                                    }
                                   >
                                     Archive
                                   </DropdownMenuItem>

@@ -28,6 +28,7 @@ import { Header } from "@/lib/components/studio/header";
 import { Suspense } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { PaymentDetailsModal, PaymentDetail } from "./payment-details-modal";
 
 // Add this type near the top of the file
 type TaxItem = {
@@ -60,6 +61,10 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
   const [taxes, setTaxes] = useState<TaxItem[]>([
     { name: "Tax", percentage: 10 },
   ]);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetail[]>([]);
+  const [selectedPaymentDetail, setSelectedPaymentDetail] =
+    useState<string>("");
+  const [paymentDetailsModalOpen, setPaymentDetailsModalOpen] = useState(false);
 
   useEffect(() => {
     if (data?.invoice) {
@@ -229,7 +234,7 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
     <div className="container mx-auto ">
       <div className="flex justify-between items-center mb-6 sticky top-0 z-50 bg-background px-4 py-4">
         <Link
-          href="/invoices"
+          href="/dashboard/invoices"
           className="flex items-center text-muted-foreground hover:text-primary"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -353,14 +358,102 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                 <option value="custom">Custom</option>
               </select>
             </div>
+
+            {/* Payment Details */}
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <Label>Payment Details</Label>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPaymentDetailsModalOpen(true)}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add New
+                </Button>
+              </div>
+              <select
+                className="w-full p-2 border rounded-md"
+                value={selectedPaymentDetail}
+                onChange={(e) => setSelectedPaymentDetail(e.target.value)}
+              >
+                <option value="">Select payment details...</option>
+                {paymentDetails.map((detail) => (
+                  <option key={detail.id} value={detail.id}>
+                    {detail.name}
+                  </option>
+                ))}
+              </select>
+
+              {/* Show selected payment details */}
+              {selectedPaymentDetail && (
+                <div className="mt-2 text-sm">
+                  {(() => {
+                    const detail = paymentDetails.find(
+                      (d) => d.id === selectedPaymentDetail
+                    );
+                    if (!detail) return null;
+
+                    return detail.type === "link" ? (
+                      <a
+                        href={detail.value}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        {detail.value}
+                      </a>
+                    ) : (
+                      <pre className="whitespace-pre-wrap bg-muted p-2 rounded-md">
+                        {detail.value}
+                      </pre>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Products Card */}
-          <Label className="">Product</Label>
+          <h2 className="text-lg font-medium mb-4 mt-4">Products</h2>
           <div className="space-y-4">
+            {/* Add column headers */}
+            <div className="hidden md:flex gap-4 items-center px-2">
+              <div className="flex-1">
+                <Label>Item</Label>
+              </div>
+              <div className="flex gap-2 w-auto">
+                <div className="w-20">
+                  <Label>Qty</Label>
+                </div>
+                <div className="w-24">
+                  <Label>Price</Label>
+                </div>
+                <div className="w-32">
+                  <Label>Discount</Label>
+                </div>
+                <div className="w-9"></div> {/* Space for delete button */}
+              </div>
+            </div>
+
+            {/* Mobile headers - shown above each input on mobile */}
+            <style jsx global>{`
+              @media (max-width: 768px) {
+                .mobile-label {
+                  font-size: 0.875rem;
+                  color: var(--muted-foreground);
+                  margin-bottom: 0.25rem;
+                }
+              }
+            `}</style>
+
             {items.map((item, index) => (
-              <div key={index} className="flex gap-4 items-start">
-                <div className="flex-1">
+              <div
+                key={index}
+                className="flex flex-col md:flex-row gap-4 items-start"
+              >
+                <div className="flex-1 w-full">
+                  <div className="md:hidden mobile-label">Item</div>
                   <ProductSelector
                     products={data?.products || []}
                     onProductSelect={(product) => {
@@ -379,65 +472,81 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                     }}
                   />
                 </div>
-                <Input
-                  type="number"
-                  className="w-20"
-                  value={item.quantity}
-                  onChange={(e) => {
-                    const quantity = Number(e.target.value);
-                    const discountMultiplier = (100 - item.discount) / 100;
-                    const newItems = [...items];
-                    newItems[index] = {
-                      ...item,
-                      quantity,
-                      amount: quantity * item.rate * discountMultiplier,
-                    };
-                    setItems(newItems);
-                  }}
-                />
-                <Input
-                  type="number"
-                  className="w-24"
-                  value={item.rate}
-                  onChange={(e) => {
-                    const rate = Number(e.target.value);
-                    const discountMultiplier = (100 - item.discount) / 100;
-                    const newItems = [...items];
-                    newItems[index] = {
-                      ...item,
-                      rate,
-                      amount: item.quantity * rate * discountMultiplier,
-                    };
-                    setItems(newItems);
-                  }}
-                />
-                <div className="flex items-center gap-2 w-32">
-                  <Input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={item.discount}
-                    onChange={(e) => {
-                      const discount = Number(e.target.value);
-                      const discountMultiplier = (100 - discount) / 100;
-                      const newItems = [...items];
-                      newItems[index] = {
-                        ...item,
-                        discount,
-                        amount: item.quantity * item.rate * discountMultiplier,
-                      };
-                      setItems(newItems);
-                    }}
-                  />
-                  <span className="text-sm">%</span>
+                <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+                  <div className="w-full md:w-20">
+                    <div className="md:hidden mobile-label">Quantity</div>
+                    <Input
+                      type="number"
+                      className="w-full"
+                      placeholder="Qty"
+                      value={item.quantity}
+                      onChange={(e) => {
+                        const quantity = Number(e.target.value);
+                        const discountMultiplier = (100 - item.discount) / 100;
+                        const newItems = [...items];
+                        newItems[index] = {
+                          ...item,
+                          quantity,
+                          amount: quantity * item.rate * discountMultiplier,
+                        };
+                        setItems(newItems);
+                      }}
+                    />
+                  </div>
+                  <div className="w-full md:w-24">
+                    <div className="md:hidden mobile-label">Price</div>
+                    <Input
+                      type="number"
+                      className="w-full"
+                      placeholder="Rate"
+                      value={item.rate}
+                      onChange={(e) => {
+                        const rate = Number(e.target.value);
+                        const discountMultiplier = (100 - item.discount) / 100;
+                        const newItems = [...items];
+                        newItems[index] = {
+                          ...item,
+                          rate,
+                          amount: item.quantity * rate * discountMultiplier,
+                        };
+                        setItems(newItems);
+                      }}
+                    />
+                  </div>
+                  <div className="w-full md:w-32">
+                    <div className="md:hidden mobile-label">Discount</div>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        min="0"
+                        max="100"
+                        placeholder="Discount"
+                        value={item.discount}
+                        onChange={(e) => {
+                          const discount = Number(e.target.value);
+                          const discountMultiplier = (100 - discount) / 100;
+                          const newItems = [...items];
+                          newItems[index] = {
+                            ...item,
+                            discount,
+                            amount:
+                              item.quantity * item.rate * discountMultiplier,
+                          };
+                          setItems(newItems);
+                        }}
+                      />
+                      <span className="text-sm">%</span>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="mt-2 md:mt-0"
+                    onClick={() => removeItem(index)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => removeItem(index)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
               </div>
             ))}
             <Button variant="outline" className="w-full" onClick={addItem}>
@@ -619,6 +728,18 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
           </Card>
         </div>
       </div>
+
+      <PaymentDetailsModal
+        open={paymentDetailsModalOpen}
+        onClose={() => setPaymentDetailsModalOpen(false)}
+        onSave={(newDetail) => {
+          const detail: PaymentDetail = {
+            ...newDetail,
+            id: crypto.randomUUID(),
+          };
+          setPaymentDetails([...paymentDetails, detail]);
+        }}
+      />
     </div>
   );
 }

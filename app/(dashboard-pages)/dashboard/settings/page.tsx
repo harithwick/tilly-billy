@@ -16,9 +16,6 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <Breadcrumb
-          items={[{ title: "Settings", href: "/dashboard/settings" }]}
-        />
         <h2 className="mt-4 text-3xl font-bold tracking-tight">Settings</h2>
         <p className="text-muted-foreground">Manage your account settings.</p>
       </div>

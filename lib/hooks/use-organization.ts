@@ -10,9 +10,7 @@ export function useOrganization() {
     async function fetchOrganization() {
       try {
         setLoading(true);
-        const response = await fetch(`/api/dashboard/organization/`, {
-          cache: "force-cache",
-        });
+        const response = await fetch(`/api/dashboard/organization/`);
 
         if (!response.ok) {
           const errorData = await response.json();

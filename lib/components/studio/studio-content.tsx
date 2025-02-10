@@ -732,12 +732,13 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
       <PaymentDetailsModal
         open={paymentDetailsModalOpen}
         onClose={() => setPaymentDetailsModalOpen(false)}
-        onSave={(newDetail) => {
+        onSave={async (newDetail) => {
           const detail: PaymentDetail = {
             ...newDetail,
             id: crypto.randomUUID(),
           };
           setPaymentDetails([...paymentDetails, detail]);
+          return true;
         }}
       />
     </div>

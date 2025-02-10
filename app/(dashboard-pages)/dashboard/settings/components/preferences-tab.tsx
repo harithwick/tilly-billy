@@ -82,7 +82,7 @@ export function PreferencesTab() {
 
   const handleAddPaymentDetail = async (
     newDetail: Omit<PaymentDetail, "id">
-  ) => {
+  ): Promise<boolean> => {
     try {
       const response = await fetch("/api/dashboard/settings/payment-details", {
         method: "POST",
@@ -102,33 +102,42 @@ export function PreferencesTab() {
       await fetchPaymentDetails();
       setIsModalOpen(false);
       toast.success("Payment detail added successfully");
+      return true;
     } catch (error) {
       toast.error("Failed to add payment detail");
       console.error(error);
+      return false;
     }
   };
 
   const setDefaultPaymentDetail = async (id: string) => {
     try {
-      const response = await fetch("/api/dashboard/settings/payment-details", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id,
-          default: true,
-          // Include existing values
-          ...paymentDetails.find((detail) => detail.id === id),
-        }),
-      });
+      const response = await fetch(
+        "/api/dashboard/settings/payment-details/make-default",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id }),
+        }
+      );
 
-      if (!response.ok) throw new Error("Failed to update payment detail");
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(
+          error.error || "Failed to update default payment method"
+        );
+      }
 
       await fetchPaymentDetails();
       toast.success("Default payment method updated");
     } catch (error) {
-      toast.error("Failed to update default payment method");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to update default payment method"
+      );
       console.error(error);
     }
   };
@@ -162,7 +171,7 @@ export function PreferencesTab() {
 
   const handleEditPaymentDetail = async (
     editedDetail: Omit<PaymentDetail, "id">
-  ) => {
+  ): Promise<boolean> => {
     try {
       const response = await fetch("/api/dashboard/settings/payment-details", {
         method: "PUT",
@@ -182,10 +191,13 @@ export function PreferencesTab() {
 
       await fetchPaymentDetails();
       setEditingPaymentDetail(null);
+      setIsModalOpen(false);
       toast.success("Payment detail updated successfully");
+      return true;
     } catch (error) {
       toast.error("Failed to update payment detail");
       console.error(error);
+      return false;
     }
   };
 

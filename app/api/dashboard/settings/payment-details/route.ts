@@ -13,7 +13,8 @@ export const GET = apiRouteHandler({
       const { data: paymentDetails, error } = await supabase
         .from("payment_details")
         .select("*")
-        .eq("org_id", orgId);
+        .eq("org_id", orgId)
+        .order("created_at", { ascending: false });
 
       if (error) {
         console.error("Error fetching payment details:", error);
@@ -199,7 +200,8 @@ export const DELETE = apiRouteHandler({
       const { error } = await supabase
         .from("payment_details")
         .delete()
-        .eq("id", id);
+        .eq("id", id)
+        .eq("org_id", orgId);
 
       if (error) {
         console.error("Error deleting payment detail:", error);

@@ -12,6 +12,7 @@ import { Input } from "@/lib/components/ui/input";
 import { Label } from "@/lib/components/ui/label";
 import { Textarea } from "@/lib/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/lib/components/ui/radio-group";
+import { Loader2 } from "lucide-react";
 
 export type PaymentDetail = {
   id: string;
@@ -23,7 +24,7 @@ export type PaymentDetail = {
 type PaymentDetailsModalProps = {
   open: boolean;
   onClose: () => void;
-  onSave: (paymentDetail: Omit<PaymentDetail, "id">) => void;
+  onSave: (paymentDetail: Omit<PaymentDetail, "id">) => Promise<boolean>;
   editingPaymentDetail?: {
     id: string;
     label: string;
@@ -42,6 +43,7 @@ export function PaymentDetailsModal({
   const [name, setName] = useState("");
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Initialize form when editing
   useEffect(() => {
@@ -61,7 +63,7 @@ export function PaymentDetailsModal({
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Reset error state
     setError(null);
 
@@ -86,12 +88,17 @@ export function PaymentDetailsModal({
       return;
     }
 
-    onSave({ type, name, value });
-    setType("link");
-    setName("");
-    setValue("");
-    setError(null);
-    onClose();
+    setIsLoading(true);
+    const success = await onSave({ type, name, value });
+    setIsLoading(false);
+
+    if (success) {
+      setType("link");
+      setName("");
+      setValue("");
+      setError(null);
+      onClose();
+    }
   };
 
   const handleClose = () => {
@@ -194,10 +201,13 @@ export function PaymentDetailsModal({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={handleClose}>
+          <Button variant="outline" onClick={handleClose} disabled={isLoading}>
             Cancel
           </Button>
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleSave} disabled={isLoading}>
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Save
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

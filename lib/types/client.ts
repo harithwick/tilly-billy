@@ -14,6 +14,8 @@ export interface Client {
   status: ClientStatus;
   createdAt: Date;
   updatedAt: Date;
+  uuid: string;
+  invoiceCount: number;
 }
 
 export interface ClientAddress {
@@ -24,4 +26,4 @@ export interface ClientAddress {
   country?: string;
 }
 
-export type ClientStatus = 'active' | 'inactive' | 'archived';
+export type ClientStatus = "active" | "inactive" | "archived";

@@ -1,13 +1,19 @@
 export interface Organization {
   id: string;
   name: string;
-  uuid:string;
+  uuid: string;
   email?: string;
   logo_url?: string;
   currency: string;
   createdAt: Date;
   updatedAt: Date;
 }
+
+export type AdjustmentItem = {
+  name: string;
+  value: number;
+  isPercentage: boolean;
+};
 
 export interface OrganizationMember {
   id: string;
@@ -17,4 +23,4 @@ export interface OrganizationMember {
   joinedAt: Date;
 }
 
-export type OrganizationRole = 'owner' | 'admin' | 'member';
+export type OrganizationRole = "owner" | "admin" | "member";

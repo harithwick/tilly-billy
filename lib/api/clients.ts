@@ -18,10 +18,10 @@ export async function createClient(data: Partial<Client>): Promise<Client> {
 }
 
 export async function updateClient(
-  id: string,
+  uuid: string,
   data: Partial<Client>
 ): Promise<Client> {
-  const response = await fetch(`/api/dashboard/clients/${id}`, {
+  const response = await fetch(`/api/dashboard/clients/${uuid}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -37,8 +37,8 @@ export async function updateClient(
   return response.json();
 }
 
-export async function deleteClient(id: string): Promise<void> {
-  const response = await fetch(`/api/dashboard/clients/${id}`, {
+export async function deleteClient(uuid: string): Promise<void> {
+  const response = await fetch(`/api/dashboard/clients/${uuid}`, {
     method: "DELETE",
   });
 
@@ -48,8 +48,8 @@ export async function deleteClient(id: string): Promise<void> {
   }
 }
 
-export async function archiveClient(id: string): Promise<void> {
-  const response = await fetch(`/api/dashboard/client/${id}/archive`, {
+export async function archiveClient(uuid: string): Promise<void> {
+  const response = await fetch(`/api/dashboard/clients/${uuid}/archive`, {
     method: "POST",
   });
 
@@ -59,8 +59,8 @@ export async function archiveClient(id: string): Promise<void> {
   }
 }
 
-export async function unarchiveClient(id: string): Promise<void> {
-  const response = await fetch(`/api/dashboard/client/${id}/unarchive`, {
+export async function unarchiveClient(uuid: string): Promise<void> {
+  const response = await fetch(`/api/dashboard/clients/${uuid}/unarchive`, {
     method: "POST",
   });
 

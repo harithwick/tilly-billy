@@ -16,6 +16,21 @@ export const GET = apiRouteHandler({
         supabase,
         activeOrgUuid!
       );
+
+      // Get organization details
+      const { data: organization, error: orgError } = await supabase
+        .from("organizations")
+        .select("*")
+        .eq("id", organizationId)
+        .single();
+
+      if (orgError) {
+        return NextResponse.json(
+          { error: "Failed to fetch organization details" },
+          { status: 500 }
+        );
+      }
+
       // Get active clients
       const { data: clients, error: clientsError } = await supabase
         .from("clients")
@@ -73,6 +88,7 @@ export const GET = apiRouteHandler({
       }
 
       return NextResponse.json({
+        organization,
         clients,
         products,
         invoice,

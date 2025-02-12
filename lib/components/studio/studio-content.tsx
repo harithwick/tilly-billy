@@ -9,7 +9,6 @@ import { Button } from "@/lib/components/ui/button";
 import { Textarea } from "@/lib/components/ui/textarea";
 import { Calendar } from "@/lib/components/ui/calendar";
 import { ConfirmationModal } from "@/lib/components/confirmation-dialog";
-
 import {
   Popover,
   PopoverContent,
@@ -28,18 +27,19 @@ import { Header } from "@/lib/components/studio/header";
 import { Suspense } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { PaymentDetailsModal, PaymentDetail } from "./payment-details-modal";
-
-// Add this type near the top of the file
-type TaxItem = {
+import { Client, Organization, ClientAddress } from "@/lib/types";
+// Update the TaxItem type to become AdjustmentItem
+type AdjustmentItem = {
   name: string;
-  percentage: number;
+  value: number;
+  isPercentage: boolean;
 };
 
 export default function StudioContent({ uuid }: { uuid?: string }) {
   const [date, setDate] = useState<Date>();
   const [items, setItems] = useState<
     Array<{
+      id: string | null;
       description: string;
       quantity: number;
       rate: number;
@@ -49,7 +49,7 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
   >([]);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [loadingModal, setLoadingModal] = useState(false);
-  const [selectedClient, setSelectedClient] = useState<any>(null);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const searchParams = useSearchParams();
   const invoiceId = searchParams.get("id");
   const { data, loading, error } = useStudio(invoiceId || null);
@@ -57,22 +57,21 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
   const [invoiceNumber, setInvoiceNumber] = useState("INV2398-08-087");
   const [notes, setNotes] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("due_on_receipt");
-  const [issueDate, setIssueDate] = useState<Date>();
-  const [taxes, setTaxes] = useState<TaxItem[]>([
-    { name: "Tax", percentage: 10 },
+  const [issueDate, setIssueDate] = useState<Date>(new Date());
+  const [organization, setOrganization] = useState<Organization | null>(null);
+  const [adjustments, setAdjustments] = useState<AdjustmentItem[]>([
+    { name: "Tax", value: 10, isPercentage: true },
   ]);
-  const [paymentDetails, setPaymentDetails] = useState<PaymentDetail[]>([]);
-  const [selectedPaymentDetail, setSelectedPaymentDetail] =
-    useState<string>("");
-  const [paymentDetailsModalOpen, setPaymentDetailsModalOpen] = useState(false);
+  const [terms, setTerms] = useState("");
 
   useEffect(() => {
     if (data?.invoice) {
       // Populate form with invoice data
       setDate(new Date(data.invoice.issueDate));
-      setSelectedClient(data.invoice.clientId);
+      // setSelectedClient(data.invoice.clientId);
       setItems(
         data.invoice.items.map((item) => ({
+          id: item.id,
           description: item.description,
           quantity: item.quantity,
           rate: item.rate,
@@ -108,7 +107,14 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
   const addItem = () => {
     setItems([
       ...items,
-      { description: "", quantity: 1, rate: 0, discount: 0, amount: 0 },
+      {
+        id: null,
+        description: "",
+        quantity: 1,
+        rate: 0,
+        discount: 0,
+        amount: 0,
+      },
     ]);
   };
 
@@ -119,10 +125,15 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
   const hasDiscounts = items.some((item) => item.discount > 0);
 
   const subtotal = items.reduce((acc, item) => acc + item.amount, 0);
-  const totalTax = taxes.reduce((acc, tax) => {
-    return acc + subtotal * (tax.percentage / 100);
+  const totalAdjustments = adjustments.reduce((acc, adjustment) => {
+    return (
+      acc +
+      (adjustment.isPercentage
+        ? subtotal * (adjustment.value / 100)
+        : adjustment.value)
+    );
   }, 0);
-  const total = subtotal + totalTax;
+  const total = subtotal + totalAdjustments;
 
   // Add a helper function to get readable payment terms
   const getReadablePaymentTerms = (terms: string) => {
@@ -151,46 +162,72 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
     doc.setFontSize(20);
     doc.text(invoiceNumber, 20, 20);
 
-    // Add issue date and subject
-    doc.setFontSize(12);
-    doc.text("Issue date:", 20, 35);
-    doc.text(issueDate ? format(issueDate, "d MMMM yyyy") : "Not set", 60, 35);
-    doc.text("Subject:", 20, 45);
-    doc.text("Service per June 2023", 60, 45);
+    // Add client details
+    if (selectedClient) {
+      doc.setFontSize(10);
+      doc.text("Bill To:", 20, 35);
+      doc.setFont("helvetica", "bold");
+      doc.text(selectedClient.name, 20, 45);
+      doc.setFont("helvetica", "normal");
+      if (selectedClient.company) {
+        doc.text(selectedClient.company, 20, 52);
+      }
+      if (selectedClient.address) {
+        // doc.text(selectedClient.address, 20, selectedClient.company ? 59 : 52);
+      }
+      if (selectedClient.email) {
+        doc.text(selectedClient.email, 20, selectedClient.address ? 66 : 59);
+      }
+      if (selectedClient.phone) {
+        doc.text(selectedClient.phone, 20, selectedClient.email ? 73 : 66);
+      }
 
-    // Add payment terms after the dates
-    doc.text("Payment Terms:", 20, 55);
-    doc.text(getReadablePaymentTerms(paymentTerms), 60, 55);
+      // Adjust the starting Y position for the rest of the content
+      const startY = selectedClient.phone ? 90 : 80;
 
-    // Add items table
-    autoTable(doc, {
-      startY: 70,
-      head: [
-        hasDiscounts
-          ? ["Description", "Qty", "Unit Price", "Discount", "Amount"]
-          : ["Description", "Qty", "Unit Price", "Amount"],
-      ],
-      body: items.map((item) => {
-        const row = [
-          item.description,
-          item.quantity.toString(),
-          item.rate.toString(),
-        ];
-        if (hasDiscounts) {
-          row.push(item.discount > 0 ? `${item.discount}%` : "-");
-        }
-        row.push(item.amount.toFixed(2));
-        return row;
-      }),
-      styles: { fontSize: 10 },
-      headStyles: { fillColor: [66, 66, 66] },
-    });
+      // Add issue date and payment terms
+      doc.text("Issue date:", 120, 35);
+      doc.text(
+        issueDate ? format(issueDate, "d MMMM yyyy") : "Not set",
+        160,
+        35
+      );
+      doc.text("Payment Terms:", 120, 45);
+      doc.text(getReadablePaymentTerms(paymentTerms), 160, 45);
 
-    // Add taxes table
+      // Update the items table starting position
+      autoTable(doc, {
+        startY,
+        head: [
+          hasDiscounts
+            ? ["Description", "Qty", "Unit Price", "Discount", "Amount"]
+            : ["Description", "Qty", "Unit Price", "Amount"],
+        ],
+        body: items.map((item) => {
+          const row = [
+            item.description,
+            item.quantity.toString(),
+            item.rate.toString(),
+          ];
+          if (hasDiscounts) {
+            row.push(item.discount > 0 ? `${item.discount}%` : "-");
+          }
+          row.push(item.amount.toFixed(2));
+          return row;
+        }),
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [66, 66, 66] },
+      });
+    }
+
+    // Add adjustments table
     autoTable(doc, {
       startY: (doc as any).lastAutoTable.finalY + 10,
-      head: [["Tax", "Percentage"]],
-      body: taxes.map((tax) => [tax.name, tax.percentage.toString()]),
+      head: [["Adjustment", "Value"]],
+      body: adjustments.map((adjustment) => [
+        adjustment.name,
+        adjustment.value.toString(),
+      ]),
       styles: { fontSize: 10 },
       headStyles: { fillColor: [66, 66, 66] },
     });
@@ -202,12 +239,17 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
     doc.text("Subtotal:", 140, currentY);
     doc.text(subtotal.toFixed(2), 170, currentY, { align: "right" });
 
-    taxes.forEach((tax, index) => {
+    adjustments.forEach((adjustment, index) => {
       currentY += 10;
-      doc.text(`${tax.name} (${tax.percentage}%):`, 140, currentY);
-      doc.text((subtotal * (tax.percentage / 100)).toFixed(2), 170, currentY, {
-        align: "right",
-      });
+      doc.text(`${adjustment.name} (${adjustment.value}%):`, 140, currentY);
+      doc.text(
+        (subtotal * (adjustment.value / 100)).toFixed(2),
+        170,
+        currentY,
+        {
+          align: "right",
+        }
+      );
     });
 
     currentY += 10;
@@ -216,12 +258,22 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
     doc.text(total.toFixed(2), 170, currentY, { align: "right" });
 
     // Add notes after totals if they exist
-    if (notes) {
+    if (notes || terms) {
       const notesY = (doc as any).lastAutoTable.finalY + 40;
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
       doc.text("Notes:", 20, notesY);
       doc.text(notes, 20, notesY + 10, {
+        maxWidth: 170,
+      });
+    }
+
+    if (terms) {
+      const termsY = (doc as any).lastAutoTable.finalY + (notes ? 60 : 40);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.text("Terms & Conditions:", 20, termsY);
+      doc.text(terms, 20, termsY + 10, {
         maxWidth: 170,
       });
     }
@@ -257,13 +309,13 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
         {/* Left side - Form */}
-        <div className="space-y-6">
+        <div className="space-y-6 mb-24">
           <div>
             <h2 className="text-lg font-medium mb-4">Invoice Details</h2>
 
             {/* Invoice Number */}
             <div className="mb-6">
-              <Label htmlFor="invoiceNumber">Invoice Number</Label>
+              <Label htmlFor="invoiceNumber">Invoice Number*</Label>
               <Input
                 id="invoiceNumber"
                 value={invoiceNumber}
@@ -274,10 +326,12 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
 
             {/* Client Section */}
             <div className="mb-6">
-              <Label className="mb-2">Client</Label>
+              <Label className="mb-2">Client*</Label>
               <ClientSelector
                 clients={data?.clients || []}
-                onClientSelect={setSelectedClient}
+                onClientSelect={(client) => {
+                  // setSelectedClient(client);
+                }}
               />
             </div>
 
@@ -285,7 +339,7 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
             <div className="grid grid-cols-2 gap-4 mb-6">
               {/* Issue Date */}
               <div>
-                <Label>Issue Date</Label>
+                <Label>Issue Date*</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -307,7 +361,7 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                     <Calendar
                       mode="single"
                       selected={issueDate}
-                      onSelect={setIssueDate}
+                      onSelect={(date) => setIssueDate(date || new Date())}
                       initialFocus
                     />
                   </PopoverContent>
@@ -316,101 +370,20 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
 
               {/* Due Date */}
               <div>
-                <Label>Due Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-            </div>
-
-            {/* Payment Terms */}
-            <div className="mb-6">
-              <Label>Payment Terms</Label>
-              <select
-                className="w-full p-2 border rounded-md"
-                value={paymentTerms}
-                onChange={(e) => setPaymentTerms(e.target.value)}
-              >
-                <option value="due_on_receipt">Due on Receipt</option>
-                <option value="net_15">Net 15</option>
-                <option value="net_30">Net 30</option>
-                <option value="net_45">Net 45</option>
-                <option value="net_60">Net 60</option>
-                <option value="custom">Custom</option>
-              </select>
-            </div>
-
-            {/* Payment Details */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <Label>Payment Details</Label>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPaymentDetailsModalOpen(true)}
+                <Label>Payment Terms</Label>
+                <select
+                  className="w-full p-2 border rounded-md"
+                  value={paymentTerms}
+                  onChange={(e) => setPaymentTerms(e.target.value)}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add New
-                </Button>
+                  <option value="due_on_receipt">Due on Receipt</option>
+                  <option value="net_15">Net 15</option>
+                  <option value="net_30">Net 30</option>
+                  <option value="net_45">Net 45</option>
+                  <option value="net_60">Net 60</option>
+                  <option value="custom">Custom</option>
+                </select>
               </div>
-              <select
-                className="w-full p-2 border rounded-md"
-                value={selectedPaymentDetail}
-                onChange={(e) => setSelectedPaymentDetail(e.target.value)}
-              >
-                <option value="">Select payment details...</option>
-                {paymentDetails.map((detail) => (
-                  <option key={detail.id} value={detail.id}>
-                    {detail.name}
-                  </option>
-                ))}
-              </select>
-
-              {/* Show selected payment details */}
-              {selectedPaymentDetail && (
-                <div className="mt-2 text-sm">
-                  {(() => {
-                    const detail = paymentDetails.find(
-                      (d) => d.id === selectedPaymentDetail
-                    );
-                    if (!detail) return null;
-
-                    return detail.type === "link" ? (
-                      <a
-                        href={detail.value}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        {detail.value}
-                      </a>
-                    ) : (
-                      <pre className="whitespace-pre-wrap bg-muted p-2 rounded-md">
-                        {detail.value}
-                      </pre>
-                    );
-                  })()}
-                </div>
-              )}
             </div>
           </div>
 
@@ -456,11 +429,13 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                   <div className="md:hidden mobile-label">Item</div>
                   <ProductSelector
                     products={data?.products || []}
+                    selectedProductId={item.id}
                     onProductSelect={(product) => {
                       const newItems = [...items];
                       const discountMultiplier = (100 - item.discount) / 100;
                       newItems[index] = {
                         ...item,
+                        id: product.id,
                         description: product.name,
                         rate: product.price || 0,
                         amount:
@@ -549,60 +524,83 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                 </div>
               </div>
             ))}
-            <Button variant="outline" className="w-full" onClick={addItem}>
+            <Button variant="link" className="w-full" onClick={addItem}>
               <Plus className="h-4 w-4 mr-2" />
               Add New Line
             </Button>
           </div>
 
-          {/* Tax Section */}
+          {/* Adjustments Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label>Taxes</Label>
+              <Label>Fees & Adjustments</Label>
               <Button
-                variant="outline"
+                variant="link"
                 size="sm"
                 onClick={() =>
-                  setTaxes([...taxes, { name: "Tax", percentage: 0 }])
+                  setAdjustments([
+                    ...adjustments,
+                    adjustments.length === 0
+                      ? { name: "Tax", value: 10, isPercentage: true }
+                      : { name: "Adjustment", value: 0, isPercentage: true },
+                  ])
                 }
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Tax
+                Add Adjustment
               </Button>
             </div>
-            {taxes.map((tax, index) => (
+            {adjustments.map((adjustment, index) => (
               <div key={index} className="flex gap-4 items-center">
                 <Input
                   className="flex-1"
-                  placeholder="Tax name"
-                  value={tax.name}
+                  placeholder="Adjustment name"
+                  value={adjustment.name}
                   onChange={(e) => {
-                    const newTaxes = [...taxes];
-                    newTaxes[index] = { ...tax, name: e.target.value };
-                    setTaxes(newTaxes);
+                    const newAdjustments = [...adjustments];
+                    newAdjustments[index] = {
+                      ...adjustment,
+                      name: e.target.value,
+                    };
+                    setAdjustments(newAdjustments);
                   }}
                 />
-                <div className="flex items-center gap-2 w-32">
+                <div className="flex items-center gap-2 w-40">
                   <Input
                     type="number"
                     min="0"
-                    max="100"
-                    value={tax.percentage}
+                    value={adjustment.value}
                     onChange={(e) => {
-                      const newTaxes = [...taxes];
-                      newTaxes[index] = {
-                        ...tax,
-                        percentage: Number(e.target.value),
+                      const newAdjustments = [...adjustments];
+                      newAdjustments[index] = {
+                        ...adjustment,
+                        value: Number(e.target.value),
                       };
-                      setTaxes(newTaxes);
+                      setAdjustments(newAdjustments);
                     }}
                   />
-                  <span className="text-sm">%</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-12"
+                    onClick={() => {
+                      const newAdjustments = [...adjustments];
+                      newAdjustments[index] = {
+                        ...adjustment,
+                        isPercentage: !adjustment.isPercentage,
+                      };
+                      setAdjustments(newAdjustments);
+                    }}
+                  >
+                    {adjustment.isPercentage ? "%" : "$"}
+                  </Button>
                 </div>
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setTaxes(taxes.filter((_, i) => i !== index))}
+                  onClick={() =>
+                    setAdjustments(adjustments.filter((_, i) => i !== index))
+                  }
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -610,8 +608,7 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
             ))}
           </div>
 
-          {/* Notes Section - Add this after the Products Card */}
-
+          {/* Notes Section */}
           <h2 className="text-lg font-medium mb-4">Notes</h2>
           <Textarea
             value={notes}
@@ -619,6 +616,17 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
             placeholder="Add any additional notes or payment instructions..."
             rows={4}
           />
+
+          {/* Terms Section */}
+          <div className="mt-6">
+            <h2 className="text-lg font-medium mb-4">Terms & Conditions</h2>
+            <Textarea
+              value={terms}
+              onChange={(e) => setTerms(e.target.value)}
+              placeholder="Add your terms and conditions..."
+              rows={4}
+            />
+          </div>
         </div>
 
         {/* Right side - Preview */}
@@ -639,11 +647,35 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
 
             {/* Preview Content based on activeView */}
             {activeView === "pdf" && (
-              <div className="space-y-4">
+              <div className="space-y-4" style={{ zoom: 0.75 }}>
                 <div className="border rounded-lg p-6 bg-white border-none">
                   <div className="mb-6">
-                    <h3 className="text-lg font-bold mb-2">{invoiceNumber}</h3>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="flex justify-between">
+                      <h3 className="text-lg font-bold mb-2">
+                        {invoiceNumber}
+                      </h3>
+                      {selectedClient && (
+                        <div className="text-right">
+                          <p className="text-sm text-gray-600 mb-1">Bill To:</p>
+                          <p className="font-medium">{selectedClient.name}</p>
+                          {selectedClient.company && (
+                            <p className="text-sm">{selectedClient.company}</p>
+                          )}
+                          {selectedClient.address && (
+                            <p className="text-sm">
+                              {selectedClient.address.street}
+                            </p>
+                          )}
+                          {selectedClient.email && (
+                            <p className="text-sm">{selectedClient.email}</p>
+                          )}
+                          {selectedClient.phone && (
+                            <p className="text-sm">{selectedClient.phone}</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 mt-6">
                       <div>
                         <p className="text-sm text-gray-600">Issue date</p>
                         <p>
@@ -651,10 +683,6 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                             ? format(issueDate, "d MMMM yyyy")
                             : "Not set"}
                         </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Due date</p>
-                        <p>{date ? format(date, "d MMMM yyyy") : "Not set"}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-600">Payment Terms</p>
@@ -694,18 +722,23 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                   </table>
 
                   {/* Totals */}
-                  <div className="border-t pt-4">
+                  <div className="border-t pt-4 ml-auto max-w-xs">
                     <div className="flex justify-between mb-2">
                       <span>Subtotal</span>
                       <span>{subtotal.toFixed(2)}</span>
                     </div>
-                    {taxes.map((tax, index) => (
+                    {adjustments.map((adjustment, index) => (
                       <div key={index} className="flex justify-between mb-2">
                         <span>
-                          {tax.name} ({tax.percentage}%)
+                          {adjustment.name}{" "}
+                          {adjustment.isPercentage
+                            ? `(${adjustment.value}%)`
+                            : ""}
                         </span>
                         <span>
-                          {(subtotal * (tax.percentage / 100)).toFixed(2)}
+                          {adjustment.isPercentage
+                            ? (subtotal * (adjustment.value / 100)).toFixed(2)
+                            : adjustment.value.toFixed(2)}
                         </span>
                       </div>
                     ))}
@@ -716,10 +749,20 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                   </div>
 
                   {/* Add Notes to Preview */}
-                  {notes && (
+                  {(notes || terms) && (
                     <div className="border-t mt-4 pt-4">
-                      <p className="text-sm text-gray-600 mb-2">Notes</p>
-                      <p className="whitespace-pre-wrap">{notes}</p>
+                      {notes && (
+                        <>
+                          <p className="text-sm text-gray-600 mb-2">Notes</p>
+                          <p className="whitespace-pre-wrap mb-4">{notes}</p>
+                        </>
+                      )}
+                      {terms && (
+                        <>
+                          <p className="text-sm text-gray-600 mb-2">Terms</p>
+                          <p className="whitespace-pre-wrap">{terms}</p>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
@@ -728,19 +771,6 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
           </Card>
         </div>
       </div>
-
-      <PaymentDetailsModal
-        open={paymentDetailsModalOpen}
-        onClose={() => setPaymentDetailsModalOpen(false)}
-        onSave={async (newDetail) => {
-          const detail: PaymentDetail = {
-            ...newDetail,
-            id: crypto.randomUUID(),
-          };
-          setPaymentDetails([...paymentDetails, detail]);
-          return true;
-        }}
-      />
     </div>
   );
 }

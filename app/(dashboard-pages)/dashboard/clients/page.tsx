@@ -213,8 +213,8 @@ export default function ClientsPage() {
                       .map((client) => (
                         <TableRow key={client.id}>
                           <TableCell>
-                            <Link href={`/dashboard/client/${client.id}`}>
-                              {client.name}
+                            <Link href={`/dashboard/client/${client.uuid}`}>
+                              <Button variant="link"> {client.name}</Button>
                             </Link>
                           </TableCell>
                           <TableCell className="hidden md:table-cell">

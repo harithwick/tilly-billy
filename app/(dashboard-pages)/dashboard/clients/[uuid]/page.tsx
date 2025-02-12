@@ -58,7 +58,7 @@ type PageProps = {
 };
 
 export default function ClientPage() {
-  const params = useParams<{ id: string }>();
+  const params = useParams<{ uuid: string }>();
 
   const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
   const [client, setClient] = useState<Client | null>(null);
@@ -72,15 +72,15 @@ export default function ClientPage() {
   useEffect(() => {
     const fetchClientData = async () => {
       try {
-        const id = params.id;
-        const response = await fetch(`/api/dashboard/client/${id}`);
+        const uuid = params.uuid;
+        const response = await fetch(`/api/dashboard/clients/${uuid}`);
         if (!response.ok) {
           throw new Error("Failed to fetch client data");
         }
         const data = await response.json();
         console.log("data", data);
         setClient(data.client);
-        setInvoices(data.invoices);
+        setInvoices(data.client.invoices);
       } catch (error) {
         console.error("Error fetching client data:", error);
       } finally {
@@ -89,7 +89,7 @@ export default function ClientPage() {
     };
 
     fetchClientData();
-  }, [params.id]);
+  }, [params.uuid]);
 
   if (loading) {
     return <LoadingState />;

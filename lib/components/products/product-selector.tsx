@@ -23,13 +23,13 @@ import { Product } from "@/lib/types";
 interface ProductSelectorProps {
   products: Product[];
   onProductSelect: (product: Product) => void;
-  value?: string;
+  selectedProductId?: string | null;
 }
 
 export function ProductSelector({
   products,
   onProductSelect,
-  value,
+  selectedProductId,
 }: ProductSelectorProps) {
   const [open, setOpen] = React.useState(false);
   const [createModalOpen, setCreateModalOpen] = React.useState(false);
@@ -46,8 +46,8 @@ export function ProductSelector({
   }, [search]);
 
   const selectedProduct = React.useMemo(
-    () => products.find((product) => product.name === value),
-    [value]
+    () => products.find((product) => product.id === selectedProductId),
+    [selectedProductId]
   );
 
   const handleSelect = React.useCallback(
@@ -118,7 +118,7 @@ export function ProductSelector({
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === product.id.toString()
+                      selectedProductId === product.id.toString()
                         ? "opacity-100"
                         : "opacity-0"
                     )}

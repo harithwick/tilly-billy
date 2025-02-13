@@ -4,46 +4,14 @@ import { cookies } from "next/headers";
 import { get } from "http";
 import { getOrganizationIdFromUuid } from "@/lib/utils/organizations";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
+import { getProducts } from "@/app/api/_handlers/products_db";
 
 export const GET = apiRouteHandler({
   authRequired: true,
   orgUuidRequired: true,
   handler: async (request, { supabaseUser, supabase, activeOrgUuid }) => {
     try {
-      const { searchParams } = new URL(request.url);
-
-      const organizationId = await getOrganizationIdFromUuid(
-        supabase,
-        activeOrgUuid!
-      );
-
-      const { data: products, error } = await supabase
-        .from("products")
-        .select(
-          `
-        id,
-        name,
-        description,
-        price,
-        sku,
-        status,
-        created_at,
-        updated_at
-      `
-        )
-        .eq("org_id", organizationId)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Database error:", error);
-        return NextResponse.json(
-          { error: "Failed to fetch products" },
-          { status: 500 }
-        );
-      }
-
-      console.log("Products fetched:", products);
-      return NextResponse.json(products);
+      return NextResponse.json(await getProducts(supabase));
     } catch (error) {
       console.error("Error fetching products:", error);
       return NextResponse.json(

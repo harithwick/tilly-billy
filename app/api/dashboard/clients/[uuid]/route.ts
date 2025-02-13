@@ -4,6 +4,8 @@ import { cookies } from "next/headers";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 import { getOrganizationIdFromUuid } from "@/lib/utils/organizations";
 import { getClient } from "@/app/api/_handlers/clients_db";
+import { errorResponse } from "@/app/api/_handlers/error-response";
+
 export const GET = apiRouteHandler({
   authRequired: true,
   orgUuidRequired: true,
@@ -15,11 +17,7 @@ export const GET = apiRouteHandler({
     try {
       return NextResponse.json(await getClient(supabase, params!.uuid, true));
     } catch (error) {
-      console.error("Error fetching client:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });
@@ -56,19 +54,12 @@ export const PATCH = apiRouteHandler({
         .single();
 
       if (error) {
-        return NextResponse.json(
-          { error: "Failed to update client" },
-          { status: 500 }
-        );
+        return errorResponse(error);
       }
 
       return NextResponse.json(client);
     } catch (error) {
-      console.error("Error updating client:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });
@@ -90,10 +81,7 @@ export const DELETE = apiRouteHandler({
         .limit(1);
 
       if (checkError) {
-        return NextResponse.json(
-          { error: "Failed to check client usage" },
-          { status: 500 }
-        );
+        return errorResponse(checkError);
       }
 
       if (invoices && invoices.length > 0) {
@@ -109,19 +97,12 @@ export const DELETE = apiRouteHandler({
       const { error } = await supabase.from("clients").delete().eq("id", id);
 
       if (error) {
-        return NextResponse.json(
-          { error: "Failed to delete client" },
-          { status: 500 }
-        );
+        return errorResponse(error);
       }
 
       return new NextResponse(null, { status: 204 });
     } catch (error) {
-      console.error("Error deleting client:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });

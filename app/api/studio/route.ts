@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { getOrganizationIdFromUuid } from "@/lib/utils/organizations";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
+import { errorResponse } from "@/app/api/_handlers/error-response";
 
 export const GET = apiRouteHandler({
   authRequired: true,
@@ -22,10 +23,7 @@ export const GET = apiRouteHandler({
         .single();
 
       if (orgError) {
-        return NextResponse.json(
-          { error: "Failed to fetch organization details" },
-          { status: 500 }
-        );
+        return errorResponse(orgError);
       }
 
       // Get active clients
@@ -36,10 +34,7 @@ export const GET = apiRouteHandler({
         .eq("status", "active");
       console.log("clients", clients);
       if (clientsError) {
-        return NextResponse.json(
-          { error: "Failed to fetch clients" },
-          { status: 500 }
-        );
+        return errorResponse(clientsError);
       }
 
       // Get active products
@@ -50,10 +45,7 @@ export const GET = apiRouteHandler({
         .eq("status", "active");
 
       if (productsError) {
-        return NextResponse.json(
-          { error: "Failed to fetch products" },
-          { status: 500 }
-        );
+        return errorResponse(productsError);
       }
 
       return NextResponse.json({
@@ -62,11 +54,7 @@ export const GET = apiRouteHandler({
         products,
       });
     } catch (error) {
-      console.error("Error in studio endpoint:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });

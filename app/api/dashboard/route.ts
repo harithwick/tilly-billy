@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { setActiveOrganization } from "@/lib/utils/organizations";
 import { redirect } from "next/navigation";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
+import { errorResponse } from "@/app/api/_handlers/error-response";
 
 export const GET = apiRouteHandler({
   authRequired: true,
@@ -23,7 +24,7 @@ export const GET = apiRouteHandler({
         .order("created_at", { ascending: false });
 
       if (orgsError) {
-        throw orgsError;
+        return errorResponse(orgsError);
       }
 
       if (orgs && orgs.length === 0) {
@@ -34,11 +35,7 @@ export const GET = apiRouteHandler({
         organizations: orgs,
       });
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });

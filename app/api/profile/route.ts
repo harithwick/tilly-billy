@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
+import { errorResponse } from "@/app/api/_handlers/error-response";
 
 export const GET = apiRouteHandler({
   authRequired: true,
@@ -27,11 +28,7 @@ export const GET = apiRouteHandler({
         // subscription: subscription,
       });
     } catch (error) {
-      console.error("Error fetching user profile:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });
@@ -54,10 +51,7 @@ export const POST = apiRouteHandler({
       const json = await request.json();
 
       if (!user || !activeOrgUuid) {
-        return NextResponse.json(
-          { error: "Failed to fetch user" },
-          { status: 401 }
-        );
+        return errorResponse(new Error("Unauthorized"));
       }
 
       const { error } = await supabase.auth.updateUser({
@@ -68,10 +62,7 @@ export const POST = apiRouteHandler({
       });
 
       if (error) {
-        return NextResponse.json(
-          { error: "Failed to update profile" },
-          { status: 500 }
-        );
+        return errorResponse(error);
       }
 
       //Update the user metadata in the database
@@ -83,19 +74,12 @@ export const POST = apiRouteHandler({
         .eq("supabase_uid", user?.id);
 
       if (updateUserMetadataError) {
-        return NextResponse.json(
-          { error: "Failed to update user metadata" },
-          { status: 500 }
-        );
+        return errorResponse(updateUserMetadataError);
       }
 
       return NextResponse.json({ success: true });
     } catch (error) {
-      console.error("Error updating profile:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });
@@ -110,10 +94,7 @@ export const DELETE = apiRouteHandler({
       );
 
       if (error) {
-        return NextResponse.json(
-          { error: "Failed to delete account" },
-          { status: 500 }
-        );
+        return errorResponse(error);
       }
 
       // delete the user from the database
@@ -123,19 +104,12 @@ export const DELETE = apiRouteHandler({
         .eq("supabase_uid", supabaseUser!.id);
 
       if (deleteUserError) {
-        return NextResponse.json(
-          { error: "Failed to delete account" },
-          { status: 500 }
-        );
+        return errorResponse(deleteUserError);
       }
 
       return NextResponse.json({ success: true });
     } catch (error) {
-      console.error("Error deleting account:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });

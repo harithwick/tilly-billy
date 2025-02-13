@@ -2,6 +2,7 @@ export interface Product {
   id: string;
   organizationId: string;
   name: string;
+  uuid: string;
   description?: string;
   price?: number;
   sku?: string;
@@ -11,4 +12,4 @@ export interface Product {
   updatedAt: Date;
 }
 
-export type ProductStatus = 'active' | 'inactive' | 'archived';
+export type ProductStatus = "active" | "inactive" | "archived";

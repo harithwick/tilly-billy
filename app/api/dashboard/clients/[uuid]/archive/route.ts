@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 import { archiveClient } from "@/app/api/_handlers/clients_db";
+import { errorResponse } from "@/app/api/_handlers/error-response";
 
 export const POST = apiRouteHandler({
   authRequired: true,
@@ -9,11 +10,7 @@ export const POST = apiRouteHandler({
     try {
       return NextResponse.json(await archiveClient(supabase, params!.uuid));
     } catch (error) {
-      console.error("Error archiving client:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });

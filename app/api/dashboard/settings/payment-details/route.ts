@@ -3,6 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 import { getOrganizationIdFromUuid } from "@/lib/utils/organizations";
+import { errorResponse } from "@/app/api/_handlers/error-response";
 
 export const GET = apiRouteHandler({
   authRequired: true,
@@ -18,10 +19,7 @@ export const GET = apiRouteHandler({
 
       if (error) {
         console.error("Error fetching payment details:", error);
-        return NextResponse.json(
-          { error: "Failed to fetch payment details" },
-          { status: 500 }
-        );
+        return errorResponse(error);
       }
 
       const formattedPaymentDetails = paymentDetails.map((detail: any) => ({
@@ -36,11 +34,7 @@ export const GET = apiRouteHandler({
 
       return NextResponse.json(formattedPaymentDetails);
     } catch (error) {
-      console.error("Error fetching payment details:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });
@@ -77,19 +71,12 @@ export const POST = apiRouteHandler({
 
       if (error) {
         console.error("Error creating payment detail:", error);
-        return NextResponse.json(
-          { error: "Failed to create payment detail" },
-          { status: 500 }
-        );
+        return errorResponse(error);
       }
 
       return NextResponse.json(newPaymentDetail);
     } catch (error) {
-      console.error("Error creating payment detail:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });

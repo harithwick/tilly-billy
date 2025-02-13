@@ -7,6 +7,7 @@ import {
   getOrganizationIdFromUuid,
 } from "@/lib/utils/organizations";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
+import { errorResponse } from "@/app/api/_handlers/error-response";
 
 export const POST = apiRouteHandler({
   authRequired: true,
@@ -16,10 +17,7 @@ export const POST = apiRouteHandler({
       let userId = await getUserIdFromSupabaseId(supabase, supabaseUser!.id);
 
       if (!userId) {
-        return NextResponse.json(
-          { error: "Failed to get user id" },
-          { status: 500 }
-        );
+        return errorResponse(new Error("Failed to get user id"));
       }
 
       const json = await request.json();
@@ -38,10 +36,7 @@ export const POST = apiRouteHandler({
 
       if (error) {
         console.error("Error calling create_organization function:", error);
-        return NextResponse.json(
-          { error: "Failed to create organization" },
-          { status: 500 }
-        );
+        return errorResponse(error);
       }
       let cookieStore = await cookies();
 
@@ -51,10 +46,7 @@ export const POST = apiRouteHandler({
       return NextResponse.json(data);
     } catch (error) {
       console.error("Error creating organization:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });

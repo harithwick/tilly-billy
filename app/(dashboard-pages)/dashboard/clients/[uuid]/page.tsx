@@ -34,7 +34,7 @@ import { MoreVertical } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { capitalizeWords } from "@/lib/utils";
 import { ConfirmDelete } from "@/lib/components/confirm-delete";
-import { deleteInvoice } from "@/lib/api/invoices";
+import { deleteInvoice } from "@/lib/api_repository/invoices";
 import { toast } from "sonner";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
 import Link from "next/link";

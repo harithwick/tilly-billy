@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { useInvoices } from "@/lib/hooks/use-invoices";
 import { LoadingState } from "@/lib/components/loading-state";
-import { deleteInvoice } from "@/lib/api/invoices";
+import { deleteInvoice } from "@/lib/api_repository/invoices";
 import { formatCurrency, capitalizeWords } from "@/lib/utils";
 import { format } from "date-fns";
 import { TemplateSelectorModal } from "@/lib/components/invoices/templates/template-selector-modal";

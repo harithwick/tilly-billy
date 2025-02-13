@@ -23,7 +23,7 @@ import {
 import { Input } from "@/lib/components/ui/input";
 import { Button } from "@/lib/components/ui/button";
 import { Textarea } from "@/lib/components/ui/textarea";
-import { createProduct, updateProduct } from "@/lib/api/products";
+import { createProduct, updateProduct } from "@/lib/api_repository/products";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
 import { toast } from "sonner";
 import {

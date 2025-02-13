@@ -25,7 +25,7 @@ import {
   deleteClient,
   archiveClient,
   unarchiveClient,
-} from "@/lib/api/clients";
+} from "@/lib/api_repository/clients";
 import { useClients } from "@/lib/hooks/use-clients";
 import Link from "next/link";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";

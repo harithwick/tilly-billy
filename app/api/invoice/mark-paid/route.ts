@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
+import { errorResponse } from "@/app/api/_handlers/error-response";
 
 export const POST = apiRouteHandler({
   authRequired: true,
@@ -12,10 +13,7 @@ export const POST = apiRouteHandler({
       const invoiceId = formData.get("invoiceId") as string;
 
       if (!invoiceId) {
-        return NextResponse.json(
-          { error: "Invoice ID is required" },
-          { status: 400 }
-        );
+        return errorResponse(new Error("Invoice ID is required"));
       }
 
       const { data: invoice, error: invoiceError } = await supabase
@@ -27,18 +25,12 @@ export const POST = apiRouteHandler({
         .eq("id", invoiceId);
 
       if (invoiceError) {
-        return NextResponse.json(
-          { error: "Failed to mark invoice as paid" },
-          { status: 500 }
-        );
+        return errorResponse(invoiceError);
       }
 
       return NextResponse.json({ message: "Invoice marked as paid" });
     } catch (error) {
-      return NextResponse.json(
-        { error: "Failed to mark invoice as paid" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });

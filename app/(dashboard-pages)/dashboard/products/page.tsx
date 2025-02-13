@@ -36,7 +36,7 @@ import {
 import { useProducts } from "@/lib/hooks/use-products";
 import { LoadingState } from "@/lib/components/loading-state";
 import { cn, formatCurrency, capitalizeWords } from "@/lib/utils";
-import { deleteProduct } from "@/lib/api/products";
+import { deleteProduct } from "@/lib/api_repository/products";
 import { Product } from "@/lib/types";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
 

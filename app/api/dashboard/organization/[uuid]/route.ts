@@ -2,6 +2,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
+import { errorResponse } from "@/app/api/_handlers/error-response";
 
 export const GET = apiRouteHandler({
   authRequired: true,
@@ -19,26 +20,16 @@ export const GET = apiRouteHandler({
         .single();
 
       if (error) {
-        return NextResponse.json(
-          { error: "Failed to fetch organization" },
-          { status: 500 }
-        );
+        return errorResponse(error);
       }
 
       if (!organization) {
-        return NextResponse.json(
-          { error: "Organization not found" },
-          { status: 404 }
-        );
+        return errorResponse(new Error("Organization not found"));
       }
 
       return NextResponse.json(organization);
     } catch (error) {
-      console.error("Error fetching organization:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });
@@ -71,19 +62,12 @@ export const PATCH = apiRouteHandler({
         .single();
 
       if (error) {
-        return NextResponse.json(
-          { error: "Failed to update organization" },
-          { status: 500 }
-        );
+        return errorResponse(error);
       }
 
       return NextResponse.json(organization);
     } catch (error) {
-      console.error("Error updating organization:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });
@@ -105,19 +89,12 @@ export const DELETE = apiRouteHandler({
         .eq("uuid", uuid);
 
       if (error) {
-        return NextResponse.json(
-          { error: "Failed to delete organization" },
-          { status: 500 }
-        );
+        return errorResponse(error);
       }
 
       return NextResponse.json({ message: "Organization deleted" });
     } catch (error) {
-      console.error("Error deleting organization:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });

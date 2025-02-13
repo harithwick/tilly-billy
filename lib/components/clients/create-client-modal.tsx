@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { createClient, updateClient } from "@/lib/api/clients";
+import { createClient, updateClient } from "@/lib/api_repository/clients";
 import { toast } from "sonner";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
 import {

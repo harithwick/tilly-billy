@@ -5,6 +5,7 @@ import { get } from "http";
 import { getOrganizationIdFromUuid } from "@/lib/utils/organizations";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 import { getProducts } from "@/app/api/_handlers/products_db";
+import { errorResponse } from "@/app/api/_handlers/error-response";
 
 export const GET = apiRouteHandler({
   authRequired: true,
@@ -13,11 +14,7 @@ export const GET = apiRouteHandler({
     try {
       return NextResponse.json(await getProducts(supabase));
     } catch (error) {
-      console.error("Error fetching products:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });
@@ -35,10 +32,7 @@ export const POST = apiRouteHandler({
       );
 
       if (!organizationId) {
-        return NextResponse.json(
-          { error: "Organization not found" },
-          { status: 404 }
-        );
+        return errorResponse(new Error("Organization not found"));
       }
 
       console.log("Creating product:", data);
@@ -59,21 +53,13 @@ export const POST = apiRouteHandler({
         .single();
 
       if (error) {
-        console.error("Error creating product:", error);
-        return NextResponse.json(
-          { error: "Failed to create product" },
-          { status: 500 }
-        );
+        return errorResponse(error);
       }
 
       console.log("Product created:", product);
       return NextResponse.json(product);
     } catch (error) {
-      console.error("Error creating product:", error);
-      return NextResponse.json(
-        { error: "Internal server error" },
-        { status: 500 }
-      );
+      return errorResponse(error);
     }
   },
 });

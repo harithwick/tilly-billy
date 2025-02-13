@@ -25,7 +25,7 @@ import { toast } from "sonner";
 import {
   getOrganizationSettings,
   updateOrganizationSettings,
-} from "@/lib/api/settings";
+} from "@/lib/api_repository/settings";
 import { LoadingState } from "@/lib/components/loading-state";
 import { OrganizationSettings } from "@/lib/types/organizaiton-settings";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";

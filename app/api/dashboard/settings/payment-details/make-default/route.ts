@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { apiRouteHandler } from "@/lib/api/route-handler";
+import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 import { getOrganizationIdFromUuid } from "@/lib/utils/organizations";
 
 export const POST = apiRouteHandler({

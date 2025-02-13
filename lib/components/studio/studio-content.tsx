@@ -27,13 +27,13 @@ import { Header } from "@/lib/components/studio/header";
 import { Suspense } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Client, Organization, ClientAddress } from "@/lib/types";
+import {
+  Client,
+  Organization,
+  ClientAddress,
+  AdjustmentItem,
+} from "@/lib/types";
 // Update the TaxItem type to become AdjustmentItem
-type AdjustmentItem = {
-  name: string;
-  value: number;
-  isPercentage: boolean;
-};
 
 export default function StudioContent({ uuid }: { uuid?: string }) {
   const [date, setDate] = useState<Date>();

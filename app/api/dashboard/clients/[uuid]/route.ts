@@ -1,8 +1,9 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
-import { apiRouteHandler } from "@/lib/api/route-handler";
+import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 import { getOrganizationIdFromUuid } from "@/lib/utils/organizations";
+import { getClient } from "@/app/api/_handlers/clients_db";
 export const GET = apiRouteHandler({
   authRequired: true,
   orgUuidRequired: true,
@@ -12,35 +13,7 @@ export const GET = apiRouteHandler({
     { supabaseUser, supabase, activeOrgUuid, params }
   ) => {
     try {
-      let clientUuid = params!.uuid;
-      let orgId = await getOrganizationIdFromUuid(supabase, activeOrgUuid!);
-      const { data: client, error } = await supabase
-        .from("clients")
-        .select("*, invoices (*)")
-        .eq("uuid", clientUuid)
-        .eq("org_id", orgId)
-        .single();
-
-      if (error) {
-        return NextResponse.json(
-          { error: "Failed to fetch client" },
-          { status: 500 }
-        );
-      }
-
-      if (!client) {
-        return NextResponse.json(
-          { error: "Client not found" },
-          { status: 404 }
-        );
-      }
-
-      // const { data: invoices, error: invoicesError } = await supabase
-      //   .from("invoices")
-      //   .select("id, status")
-      //   .eq("client_id", id);
-
-      return NextResponse.json({ client });
+      return NextResponse.json(await getClient(supabase, params!.uuid, true));
     } catch (error) {
       console.error("Error fetching client:", error);
       return NextResponse.json(
@@ -108,7 +81,7 @@ export const DELETE = apiRouteHandler({
     { supabaseUser, supabase, activeOrgUuid, params }
   ) => {
     try {
-      const id = params!.id;
+      const id = params!.uuid;
 
       const { data: invoices, error: checkError } = await supabase
         .from("invoices")

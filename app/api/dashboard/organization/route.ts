@@ -6,7 +6,7 @@ import {
   getUserIdFromSupabaseId,
   getOrganizationIdFromUuid,
 } from "@/lib/utils/organizations";
-import { apiRouteHandler } from "@/lib/api/route-handler";
+import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 
 export const POST = apiRouteHandler({
   authRequired: true,

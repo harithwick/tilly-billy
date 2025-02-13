@@ -49,7 +49,9 @@ export default function ClientsPage() {
   const [status, setStatus] = useState("active");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
+  const [selectedClientUuid, setSelectedClientUuid] = useState<string | null>(
+    null
+  );
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const { clients, loading, error } = useClients();
   const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
@@ -66,16 +68,16 @@ export default function ClientsPage() {
     );
   }
 
-  const handleDeleteClick = async (clientId: number) => {
-    setSelectedClientId(clientId);
+  const handleDeleteClick = async (uuid: string) => {
+    setSelectedClientUuid(uuid);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedClientId) return;
+    if (!selectedClientUuid) return;
 
     try {
-      await deleteClient(selectedClientId.toString());
+      await deleteClient(selectedClientUuid);
       toast.success("Client deleted successfully");
       triggerRefresh();
     } catch (error) {
@@ -84,13 +86,13 @@ export default function ClientsPage() {
       );
     } finally {
       setDeleteDialogOpen(false);
-      setSelectedClientId(null);
+      setSelectedClientUuid(null);
     }
   };
 
-  const handleArchiveClick = async (clientId: number) => {
+  const handleArchiveClick = async (uuid: string) => {
     try {
-      await archiveClient(clientId.toString());
+      await archiveClient(uuid);
       toast.success("Client archived successfully");
       triggerRefresh();
     } catch (error) {
@@ -264,7 +266,7 @@ export default function ClientsPage() {
                                 ) : (
                                   <DropdownMenuItem
                                     onClick={() =>
-                                      handleArchiveClick(Number(client.id))
+                                      handleArchiveClick(client.uuid)
                                     }
                                   >
                                     Archive
@@ -272,9 +274,7 @@ export default function ClientsPage() {
                                 )}
                                 <DropdownMenuItem
                                   className="text-destructive"
-                                  onClick={() =>
-                                    handleDeleteClick(Number(client.id))
-                                  }
+                                  onClick={() => handleDeleteClick(client.uuid)}
                                 >
                                   Delete
                                 </DropdownMenuItem>

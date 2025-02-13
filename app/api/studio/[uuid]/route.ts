@@ -1,14 +1,17 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { NextResponse, NextRequest } from "next/server";
-import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
 import { getOrganizationIdFromUuid } from "@/lib/utils/organizations";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 
 export const GET = apiRouteHandler({
   authRequired: true,
   orgUuidRequired: false,
-  handler: async (request, { supabaseUser, supabase, activeOrgUuid }) => {
+  handler: async (
+    request,
+    { supabaseUser, supabase, activeOrgUuid, params }
+  ) => {
     try {
+      const invoiceUuid = params!.uuid;
+
       const organizationId = await getOrganizationIdFromUuid(
         supabase,
         activeOrgUuid!
@@ -34,7 +37,7 @@ export const GET = apiRouteHandler({
         .select("*")
         .eq("org_id", organizationId)
         .eq("status", "active");
-      console.log("clients", clients);
+
       if (clientsError) {
         return NextResponse.json(
           { error: "Failed to fetch clients" },
@@ -56,13 +59,37 @@ export const GET = apiRouteHandler({
         );
       }
 
+      // Get invoice details by UUID
+      const { data: invoice, error: invoiceError } = await supabase
+        .from("invoices")
+        .select(
+          `
+          *,
+          invoice_items (
+            *,
+            product:products (*)
+          ),
+          client:clients (*)
+        `
+        )
+        .eq("uuid", invoiceUuid)
+        .single();
+
+      if (invoiceError) {
+        return NextResponse.json(
+          { error: "Invoice not found" },
+          { status: 404 }
+        );
+      }
+
       return NextResponse.json({
         organization,
         clients,
         products,
+        invoice,
       });
     } catch (error) {
-      console.error("Error in studio endpoint:", error);
+      console.error("Error in studio/[uuid] endpoint:", error);
       return NextResponse.json(
         { error: "Internal server error" },
         { status: 500 }

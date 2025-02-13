@@ -1,7 +1,7 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
-import { apiRouteHandler } from "@/lib/api/route-handler";
+import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 
 export const GET = apiRouteHandler({
   authRequired: true,

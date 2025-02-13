@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { setActiveOrganization } from "@/lib/utils/organizations";
 import { redirect } from "next/navigation";
-import { apiRouteHandler } from "@/lib/api/route-handler";
+import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 
 export const GET = apiRouteHandler({
   authRequired: true,

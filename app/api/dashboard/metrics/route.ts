@@ -1,4 +1,4 @@
-import { apiRouteHandler } from "@/lib/api/route-handler";
+import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 import { NextResponse } from "next/server";
 
 export const GET = apiRouteHandler({

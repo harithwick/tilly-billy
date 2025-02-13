@@ -5,7 +5,8 @@ import {
   getOrganizationIdFromUuid,
   getUserIdFromSupabaseId,
 } from "@/lib/utils/organizations";
-import { apiRouteHandler } from "@/lib/api/route-handler";
+import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
+import { getClients } from "@/app/api/_handlers/clients_db";
 
 export const GET = apiRouteHandler({
   authRequired: true,
@@ -14,34 +15,7 @@ export const GET = apiRouteHandler({
     request: Request,
     { supabaseUser, supabase, activeOrgUuid }
   ) => {
-    const organizationId = await getOrganizationIdFromUuid(
-      supabase,
-      activeOrgUuid!
-    );
-
-    const { data: clients, error } = await supabase
-      .from("clients")
-      .select(
-        `
-      id, name, email, status, created_at, org_id, uuid, invoices (
-        id
-      )
-    `
-      )
-      .eq("org_id", organizationId)
-      .order("created_at", { ascending: false });
-
-    if (error) {
-      throw new Error("Failed to fetch clients");
-    }
-
-    // Transform the data to include invoice count
-    const transformedClients = clients.map((client: any) => ({
-      ...client,
-      invoice_count: client.invoices.length,
-    }));
-
-    return NextResponse.json(transformedClients);
+    return NextResponse.json(await getClients(supabase, true));
   },
 });
 

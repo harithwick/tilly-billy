@@ -3,7 +3,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { get } from "http";
 import { getOrganizationIdFromUuid } from "@/lib/utils/organizations";
-import { apiRouteHandler } from "@/lib/api/route-handler";
+import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 
 export const GET = apiRouteHandler({
   authRequired: true,

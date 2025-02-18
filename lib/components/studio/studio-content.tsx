@@ -67,6 +67,7 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
   useEffect(() => {
     if (data?.invoice) {
       // Populate form with invoice data
+      setOrganization(data.organization);
       setDate(new Date(data.invoice.issueDate));
       // setSelectedClient(data.invoice.clientId);
       setItems(
@@ -158,46 +159,69 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
   const generatePDF = () => {
     const doc = new jsPDF();
 
-    // Add invoice header
+    // Add organization details
+    if (organization) {
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text(organization.name, 20, 20);
+
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+      let yPos = 30;
+
+      if (organization.email) {
+        doc.text(organization.email, 20, yPos);
+        yPos += 7;
+      }
+    }
+
+    // Add "INVOICE" text and invoice number
     doc.setFontSize(20);
-    doc.text(invoiceNumber, 20, 20);
+    doc.setFont("helvetica", "bold");
+    doc.text("INVOICE", 140, 20);
+    doc.setFontSize(12);
+    doc.text(invoiceNumber, 140, 30);
+
+    // Calculate the starting Y position based on organization and client details
+    let startY = organization ? 80 : 40;
 
     // Add client details
     if (selectedClient) {
       doc.setFontSize(10);
-      doc.text("Bill To:", 20, 35);
+      doc.setFont("helvetica", "normal");
+      doc.text("Bill To:", 20, startY);
       doc.setFont("helvetica", "bold");
-      doc.text(selectedClient.name, 20, 45);
+      doc.text(selectedClient.name, 20, startY + 10);
       doc.setFont("helvetica", "normal");
       if (selectedClient.company) {
-        doc.text(selectedClient.company, 20, 52);
+        doc.text(selectedClient.company, 20, startY + 17);
       }
       if (selectedClient.address) {
         // doc.text(selectedClient.address, 20, selectedClient.company ? 59 : 52);
       }
       if (selectedClient.email) {
-        doc.text(selectedClient.email, 20, selectedClient.address ? 66 : 59);
+        doc.text(selectedClient.email, 20, startY + 24);
       }
       if (selectedClient.phone) {
-        doc.text(selectedClient.phone, 20, selectedClient.email ? 73 : 66);
+        doc.text(selectedClient.phone, 20, startY + 31);
       }
 
-      // Adjust the starting Y position for the rest of the content
-      const startY = selectedClient.phone ? 90 : 80;
+      // Adjust startY if client has details
+      startY = startY + (selectedClient.phone ? 50 : 40);
 
       // Add issue date and payment terms
-      doc.text("Issue date:", 120, 35);
+      doc.text("Issue date:", 120, startY);
       doc.text(
         issueDate ? format(issueDate, "d MMMM yyyy") : "Not set",
         160,
-        35
+        startY
       );
-      doc.text("Payment Terms:", 120, 45);
-      doc.text(getReadablePaymentTerms(paymentTerms), 160, 45);
+      doc.text("Payment Terms:", 120, startY + 10);
+      doc.text(getReadablePaymentTerms(paymentTerms), 160, startY + 10);
 
       // Update the items table starting position
       autoTable(doc, {
-        startY,
+        startY: startY + 20,
         head: [
           hasDiscounts
             ? ["Description", "Qty", "Unit Price", "Discount", "Amount"]
@@ -650,10 +674,44 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
               <div className="space-y-4" style={{ zoom: 0.75 }}>
                 <div className="border rounded-lg p-6 bg-white border-none">
                   <div className="mb-6">
-                    <div className="flex justify-between">
-                      <h3 className="text-lg font-bold mb-2">
-                        {invoiceNumber}
-                      </h3>
+                    {/* Organization and Invoice Header */}
+                    <div className="flex justify-between mb-8">
+                      {/* Organization Details */}
+                      {organization && (
+                        <div>
+                          <h2 className="text-xl font-bold mb-2">
+                            {organization.name}
+                          </h2>
+                          <div className="text-sm text-gray-600">
+                            {organization.email && <p>{organization.email}</p>}
+                          </div>
+                        </div>
+                      )}
+                      {/* Invoice Title and Number */}
+                      <div className="text-right">
+                        <h3 className="text-2xl font-bold mb-2">INVOICE</h3>
+                        <p className="text-lg">{invoiceNumber}</p>
+                      </div>
+                    </div>
+
+                    {/* Issue Date and Payment Terms */}
+                    <div className="grid grid-cols-2 gap-4 mb-8">
+                      <div>
+                        <p className="text-sm text-gray-600">Issue Date</p>
+                        <p>
+                          {issueDate
+                            ? format(issueDate, "d MMMM yyyy")
+                            : "Not set"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600">Payment Terms</p>
+                        <p>{getReadablePaymentTerms(paymentTerms)}</p>
+                      </div>
+                    </div>
+
+                    {/* Client Details */}
+                    <div className="flex justify-end mb-8">
                       {selectedClient && (
                         <div className="text-right">
                           <p className="text-sm text-gray-600 mb-1">Bill To:</p>
@@ -675,96 +733,82 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                         </div>
                       )}
                     </div>
-                    <div className="grid grid-cols-2 gap-4 mt-6">
-                      <div>
-                        <p className="text-sm text-gray-600">Issue date</p>
-                        <p>
-                          {issueDate
-                            ? format(issueDate, "d MMMM yyyy")
-                            : "Not set"}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Payment Terms</p>
-                        <p>{getReadablePaymentTerms(paymentTerms)}</p>
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Items Table */}
-                  <table className="w-full mb-6">
-                    <thead>
-                      <tr className="text-left border-b">
-                        <th className="py-2">DESCRIPTION</th>
-                        <th className="py-2 text-right">QTY</th>
-                        <th className="py-2 text-right">UNIT PRICE</th>
-                        {hasDiscounts && (
-                          <th className="py-2 text-right">DISCOUNT</th>
-                        )}
-                        <th className="py-2 text-right">AMOUNT</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {items.map((item, index) => (
-                        <tr key={index}>
-                          <td className="py-2">{item.description}</td>
-                          <td className="py-2 text-right">{item.quantity}</td>
-                          <td className="py-2 text-right">{item.rate}</td>
+                    {/* Items Table */}
+                    <table className="w-full mb-6">
+                      <thead>
+                        <tr className="text-left border-b">
+                          <th className="py-2">DESCRIPTION</th>
+                          <th className="py-2 text-right">QTY</th>
+                          <th className="py-2 text-right">UNIT PRICE</th>
                           {hasDiscounts && (
-                            <td className="py-2 text-right">
-                              {item.discount > 0 ? `${item.discount}%` : "-"}
-                            </td>
+                            <th className="py-2 text-right">DISCOUNT</th>
                           )}
-                          <td className="py-2 text-right">{item.amount}</td>
+                          <th className="py-2 text-right">AMOUNT</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {items.map((item, index) => (
+                          <tr key={index}>
+                            <td className="py-2">{item.description}</td>
+                            <td className="py-2 text-right">{item.quantity}</td>
+                            <td className="py-2 text-right">{item.rate}</td>
+                            {hasDiscounts && (
+                              <td className="py-2 text-right">
+                                {item.discount > 0 ? `${item.discount}%` : "-"}
+                              </td>
+                            )}
+                            <td className="py-2 text-right">{item.amount}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
 
-                  {/* Totals */}
-                  <div className="border-t pt-4 ml-auto max-w-xs">
-                    <div className="flex justify-between mb-2">
-                      <span>Subtotal</span>
-                      <span>{subtotal.toFixed(2)}</span>
-                    </div>
-                    {adjustments.map((adjustment, index) => (
-                      <div key={index} className="flex justify-between mb-2">
-                        <span>
-                          {adjustment.name}{" "}
-                          {adjustment.isPercentage
-                            ? `(${adjustment.value}%)`
-                            : ""}
-                        </span>
-                        <span>
-                          {adjustment.isPercentage
-                            ? (subtotal * (adjustment.value / 100)).toFixed(2)
-                            : adjustment.value.toFixed(2)}
-                        </span>
+                    {/* Totals */}
+                    <div className="border-t pt-4 ml-auto max-w-xs">
+                      <div className="flex justify-between mb-2">
+                        <span>Subtotal</span>
+                        <span>{subtotal.toFixed(2)}</span>
                       </div>
-                    ))}
-                    <div className="flex justify-between font-bold">
-                      <span>Total</span>
-                      <span>{total.toFixed(2)}</span>
+                      {adjustments.map((adjustment, index) => (
+                        <div key={index} className="flex justify-between mb-2">
+                          <span>
+                            {adjustment.name}{" "}
+                            {adjustment.isPercentage
+                              ? `(${adjustment.value}%)`
+                              : ""}
+                          </span>
+                          <span>
+                            {adjustment.isPercentage
+                              ? (subtotal * (adjustment.value / 100)).toFixed(2)
+                              : adjustment.value.toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
+                      <div className="flex justify-between font-bold">
+                        <span>Total</span>
+                        <span>{total.toFixed(2)}</span>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Add Notes to Preview */}
-                  {(notes || terms) && (
-                    <div className="border-t mt-4 pt-4">
-                      {notes && (
-                        <>
-                          <p className="text-sm text-gray-600 mb-2">Notes</p>
-                          <p className="whitespace-pre-wrap mb-4">{notes}</p>
-                        </>
-                      )}
-                      {terms && (
-                        <>
-                          <p className="text-sm text-gray-600 mb-2">Terms</p>
-                          <p className="whitespace-pre-wrap">{terms}</p>
-                        </>
-                      )}
-                    </div>
-                  )}
+                    {/* Add Notes to Preview */}
+                    {(notes || terms) && (
+                      <div className="border-t mt-4 pt-4">
+                        {notes && (
+                          <>
+                            <p className="text-sm text-gray-600 mb-2">Notes</p>
+                            <p className="whitespace-pre-wrap mb-4">{notes}</p>
+                          </>
+                        )}
+                        {terms && (
+                          <>
+                            <p className="text-sm text-gray-600 mb-2">Terms</p>
+                            <p className="whitespace-pre-wrap">{terms}</p>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

@@ -3,6 +3,8 @@ export interface Organization {
   name: string;
   uuid: string;
   email?: string;
+  timezone?: string;
+  inv_prefix?: string;
   logo_url?: string;
   currency: string;
   createdAt: Date;

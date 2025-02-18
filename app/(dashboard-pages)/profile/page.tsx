@@ -45,6 +45,16 @@ import { User } from "@supabase/supabase-js";
 import { HTMLAttributes } from "react";
 import { plans } from "@/lib/constants/pricing-plans";
 import { getStripePortalLink } from "@/lib/constants/stripe";
+import { ChevronRight, Home } from "lucide-react";
+import Link from "next/link";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/lib/components/ui/breadcrumb";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),
@@ -175,6 +185,23 @@ export default function ProfilePage() {
 
   return (
     <div className="py-12 px-4 max-w-screen-lg mx-auto">
+      <Breadcrumb className="mb-6">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/dashboard" className="flex items-center">
+              <Home className="h-4 w-4 mr-1" />
+              Dashboard
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator>
+            <ChevronRight className="h-4 w-4" />
+          </BreadcrumbSeparator>
+          <BreadcrumbItem>
+            <BreadcrumbPage>Profile Settings</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+
       <div className="mb-8">
         <h2 className="text-3xl font-bold tracking-tight">Profile Settings</h2>
         <p className="text-muted-foreground">

@@ -288,9 +288,9 @@ const renderMenuItem = (item: MenuItem) => {
                     {category}
                   </div>
                   <ul className="w-64">
-                    <NavigationMenuLink>
-                      {items.map((subItem) => (
-                        <li key={subItem.title}>
+                    {items.map((subItem) => (
+                      <li key={subItem.title}>
+                        <NavigationMenuLink asChild>
                           <a
                             className="flex select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-muted hover:text-accent-foreground"
                             href={subItem.url}
@@ -307,9 +307,9 @@ const renderMenuItem = (item: MenuItem) => {
                               )}
                             </div>
                           </a>
-                        </li>
-                      ))}
-                    </NavigationMenuLink>
+                        </NavigationMenuLink>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               )
@@ -319,9 +319,9 @@ const renderMenuItem = (item: MenuItem) => {
             {categorizedItems.withoutCategory.length > 0 && (
               <div className="flex-1">
                 <ul className="w-64">
-                  <NavigationMenuLink>
-                    {categorizedItems.withoutCategory.map((subItem) => (
-                      <li key={subItem.title}>
+                  {categorizedItems.withoutCategory.map((subItem) => (
+                    <li key={subItem.title}>
+                      <NavigationMenuLink asChild>
                         <a
                           className="flex select-none gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-muted hover:text-accent-foreground"
                           href={subItem.url}
@@ -338,9 +338,9 @@ const renderMenuItem = (item: MenuItem) => {
                             )}
                           </div>
                         </a>
-                      </li>
-                    ))}
-                  </NavigationMenuLink>
+                      </NavigationMenuLink>
+                    </li>
+                  ))}
                 </ul>
               </div>
             )}

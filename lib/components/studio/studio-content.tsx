@@ -320,11 +320,11 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
           {uuid ? "Edit Invoice" : "Create Invoice"}
         </h1>
         <div className="flex gap-2">
-          {!uuid && (
+          {/* {!uuid && (
             <Button className="flex-1" variant="outline">
               Save Draft
             </Button>
-          )}
+          )} */}
           <Button className="flex-1" onClick={generatePDF}>
             {uuid ? "Save" : "Create"}
           </Button>

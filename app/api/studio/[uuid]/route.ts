@@ -97,3 +97,31 @@ export const GET = apiRouteHandler({
     }
   },
 });
+
+export const POST = apiRouteHandler({
+  authRequired: true,
+  orgUuidRequired: false,
+  requiredParams: ["uuid"],
+  handler: async (
+    request,
+    { supabaseUser, supabase, activeOrgUuid, params }
+  ) => {
+    // const { uuid } = params;
+
+    return NextResponse.json({ message: "Hello World" });
+  },
+});
+
+export const DELETE = apiRouteHandler({
+  authRequired: true,
+  orgUuidRequired: false,
+  requiredParams: ["uuid"],
+  handler: async (
+    request,
+    { supabaseUser, supabase, activeOrgUuid, params }
+  ) => {
+    const { uuid } = params;
+
+    return NextResponse.json({ message: "Hello World" });
+  },
+});

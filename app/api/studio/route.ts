@@ -58,3 +58,11 @@ export const GET = apiRouteHandler({
     }
   },
 });
+
+export const POST = apiRouteHandler({
+  authRequired: true,
+  orgUuidRequired: false,
+  handler: async (request, { supabaseUser, supabase, activeOrgUuid }) => {
+    return NextResponse.json({ message: "Hello World" });
+  },
+});

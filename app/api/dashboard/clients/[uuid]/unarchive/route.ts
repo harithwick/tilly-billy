@@ -8,6 +8,7 @@ export const POST = apiRouteHandler({
   orgUuidRequired: true,
   handler: async (request, { supabase, activeOrgUuid, params }) => {
     try {
+      console.log("unarchiving client", params!.uuid);
       return NextResponse.json(
         await archiveClient(supabase, params!.uuid, false)
       );

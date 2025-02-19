@@ -91,6 +91,11 @@ export function apiRouteHandler({
       return response;
     } catch (error) {
       console.error("API Error:", error);
+
+      if (error instanceof Error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+
       return NextResponse.json(
         { error: "Internal server error" },
         { status: 500 }

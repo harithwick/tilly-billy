@@ -102,9 +102,9 @@ export default function ClientsPage() {
     }
   };
 
-  const handleUnarchiveClick = async (clientId: number) => {
+  const handleUnarchiveClick = async (uuid: string) => {
     try {
-      await unarchiveClient(clientId.toString());
+      await unarchiveClient(uuid);
       toast.success("Client unarchived successfully");
       triggerRefresh();
     } catch (error) {
@@ -258,7 +258,7 @@ export default function ClientsPage() {
                                 {status === "archived" ? (
                                   <DropdownMenuItem
                                     onClick={() =>
-                                      handleUnarchiveClick(Number(client.id))
+                                      handleUnarchiveClick(client.uuid)
                                     }
                                   >
                                     Unarchive

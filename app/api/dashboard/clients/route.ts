@@ -15,7 +15,7 @@ export const GET = apiRouteHandler({
     request: Request,
     { supabaseUser, supabase, activeOrgUuid }
   ) => {
-    return NextResponse.json(await getClients(supabase, true));
+    return NextResponse.json(await getClients(supabase, true, activeOrgUuid!));
   },
 });
 

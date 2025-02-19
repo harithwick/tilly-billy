@@ -1,13 +1,19 @@
 //This file calls the client's DB' functions and returns the data
 
 import { SupabaseClient } from "@supabase/supabase-js";
+import { getOrganizationIdFromUuid } from "@/lib/utils/organizations";
+
 export async function getClients(
   supabase: SupabaseClient,
-  withInvoices: boolean = false
+  withInvoices: boolean = false,
+  orgUuid: string
 ) {
+  const orgId = await getOrganizationIdFromUuid(supabase, orgUuid);
+  console.log("orgId", orgId);
   const { data, error } = await supabase
     .from("clients")
-    .select(withInvoices ? "*, invoices (*)" : "*");
+    .select(withInvoices ? "*, invoices (*)" : "*")
+    .eq("org_id", orgId);
   if (error) throw error;
   return data;
 }

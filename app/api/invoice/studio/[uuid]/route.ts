@@ -120,7 +120,7 @@ export const DELETE = apiRouteHandler({
     request,
     { supabaseUser, supabase, activeOrgUuid, params }
   ) => {
-    const { uuid } = params;
+    // const { uuid } = params;
 
     return NextResponse.json({ message: "Hello World" });
   },

@@ -92,12 +92,12 @@ export function apiRouteHandler({
     } catch (error) {
       console.error("API Error:", error);
 
-      if (error instanceof Error) {
+      if (error && typeof error === "object" && "message" in error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
 
       return NextResponse.json(
-        { error: "Internal server error" },
+        { error: "Internsdfsdfal server error" },
         { status: 500 }
       );
     }

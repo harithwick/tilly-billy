@@ -45,3 +45,41 @@ export async function archiveClient(
   if (error) throw error;
   return data;
 }
+
+export async function deleteClient(supabase: SupabaseClient, uuid: string) {
+  // get the clientId from the uuid
+  const { data: client, error: clientError } = await supabase
+    .from("clients")
+    .select("id")
+    .eq("uuid", uuid)
+    .single();
+
+  if (clientError) {
+    throw clientError;
+  }
+
+  const { data: invoices, error: checkError } = await supabase
+    .from("invoices")
+    .select("id")
+    .eq("client_id", client?.id)
+    .limit(1);
+
+  if (checkError) {
+    throw checkError;
+  }
+
+  if (invoices && invoices.length > 0) {
+    throw new Error(
+      "This client cannot be deleted because they have associated invoices. Please archive this client instead."
+    );
+  }
+
+  const { error: deleteError } = await supabase
+    .from("clients")
+    .delete()
+    .eq("uuid", uuid);
+
+  if (deleteError) {
+    throw deleteError;
+  }
+}

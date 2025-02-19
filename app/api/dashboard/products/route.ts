@@ -11,11 +11,7 @@ export const GET = apiRouteHandler({
   authRequired: true,
   orgUuidRequired: true,
   handler: async (request, { supabaseUser, supabase, activeOrgUuid }) => {
-    try {
-      return NextResponse.json(await getProducts(supabase));
-    } catch (error) {
-      return errorResponse(error);
-    }
+    return NextResponse.json(await getProducts(supabase, activeOrgUuid!));
   },
 });
 

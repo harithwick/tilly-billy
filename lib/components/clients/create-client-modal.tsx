@@ -105,7 +105,7 @@ export function CreateClientModal({
     setLoading(true);
     try {
       if (client) {
-        const updatedClient = await updateClient(client.id.toString(), data);
+        const updatedClient = await updateClient(client.uuid, data);
         toast.success("Client updated successfully");
         if (onSuccess) onSuccess(updatedClient);
       } else {

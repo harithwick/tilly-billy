@@ -1,7 +1,12 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { getOrganizationIdFromUuid } from "@/lib/utils/organizations";
+export async function getProducts(supabase: SupabaseClient, orgUuid: string) {
+  let orgId = await getOrganizationIdFromUuid(supabase, orgUuid);
 
-export async function getProducts(supabase: SupabaseClient) {
-  const { data, error } = await supabase.from("products").select("*");
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("org_id", orgId);
   if (error) throw error;
   return data;
 }

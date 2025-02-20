@@ -196,9 +196,6 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
       if (selectedClient.company) {
         doc.text(selectedClient.company, 20, startY + 17);
       }
-      if (selectedClient.address) {
-        // doc.text(selectedClient.address, 20, selectedClient.company ? 59 : 52);
-      }
       if (selectedClient.email) {
         doc.text(selectedClient.email, 20, startY + 24);
       }

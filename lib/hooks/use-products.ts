@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Product } from "@/lib/types";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
+import { apiRequest, HttpMethod } from "@/lib/utils/api-request";
 
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -14,20 +15,17 @@ export function useProducts() {
     async function fetchProducts() {
       try {
         setLoading(true);
-        const url = new URL("/api/dashboard/products", window.location.origin);
-        const response = await fetch(url);
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to fetch products");
-        }
-        const data = await response.json();
+        const data = await apiRequest<Product[]>(
+          "/api/dashboard/products",
+          HttpMethod.GET
+        );
         setProducts(data);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Failed to fetch products"
         );
       } finally {
-        setLoading(false); // Only stop loader on initial load
+        setLoading(false);
       }
     }
 

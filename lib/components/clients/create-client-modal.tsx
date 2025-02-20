@@ -42,16 +42,11 @@ const formSchema = z.object({
   phone: z.string().optional().or(z.literal("")),
   website: z.string().url("Invalid website URL").optional().or(z.literal("")),
   taxNumber: z.string().optional(),
-  address: z
-    .object({
-      street: z.string().optional().or(z.literal("")),
-      city: z.string().optional().or(z.literal("")),
-      state: z.string().optional().or(z.literal("")),
-      postalCode: z.string().optional().or(z.literal("")),
-      country: z.string().optional().or(z.literal("")),
-    })
-    .optional()
-    .default({}),
+  street: z.string().optional().or(z.literal("")),
+  city: z.string().optional().or(z.literal("")),
+  state: z.string().optional().or(z.literal("")),
+  postalCode: z.string().optional().or(z.literal("")),
+  country: z.string().optional().or(z.literal("")),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -82,7 +77,11 @@ export function CreateClientModal({
       phone: client?.phone || "",
       website: client?.website || "",
       taxNumber: client?.vatNumber || "",
-      address: client?.address || {},
+      street: client?.street || "",
+      city: client?.city || "",
+      state: client?.state || "",
+      postalCode: client?.postalCode || "",
+      country: client?.country || "",
     },
   });
 
@@ -96,7 +95,11 @@ export function CreateClientModal({
         phone: client.phone || "",
         website: client.website || "",
         taxNumber: client.vatNumber || "",
-        address: client.address || {},
+        street: client.street || "",
+        city: client.city || "",
+        state: client.state || "",
+        postalCode: client.postalCode || "",
+        country: client.country || "",
       });
     }
   }, [client, form]);
@@ -109,15 +112,13 @@ export function CreateClientModal({
         toast.success("Client updated successfully");
         if (onSuccess) onSuccess(updatedClient);
       } else {
-        const newClient = await createClient({
-          ...data,
-        });
+        const newClient = await createClient(data);
         toast.success("Client created successfully");
         if (onSuccess) onSuccess(newClient);
       }
       onOpenChange(false);
       form.reset();
-      // triggerRefresh;
+      refreshTrigger();
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -238,7 +239,7 @@ export function CreateClientModal({
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="address.street"
+                  name="street"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Street Address</FormLabel>
@@ -251,7 +252,7 @@ export function CreateClientModal({
                 />
                 <FormField
                   control={form.control}
-                  name="address.city"
+                  name="city"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>City</FormLabel>
@@ -267,7 +268,7 @@ export function CreateClientModal({
               <div className="grid grid-cols-3 gap-4">
                 <FormField
                   control={form.control}
-                  name="address.state"
+                  name="state"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>State</FormLabel>
@@ -280,7 +281,7 @@ export function CreateClientModal({
                 />
                 <FormField
                   control={form.control}
-                  name="address.postalCode"
+                  name="postalCode"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Postal Code</FormLabel>
@@ -293,7 +294,7 @@ export function CreateClientModal({
                 />
                 <FormField
                   control={form.control}
-                  name="address.country"
+                  name="country"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Country</FormLabel>

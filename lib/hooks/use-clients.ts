@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Client } from "@/lib/types";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
+import { getClients } from "@/lib/api_repository/clients";
 
 export function useClients() {
   const [clients, setClients] = useState<Client[]>([]);
@@ -14,26 +15,15 @@ export function useClients() {
     async function fetchClients() {
       try {
         setLoading(true);
-        const responseData = await fetch("/api/dashboard/clients", {
-          cache: "no-cache",
-        });
-
-        if (!responseData.ok) {
-          const errorData = await responseData.json();
-          throw new Error(errorData.error || "Failed to fetch clients");
-        }
-
-        let data = await responseData.json();
-
-        if (responseData) {
-          setClients(data);
-          setLoading(false);
-        }
+        const data = await getClients();
+        setClients(data);
       } catch (err) {
         console.error("Error fetching clients:", err);
         setError(
           err instanceof Error ? err.message : "Failed to fetch clients"
         );
+      } finally {
+        setLoading(false);
       }
     }
 

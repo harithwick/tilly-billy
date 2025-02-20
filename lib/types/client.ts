@@ -7,7 +7,6 @@ export interface Client {
   phone?: string;
   website?: string;
   vatNumber?: string;
-  address: ClientAddress;
   billingEmail?: string;
   paymentTerms?: number;
   notes?: string;
@@ -16,9 +15,6 @@ export interface Client {
   updatedAt: Date;
   uuid: string;
   invoiceCount: number;
-}
-
-export interface ClientAddress {
   street?: string;
   city?: string;
   state?: string;

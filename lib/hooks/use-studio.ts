@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { StudioData } from "@/lib/types/studio";
+import { apiRequest, HttpMethod } from "@/lib/utils/api-request";
 
 export function useStudio(invoiceId?: string | null) {
   const [data, setData] = useState<StudioData | null>(null);
@@ -12,22 +13,11 @@ export function useStudio(invoiceId?: string | null) {
     async function fetchStudioData() {
       try {
         setLoading(true);
-        let url = new URL("/api/studio/", window.location.origin);
-        if (invoiceId) {
-          url = new URL(`/api/studio/${invoiceId}`, window.location.origin);
-        }
+        const endpoint = invoiceId
+          ? `/api/studio/${invoiceId}`
+          : "/api/studio/";
 
-        const response = await fetch(url, {
-          cache: "no-store",
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to fetch studio data");
-        }
-
-        const data = await response.json();
-
+        const data = await apiRequest<StudioData>(endpoint, HttpMethod.GET);
         setData(data);
       } catch (err) {
         console.error("Error fetching studio data:", err);

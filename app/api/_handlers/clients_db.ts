@@ -150,7 +150,6 @@ export async function updateClient(
       status: data.status || "active",
       country: data.country || null,
       city: data.city || null,
-      address: data.address || null,
       street: data.street || null,
       state: data.state || null,
       postal_code: data.postalCode || null,

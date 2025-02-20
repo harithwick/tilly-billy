@@ -2,6 +2,13 @@ import { Client } from "@/lib/types/client";
 import { apiRequest, HttpMethod } from "@/lib/utils/api-request";
 import { API_DASHBOARD_BASE_PATH } from "@/lib/constants/application";
 
+export function getClients(): Promise<Client[]> {
+  return apiRequest<Client[]>(
+    `${API_DASHBOARD_BASE_PATH}/clients`,
+    HttpMethod.GET
+  );
+}
+
 export function createClient(data: Partial<Client>): Promise<Client> {
   return apiRequest<Client>(
     `${API_DASHBOARD_BASE_PATH}/clients`,

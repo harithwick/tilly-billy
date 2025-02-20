@@ -4,6 +4,11 @@ import { useState, useEffect } from "react";
 import { Invoice } from "@/lib/types";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
 import { toast } from "sonner";
+import { getInvoices } from "@/lib/api_repository/invoices";
+
+interface InvoicesResponse {
+  invoices: Invoice[];
+}
 
 export function useInvoices() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -15,25 +20,13 @@ export function useInvoices() {
     async function fetchInvoices() {
       try {
         setLoading(true);
-        const url = new URL("/api/dashboard/invoices", window.location.origin);
-
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to fetch invoices");
-        }
-
-        const data = await response.json();
-        setInvoices(data["invoices"]);
+        const data = await getInvoices();
+        setInvoices(data.invoices);
       } catch (err) {
-        console.error("Error fetching invoices:", err);
-        toast.error(
-          err instanceof Error ? err.message : "Failed to fetch invoices"
-        );
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch invoices"
-        );
+        const message =
+          err instanceof Error ? err.message : "Failed to fetch invoices";
+        toast.error(message);
+        setError(message);
       } finally {
         setLoading(false);
       }

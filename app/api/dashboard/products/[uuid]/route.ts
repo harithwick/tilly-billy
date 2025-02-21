@@ -65,7 +65,7 @@ export const DELETE = apiRouteHandler({
   ) => {
     try {
       await deleteProduct(supabase, params!.uuid);
-      return new NextResponse();
+      return NextResponse.json({ message: "Product deleted successfully" });
     } catch (error) {
       return errorResponse(error);
     }

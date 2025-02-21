@@ -42,7 +42,7 @@ import { useRefreshStore } from "@/lib/stores/use-refresh-store";
 
 export default function ProductsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedProductId, setSelectedProductId] = useState<number | null>(
+  const [selectedProductUuid, setSelectedProductUuid] = useState<string | null>(
     null
   );
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -62,16 +62,16 @@ export default function ProductsPage() {
     );
   }
 
-  const handleDeleteClick = (productId: number) => {
-    setSelectedProductId(productId);
+  const handleDeleteClick = (productUuid: string) => {
+    setSelectedProductUuid(productUuid);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedProductId) return;
+    if (!selectedProductUuid) return;
 
     try {
-      await deleteProduct(selectedProductId.toString());
+      await deleteProduct(selectedProductUuid);
       toast.success("Product deleted successfully");
       triggerRefresh(); // Refresh products list
     } catch (error) {
@@ -80,12 +80,8 @@ export default function ProductsPage() {
       );
     } finally {
       setDeleteDialogOpen(false);
-      setSelectedProductId(null);
+      setSelectedProductUuid(null);
     }
-    // Handle delete logic here
-    console.log("Deleting product:", selectedProductId);
-    setDeleteDialogOpen(false);
-    setSelectedProductId(null);
   };
 
   return (
@@ -249,7 +245,7 @@ export default function ProductsPage() {
                                 <DropdownMenuItem
                                   className="text-destructive"
                                   onClick={() =>
-                                    handleDeleteClick(Number(product.id))
+                                    handleDeleteClick(product.uuid)
                                   }
                                 >
                                   Delete

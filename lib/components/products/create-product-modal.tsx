@@ -87,7 +87,7 @@ export function CreateProductModal({
     setLoading(true);
     try {
       if (product) {
-        await updateProduct(product.id.toString(), data);
+        await updateProduct(product.uuid, data);
         toast.success("Product updated successfully");
       } else {
         await createProduct({ data });

@@ -14,7 +14,7 @@ import {
 interface ConfirmDeleteProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
+  onConfirm: () => Promise<void>;
   title?: string;
   description?: string;
 }
@@ -36,7 +36,14 @@ export function ConfirmDelete({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={onConfirm}
+            onClick={async () => {
+              try {
+                await onConfirm();
+                onOpenChange(false);
+              } catch (error) {
+                console.error("Delete operation failed:", error);
+              }
+            }}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             Delete

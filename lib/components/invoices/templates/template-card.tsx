@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/lib/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utilities";
 import { Check } from "lucide-react";
 
 interface TemplateCardProps {

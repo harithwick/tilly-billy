@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { ChevronDown, Check, PlusCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utilities";
 import { Button } from "./ui/button";
 import { Badge } from "@/lib/components/ui/badge";
 import Cookies from "js-cookie";
@@ -18,7 +18,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Organization } from "@/lib/types";
 import { useRefreshStore } from "../stores/use-refresh-store";
-import { limitCharacters } from "@/lib/utils";
+import { limitCharacters } from "@/lib/utils/utilities";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 

@@ -1,7 +1,7 @@
 import { plans, planFeatures } from "@/lib/constants/pricing-plans";
 import Link from "next/link";
 import { Fragment } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utilities";
 import { Check } from "lucide-react";
 import { Badge } from "@/lib/components/ui/badge";
 import { Button } from "@/lib/components/ui/button";

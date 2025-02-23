@@ -20,7 +20,7 @@ import { EmptyState } from "@/lib/components/empty-state";
 import { ConfirmDelete } from "@/lib/components/confirm-delete";
 import { CreateClientModal } from "@/lib/components/clients/create-client-modal";
 import { LoadingState } from "@/lib/components/loading-state";
-import { cn, capitalizeWords } from "@/lib/utils";
+import { cn, capitalizeWords } from "@/lib/utils/utilities";
 import {
   deleteClient,
   archiveClient,
@@ -222,7 +222,7 @@ export default function ClientsPage() {
                           <TableCell className="hidden md:table-cell">
                             {client.email || "-"}
                           </TableCell>
-                          <TableCell>{client.company || "-"}</TableCell>
+                          <TableCell>{client.companyName || "-"}</TableCell>
                           <TableCell>{client.name || 0}</TableCell>
                           <TableCell>
                             <span

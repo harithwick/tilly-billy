@@ -1,5 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Invoice } from "@/lib/types/invoice";
+import { keysToCamelCase } from "@/lib/utils/utilities";
 
 export async function getInvoice(supabase: SupabaseClient, uuid: string) {
   const { data: invoice, error: invoiceError } = await supabase
@@ -8,7 +9,7 @@ export async function getInvoice(supabase: SupabaseClient, uuid: string) {
     .eq("uuid", uuid)
     .single();
   if (invoiceError) throw invoiceError;
-  return invoice;
+  return keysToCamelCase(invoice);
 }
 
 export async function createInvoice(
@@ -21,7 +22,7 @@ export async function createInvoice(
     .select()
     .single();
   if (invoiceError) throw invoiceError;
-  return invoice;
+  return keysToCamelCase(invoice);
 }
 
 export async function updateInvoice(
@@ -32,10 +33,11 @@ export async function updateInvoice(
   const { data: invoice, error: invoiceError } = await supabase
     .from("invoices")
     .update(data)
-    .eq("uuid", uuid);
+    .eq("uuid", uuid)
+    .select();
 
   if (invoiceError) throw invoiceError;
-  return invoice;
+  return keysToCamelCase(invoice);
 }
 
 export async function deleteInvoice(supabase: SupabaseClient, uuid: string) {

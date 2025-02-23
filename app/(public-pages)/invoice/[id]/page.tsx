@@ -2,7 +2,7 @@
 
 import { notFound } from "next/navigation";
 import { Button } from "@/lib/components/ui/button";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils/utilities";
 import { Download, CheckCircle } from "lucide-react";
 import { useState } from "react";
 import { Textarea } from "@/lib/components/ui/textarea";

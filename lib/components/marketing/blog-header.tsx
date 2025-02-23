@@ -1,5 +1,5 @@
 import { Badge } from "@/lib/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utilities";
 interface BlogHeaderProps {
   title: string;
   description?: string;

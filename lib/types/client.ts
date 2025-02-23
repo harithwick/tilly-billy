@@ -3,10 +3,10 @@ export interface Client {
   organizationId: string;
   name: string;
   email?: string;
-  company?: string;
+  companyName?: string;
   phone?: string;
   website?: string;
-  vatNumber?: string;
+  taxNumber?: string;
   billingEmail?: string;
   paymentTerms?: number;
   notes?: string;

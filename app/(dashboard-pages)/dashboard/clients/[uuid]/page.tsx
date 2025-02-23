@@ -31,8 +31,8 @@ import {
 } from "@/lib/components/ui/dropdown-menu";
 import { Button } from "@/lib/components/ui/button";
 import { MoreVertical } from "lucide-react";
-import { formatCurrency, formatDate } from "@/lib/utils";
-import { capitalizeWords } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/utils/utilities";
+import { capitalizeWords } from "@/lib/utils/utilities";
 import { ConfirmDelete } from "@/lib/components/confirm-delete";
 import { deleteInvoice } from "@/lib/api_repository/invoices";
 import { toast } from "sonner";
@@ -151,10 +151,10 @@ export default function ClientPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            {client.company && (
+            {client.companyName && (
               <div>
                 <p className="font-semibold">Company</p>
-                <p>{client.company}</p>
+                <p>{client.companyName}</p>
               </div>
             )}
             {client.phone && (

@@ -18,6 +18,7 @@ export async function setActiveOrganization(
   }
 
   if (orgs && orgs.length > 0) {
+    console.log("SETTING ACTIVE ORG", orgs[0].uuid);
     cookieStore.set("activeOrgUuid", orgs[0].uuid, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",

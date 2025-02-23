@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utilities";
 import { Button } from "@/lib/components/ui/button";
 import {
   Command,
@@ -20,7 +20,7 @@ import {
 } from "@/lib/components/ui/popover";
 import { CreateClientModal } from "./create-client-modal";
 import { Client } from "@/lib/types";
-
+import { Organization } from "@/lib/types";
 interface ClientSelectorProps {
   clients: Client[];
   onClientSelect: (client: Client) => void;
@@ -41,7 +41,7 @@ export function ClientSelector({
     return clients.filter(
       (client) =>
         client.name.toLowerCase().includes(searchLower) ||
-        client.company?.toLowerCase().includes(searchLower) ||
+        client.companyName?.toLowerCase().includes(searchLower) ||
         client.email?.toLowerCase().includes(searchLower)
     );
   }, [search]);
@@ -78,7 +78,7 @@ export function ClientSelector({
               <span className="flex items-center">
                 <span className="font-medium">{selectedClient.name}</span>
                 <span className="ml-2 text-muted-foreground">
-                  ({selectedClient.company})
+                  ({selectedClient.companyName})
                 </span>
               </span>
             ) : (
@@ -114,7 +114,7 @@ export function ClientSelector({
                     <div className="flex flex-col">
                       <span>{client.name}</span>
                       <span className="text-sm text-muted-foreground">
-                        {client.company}
+                        {client.companyName}
                       </span>
                     </div>
                   </CommandItem>

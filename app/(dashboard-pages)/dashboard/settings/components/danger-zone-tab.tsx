@@ -22,7 +22,7 @@ import {
 } from "@/lib/components/ui/dialog";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-
+import { deleteOrganization } from "@/lib/api_repository/organization";
 export function DangerZoneTab() {
   const router = useRouter();
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
@@ -32,17 +32,7 @@ export function DangerZoneTab() {
   const handleDelete = async () => {
     setLoading(true);
     try {
-      let activeOrgUuid = Cookies.get("activeOrgUuid");
-
-      const response = await fetch(
-        `/api/dashboard/organization/${activeOrgUuid}`,
-        {
-          method: "DELETE",
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to delete organization");
-      }
+      await deleteOrganization();
       Cookies.remove("activeOrgUuid");
       router.push("/dashboard");
     } catch (error) {

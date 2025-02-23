@@ -15,7 +15,7 @@ import {
   PopoverTrigger,
 } from "@/lib/components/ui/popover";
 import { CalendarIcon, Plus, Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utilities";
 import { format } from "date-fns";
 import { ClientSelector } from "@/lib/components/clients/client-selector";
 import { ProductSelector } from "@/lib/components/products/product-selector";
@@ -27,12 +27,7 @@ import { Header } from "@/lib/components/studio/header";
 import { Suspense } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import {
-  Client,
-  Organization,
-  ClientAddress,
-  AdjustmentItem,
-} from "@/lib/types";
+import { Client, Organization, AdjustmentItem } from "@/lib/types";
 // Update the TaxItem type to become AdjustmentItem
 
 export default function StudioContent({ uuid }: { uuid?: string }) {
@@ -716,10 +711,8 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                           {selectedClient.company && (
                             <p className="text-sm">{selectedClient.company}</p>
                           )}
-                          {selectedClient.address && (
-                            <p className="text-sm">
-                              {selectedClient.address.street}
-                            </p>
+                          {selectedClient.street && (
+                            <p className="text-sm">{selectedClient.street}</p>
                           )}
                           {selectedClient.email && (
                             <p className="text-sm">{selectedClient.email}</p>

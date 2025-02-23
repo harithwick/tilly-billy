@@ -38,7 +38,7 @@ import { Client } from "@/lib/types";
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address").or(z.literal("")),
-  company: z.string().optional().or(z.literal("")),
+  companyName: z.string().optional().or(z.literal("")),
   phone: z.string().optional().or(z.literal("")),
   website: z.string().url("Invalid website URL").optional().or(z.literal("")),
   taxNumber: z.string().optional(),
@@ -73,10 +73,10 @@ export function CreateClientModal({
     defaultValues: {
       name: client?.name || "",
       email: client?.email || "",
-      company: client?.company || "",
+      companyName: client?.companyName || "",
       phone: client?.phone || "",
       website: client?.website || "",
-      taxNumber: client?.vatNumber || "",
+      taxNumber: client?.taxNumber || "",
       street: client?.street || "",
       city: client?.city || "",
       state: client?.state || "",
@@ -91,10 +91,10 @@ export function CreateClientModal({
       form.reset({
         name: client.name,
         email: client.email || "",
-        company: client.company || "",
+        companyName: client.companyName || "",
         phone: client.phone || "",
         website: client.website || "",
-        taxNumber: client.vatNumber || "",
+        taxNumber: client.taxNumber || "",
         street: client.street || "",
         city: client.city || "",
         state: client.state || "",
@@ -178,7 +178,7 @@ export function CreateClientModal({
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="company"
+                  name="companyName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Company Name</FormLabel>

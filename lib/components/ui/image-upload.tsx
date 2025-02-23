@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { ImagePlus, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utilities";
 import { Button } from "./button";
 import { supabase } from "@/lib/supabase/client";
 import { v4 as uuidv4 } from "uuid";

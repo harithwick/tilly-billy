@@ -27,7 +27,12 @@ export const PATCH = apiRouteHandler({
     { supabaseUser, supabase, activeOrgUuid, params }
   ) => {
     return NextResponse.json(
-      await updateClient(supabase, params!.uuid, request.json(), activeOrgUuid!)
+      await updateClient(
+        supabase,
+        params!.uuid,
+        await request.json(),
+        activeOrgUuid!
+      )
     );
   },
 });

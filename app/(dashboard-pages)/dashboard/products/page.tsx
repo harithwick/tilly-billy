@@ -35,7 +35,7 @@ import {
 } from "@/lib/components/ui/table";
 import { useProducts } from "@/lib/hooks/use-products";
 import { LoadingState } from "@/lib/components/loading-state";
-import { cn, formatCurrency, capitalizeWords } from "@/lib/utils";
+import { cn, formatCurrency, capitalizeWords } from "@/lib/utils/utilities";
 import { deleteProduct } from "@/lib/api_repository/products";
 import { Product } from "@/lib/types";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";

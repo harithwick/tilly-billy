@@ -13,7 +13,7 @@ import { Button } from "@/lib/components/ui/button";
 import Link from "next/link";
 import { RevenueChart } from "@/lib/components/dashboard/revenue-chart";
 import { ClientGrowth } from "@/lib/components/dashboard/client-growth";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils/utilities";
 import { Chart1 } from "@/lib/components/charts/chart1";
 import { Chart2 } from "@/lib/components/charts/chart2";
 

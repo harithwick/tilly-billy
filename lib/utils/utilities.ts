@@ -37,3 +37,29 @@ export function capitalizeWords(text?: string): string {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
+
+export function toCamelCase(str: string): string {
+  return str.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+}
+
+export function keysToCamelCase(obj: any): any {
+  if (obj === null) {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map((item) =>
+      typeof item === "object" && item !== null ? keysToCamelCase(item) : item
+    );
+  }
+
+  const result: Record<string, any> = {};
+
+  for (const [key, value] of Object.entries(obj)) {
+    const camelKey = toCamelCase(key);
+    result[camelKey] =
+      value && typeof value === "object" ? keysToCamelCase(value) : value;
+  }
+
+  return result;
+}

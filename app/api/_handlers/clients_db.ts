@@ -5,7 +5,7 @@ import {
   getOrganizationIdFromUuid,
   getUserIdFromSupabaseId,
 } from "@/lib/utils/organizations";
-
+import { keysToCamelCase } from "@/lib/utils/utilities";
 export async function getClients(
   supabase: SupabaseClient,
   withInvoices: boolean = false,
@@ -18,7 +18,7 @@ export async function getClients(
     .select(withInvoices ? "*, invoices (*)" : "*")
     .eq("org_id", orgId);
   if (error) throw error;
-  return data;
+  return keysToCamelCase(data);
 }
 
 export async function getClient(
@@ -32,7 +32,7 @@ export async function getClient(
     .eq("uuid", uuid)
     .single();
   if (error) throw error;
-  return data;
+  return keysToCamelCase(data);
 }
 
 export async function archiveClient(
@@ -87,6 +87,23 @@ export async function deleteClient(supabase: SupabaseClient, uuid: string) {
   }
 }
 
+function structureClientData(data: any) {
+  return {
+    name: data.name,
+    email: data.email,
+    company_name: data.companyName || null,
+    phone: data.phone || null,
+    website: data.website || null,
+    tax_number: data.taxNumber || null,
+    status: data.status || "active",
+    country: data.country || null,
+    city: data.city || null,
+    street: data.street || null,
+    state: data.state || null,
+    postal_code: data.postalCode || null,
+  };
+}
+
 export async function createClient(
   supabase: SupabaseClient,
   data: any,
@@ -105,28 +122,16 @@ export async function createClient(
     .from("clients")
     .insert([
       {
+        ...structureClientData(data),
         org_id: organizationId,
-        name: data.name,
-        email: data.email,
-        company_name: data.company || null,
-        phone: data.phone || null,
-        website: data.website || null,
-        tax_number: data.taxNumber || null,
-        status: data.status || "active",
         created_by: userId,
-        country: data.country || null,
-        city: data.city || null,
-        address: data.address || null,
-        street: data.street || null,
-        state: data.state || null,
-        postal_code: data.postalCode || null,
       },
     ])
     .select()
     .single();
 
   if (error) throw error;
-  return client;
+  return keysToCamelCase(client);
 }
 
 export async function updateClient(
@@ -140,20 +145,7 @@ export async function updateClient(
 
   const { data: client, error } = await supabase
     .from("clients")
-    .update({
-      name: data.name,
-      email: data.email,
-      company_name: data.company || null,
-      phone: data.phone || null,
-      website: data.website || null,
-      tax_number: data.taxNumber || null,
-      status: data.status || "active",
-      country: data.country || null,
-      city: data.city || null,
-      street: data.street || null,
-      state: data.state || null,
-      postal_code: data.postalCode || null,
-    })
+    .update(structureClientData(data))
     .eq("uuid", clientUuid)
     .eq("org_id", orgId)
     .select()
@@ -163,5 +155,7 @@ export async function updateClient(
     throw error;
   }
 
-  return client;
+  console.log("client", client);
+
+  return keysToCamelCase(client);
 }

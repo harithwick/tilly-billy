@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils/utilities";
 import { FileText, Home, Package, Settings, Users } from "lucide-react";
 import { Button } from "./ui/button";
 import { Avatar, AvatarImage } from "./ui/avatar";

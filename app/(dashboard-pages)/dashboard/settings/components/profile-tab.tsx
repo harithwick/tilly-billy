@@ -1,13 +1,8 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/lib/components/ui/card";
-import { Label } from "@/lib/components/ui/label";
-import { Input } from "@/lib/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
 export function ProfileTab() {
   return (

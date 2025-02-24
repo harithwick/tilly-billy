@@ -1,21 +1,16 @@
 "use client";
 
 import { useDashboardMetrics } from "@/lib/hooks/use-dashboard-metrics";
-import { LoadingState } from "@/lib/components/loading-state";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/lib/components/ui/card";
+import { LoadingState } from "@/components/loading-state";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, Users, FileText, TrendingUp, Plus } from "lucide-react";
-import { Button } from "@/lib/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { RevenueChart } from "@/lib/components/dashboard/revenue-chart";
-import { ClientGrowth } from "@/lib/components/dashboard/client-growth";
+import { RevenueChart } from "@/components/dashboard/revenue-chart";
+import { ClientGrowth } from "@/components/dashboard/client-growth";
 import { formatCurrency } from "@/lib/utils/utilities";
-import { Chart1 } from "@/lib/components/charts/chart1";
-import { Chart2 } from "@/lib/components/charts/chart2";
+import { Chart1 } from "@/components/charts/chart1";
+import { Chart2 } from "@/components/charts/chart2";
 
 export default function DashboardPage() {
   const { metrics, loading, error } = useDashboardMetrics();

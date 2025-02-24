@@ -2,29 +2,19 @@
 
 import { use, useRef, useState } from "react";
 import { toast } from "sonner";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/lib/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/lib/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Package, Plus, MoreVertical } from "lucide-react";
-import { Button } from "@/lib/components/ui/button";
-import { EmptyState } from "@/lib/components/empty-state";
-import { CreateProductModal } from "@/lib/components/products/create-product-modal";
-import { ConfirmDelete } from "@/lib/components/confirm-delete";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/empty-state";
+import { CreateProductModal } from "@/components/products/create-product-modal";
+import { ConfirmDelete } from "@/components/confirm-delete";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/lib/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -32,9 +22,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/lib/components/ui/table";
+} from "@/components/ui/table";
 import { useProducts } from "@/lib/hooks/use-products";
-import { LoadingState } from "@/lib/components/loading-state";
+import { LoadingState } from "@/components/loading-state";
 import { cn, formatCurrency, capitalizeWords } from "@/lib/utils/utilities";
 import { deleteProduct } from "@/lib/api_repository/products";
 import { Product } from "@/lib/types";

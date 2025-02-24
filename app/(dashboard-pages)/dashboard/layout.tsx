@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import DashboardNav from "@/lib/components/dashboard-nav";
-import { OrgSwitcher } from "@/lib/components/org-switcher";
-import { LoadingState } from "@/lib/components/loading-state";
+import DashboardNav from "@/components/dashboard-nav";
+import { OrgSwitcher } from "@/components/org-switcher";
+import { LoadingState } from "@/components/loading-state";
 import { Organization } from "@/lib/types";
-import DashboardTopNav from "@/lib/components/dashboard-top-nav";
+import DashboardTopNav from "@/components/dashboard-top-nav";
 interface DashboardResponse {
   organizations: Organization[];
   activeOrgUuid: string | null;

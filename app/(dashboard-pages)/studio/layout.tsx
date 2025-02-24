@@ -1,9 +1,9 @@
 "use client";
 
 import { Code2, Save, ArrowLeft } from "lucide-react";
-import { Button } from "@/lib/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { UserNav } from "@/lib/components/user-nav";
+import { UserNav } from "@/components/user-nav";
 
 export default function StudioLayout({
   children,

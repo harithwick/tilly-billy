@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import { AlertTriangle } from "lucide-react";
-import { Button } from "@/lib/components/ui/button";
-import { Input } from "@/lib/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -10,8 +10,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/lib/components/ui/card";
-import { Alert, AlertDescription } from "@/lib/components/ui/alert";
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/lib/components/ui/dialog";
+} from "@/components/ui/dialog";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { deleteOrganization } from "@/lib/api_repository/organization";
@@ -34,7 +34,7 @@ export function DangerZoneTab() {
     try {
       await deleteOrganization();
       Cookies.remove("activeOrgUuid");
-      router.push("/dashboard");
+      window.location.href = "/dashboard";
     } catch (error) {
       console.error("Error deleting organization:", error);
     } finally {

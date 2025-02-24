@@ -1,32 +1,27 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/lib/components/ui/card";
-import { Label } from "@/lib/components/ui/label";
-import { Input } from "@/lib/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/lib/components/ui/select";
-import { Button } from "@/lib/components/ui/button";
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { currencies } from "@/lib/constants/currencies";
-import { Alert, AlertDescription } from "@/lib/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Copy, Info } from "lucide-react";
-import { ImageUpload } from "@/lib/components/ui/image-upload";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { toast } from "sonner";
 import {
   getOrganizationSettings,
   updateOrganizationSettings,
 } from "@/lib/api_repository/settings";
-import { LoadingState } from "@/lib/components/loading-state";
+import { LoadingState } from "@/components/loading-state";
 import { OrganizationSettings } from "@/lib/types/organizaiton-settings";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
 

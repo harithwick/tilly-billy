@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Footer from "@/lib/components/marketing/footer";
-import { SiteHeader } from "@/lib/components/marketing/site-header";
+import Footer from "@/components/marketing/footer";
+import { SiteHeader } from "@/components/marketing/site-header";
 
 export const metadata: Metadata = {
   title: "Tilly Billy",

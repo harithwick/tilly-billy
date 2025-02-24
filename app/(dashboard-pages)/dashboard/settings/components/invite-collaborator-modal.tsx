@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/lib/components/ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -19,16 +19,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/lib/components/ui/form";
-import { Input } from "@/lib/components/ui/input";
-import { Button } from "@/lib/components/ui/button";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/lib/components/ui/select";
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   email: z.string().email("Invalid email address"),

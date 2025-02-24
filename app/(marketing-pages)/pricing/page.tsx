@@ -1,8 +1,8 @@
 "use client";
 
-import PricingPlans from "@/lib/components/marketing/pricing-plans";
-import { PricingTable } from "@/lib/components/marketing/pricing-table";
-import PricingFAQ from "@/lib/components/marketing/pricing-faq";
+import PricingPlans from "@/components/marketing/pricing-plans";
+import { PricingTable } from "@/components/marketing/pricing-table";
+import PricingFAQ from "@/components/marketing/pricing-faq";
 import { GridSVG } from "@/lib/constants/grid-svg";
 
 export default function page() {

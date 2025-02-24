@@ -7,7 +7,7 @@ import * as z from "zod";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@/lib/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { getRedirectError } from "next/dist/client/components/redirect";
 import { Suspense } from "react";
 import {
@@ -17,11 +17,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/lib/components/ui/form";
-import { Input } from "@/lib/components/ui/input";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Github } from "lucide-react";
-import { AuthLayout } from "@/lib/components/auth/auth-layout";
-import { SocialButton } from "@/lib/components/auth/social-button";
+import { AuthLayout } from "@/components/auth/auth-layout";
+import { SocialButton } from "@/components/auth/social-button";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 

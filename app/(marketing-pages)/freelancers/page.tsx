@@ -1,4 +1,4 @@
-import { Button } from "@/lib/components/ui/button";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { GridSVG } from "@/lib/constants/grid-svg";
 // You'll need to create these icons or import them from your preferred icon library

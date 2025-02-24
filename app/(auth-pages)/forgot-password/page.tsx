@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
-import { Button } from "@/lib/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -13,9 +13,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/lib/components/ui/form";
-import { Input } from "@/lib/components/ui/input";
-import { AuthLayout } from "@/lib/components/auth/auth-layout";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { AuthLayout } from "@/components/auth/auth-layout";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 

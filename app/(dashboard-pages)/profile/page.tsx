@@ -10,7 +10,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/lib/components/ui/card";
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -18,18 +18,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/lib/components/ui/form";
-import { Input } from "@/lib/components/ui/input";
-import { Button } from "@/lib/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/lib/components/ui/tabs";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertTriangle, Mail, Github } from "lucide-react";
 import { GoogleIcon } from "@/lib/constants/custom-icons";
-import { Alert, AlertDescription } from "@/lib/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -37,7 +32,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/lib/components/ui/dialog";
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
@@ -54,7 +49,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/lib/components/ui/breadcrumb";
+} from "@/components/ui/breadcrumb";
 
 const formSchema = z.object({
   fullName: z.string().min(2, "Name must be at least 2 characters"),

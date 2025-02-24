@@ -2,18 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/lib/components/ui/card";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/lib/components/ui/avatar";
-import { LoadingState } from "@/lib/components/loading-state";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LoadingState } from "@/components/loading-state";
 import { Client, Invoice } from "@/lib/types";
 import {
   Table,
@@ -22,24 +13,24 @@ import {
   TableCell,
   TableHead,
   TableRow,
-} from "@/lib/components/ui/table";
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/lib/components/ui/dropdown-menu";
-import { Button } from "@/lib/components/ui/button";
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils/utilities";
 import { capitalizeWords } from "@/lib/utils/utilities";
-import { ConfirmDelete } from "@/lib/components/confirm-delete";
+import { ConfirmDelete } from "@/components/confirm-delete";
 import { deleteInvoice } from "@/lib/api_repository/invoices";
 import { toast } from "sonner";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
 import Link from "next/link";
 import { Plus, FileText, DollarSign, Clock } from "lucide-react";
-import { EmptyState } from "@/lib/components/empty-state";
+import { EmptyState } from "@/components/empty-state";
 import { ChevronRight, Home } from "lucide-react";
 import {
   Breadcrumb,
@@ -48,8 +39,10 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/lib/components/ui/breadcrumb";
+} from "@/components/ui/breadcrumb";
 import { useParams } from "next/navigation";
+import { getClient } from "@/lib/api_repository/clients";
+import { getClientInvoices } from "@/lib/api_repository/clients";
 type PageProps = {
   params: {
     id: string;
@@ -59,11 +52,12 @@ type PageProps = {
 
 export default function ClientPage() {
   const params = useParams<{ uuid: string }>();
-
   const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
+
   const [client, setClient] = useState<Client | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loadingClient, setLoadingClient] = useState(true);
+  const [loadingInvoices, setLoadingInvoices] = useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(
     null
@@ -72,27 +66,40 @@ export default function ClientPage() {
   useEffect(() => {
     const fetchClientData = async () => {
       try {
-        const uuid = params.uuid;
-        const response = await fetch(`/api/dashboard/clients/${uuid}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch client data");
-        }
-        const data = await response.json();
-        console.log("data", data);
-        setClient(data.client);
-        setInvoices(data.client.invoices);
+        const clientData = await getClient(params.uuid);
+        setClient(clientData);
       } catch (error) {
         console.error("Error fetching client data:", error);
       } finally {
-        setLoading(false);
+        setLoadingClient(false);
       }
     };
 
     fetchClientData();
   }, [params.uuid]);
 
-  if (loading) {
-    return <LoadingState />;
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      try {
+        const invoices = await getClientInvoices(params.uuid);
+        console.log(invoices);
+        setInvoices(invoices.invoices);
+      } catch (error) {
+        console.error("Error fetching invoices:", error);
+      } finally {
+        setLoadingInvoices(false);
+      }
+    };
+
+    fetchInvoices();
+  }, [params.uuid]);
+
+  if (loadingClient) {
+    return (
+      <div className="container mx-auto py-6 space-y-6">
+        <LoadingState />
+      </div>
+    );
   }
 
   if (!client) {
@@ -189,128 +196,139 @@ export default function ClientPage() {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Invoices
-            </CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{invoices.length}</div>
-            <p className="text-xs text-muted-foreground">
-              {
-                invoices.filter(
-                  (inv) =>
-                    new Date(inv.createdAt).getMonth() === new Date().getMonth()
-                ).length
-              }{" "}
-              created this month
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Amount</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(
-                invoices.reduce((sum, inv) => sum + inv.total, 0)
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              From {invoices.length} invoices
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Pending Payment
-            </CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(
-                invoices
-                  .filter((inv) => inv.status === "pending")
-                  .reduce((sum, inv) => sum + inv.total, 0)
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {invoices.filter((inv) => inv.status === "pending").length}{" "}
-              invoices pending
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {invoices.length === 0 ? (
-        <EmptyState
-          icon={FileText}
-          title="No invoices yet"
-          description="Create your first invoice to get started."
-          actionLabel="Create Invoice"
-          onAction={() => {}}
-        />
+      {loadingInvoices ? (
+        <LoadingState />
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>Invoices</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Invoice #</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="w-[50px]"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {invoices.map((invoice) => (
-                    <TableRow key={invoice.id}>
-                      <TableCell>{invoice.invoiceNumber}</TableCell>
-                      <TableCell>
-                        {formatDate(new Date(invoice.issueDate))}
-                      </TableCell>
-                      <TableCell>{formatCurrency(invoice.total)}</TableCell>
-                      <TableCell>{capitalizeWords(invoice.status)}</TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>View PDF</DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() =>
-                                handleDeleteClick(Number(invoice.id))
-                              }
-                            >
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+        <>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Invoices
+                </CardTitle>
+                <FileText className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{invoices.length}</div>
+                <p className="text-xs text-muted-foreground">
+                  {
+                    invoices.filter(
+                      (inv) =>
+                        new Date(inv.createdAt).getMonth() ===
+                        new Date().getMonth()
+                    ).length
+                  }{" "}
+                  created this month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Amount
+                </CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {formatCurrency(
+                    invoices.reduce((sum, inv) => sum + inv.total, 0)
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  From {invoices.length} invoices
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Pending Payment
+                </CardTitle>
+                <Clock className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {formatCurrency(
+                    invoices
+                      .filter((inv) => inv.status === "pending")
+                      .reduce((sum, inv) => sum + inv.total, 0)
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {invoices.filter((inv) => inv.status === "pending").length}{" "}
+                  invoices pending
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {invoices.length === 0 ? (
+            <EmptyState
+              icon={FileText}
+              title="No invoices yet"
+              description="Create your first invoice to get started."
+              actionLabel="Create Invoice"
+              onAction={() => {}}
+            />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Invoices</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Invoice #</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Amount</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="w-[50px]"></TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {invoices.map((invoice) => (
+                        <TableRow key={invoice.id}>
+                          <TableCell>{invoice.invoiceNumber}</TableCell>
+                          <TableCell>
+                            {formatDate(new Date(invoice.issueDate))}
+                          </TableCell>
+                          <TableCell>{formatCurrency(invoice.total)}</TableCell>
+                          <TableCell>
+                            {capitalizeWords(invoice.status)}
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                                <DropdownMenuItem>View PDF</DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="text-destructive"
+                                  onClick={() =>
+                                    handleDeleteClick(Number(invoice.id))
+                                  }
+                                >
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </>
       )}
 
       <ConfirmDelete

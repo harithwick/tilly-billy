@@ -12,6 +12,20 @@ export async function getInvoice(supabase: SupabaseClient, uuid: string) {
   return keysToCamelCase(invoice);
 }
 
+export async function getClientInvoices(
+  supabase: SupabaseClient,
+  clientUuid: string
+) {
+  const { data: clientInvoices, error: invoicesError } = await supabase
+    .from("clients")
+    .select("*, invoices (*)")
+    .eq("uuid", clientUuid)
+    .single();
+
+  if (invoicesError) throw invoicesError;
+  return keysToCamelCase(clientInvoices.invoices);
+}
+
 export async function createInvoice(
   supabase: SupabaseClient,
   data: Partial<Invoice>

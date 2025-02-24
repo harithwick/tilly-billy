@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { ContactForm } from "@/lib/components/marketing/contact-form";
+import { ContactForm } from "@/components/marketing/contact-form";
 import { GridSVG } from "@/lib/constants/grid-svg";
 export const metadata: Metadata = {
   title: "Contact Us",

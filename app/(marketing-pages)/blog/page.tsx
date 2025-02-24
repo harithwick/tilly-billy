@@ -4,10 +4,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/lib/components/ui/card";
+} from "@/components/ui/card";
 import Link from "next/link";
-import { Badge } from "@/lib/components/ui/badge";
-import { BlogHeader } from "@/lib/components/marketing/blog-header";
+import { Badge } from "@/components/ui/badge";
+import { BlogHeader } from "@/components/marketing/blog-header";
 import { getBlogPostsArray } from "@/lib/constants/blog-posts";
 
 export default async function BlogPage() {

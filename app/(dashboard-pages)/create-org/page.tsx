@@ -12,7 +12,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/lib/components/ui/card";
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -20,17 +20,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/lib/components/ui/form";
-import { Input } from "@/lib/components/ui/input";
-import { Button } from "@/lib/components/ui/button";
-import { ImageUpload } from "@/lib/components/ui/image-upload";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ImageUpload } from "@/components/ui/image-upload";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/lib/components/ui/select";
+} from "@/components/ui/select";
 import { currencies } from "@/lib/constants/currencies";
 import { timezoneList } from "@/lib/constants/timezones";
 import { Code2 } from "lucide-react";

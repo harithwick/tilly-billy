@@ -2,24 +2,14 @@
 
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/lib/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/lib/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, UserPlus, Plus, MoreVertical } from "lucide-react";
-import { Button } from "@/lib/components/ui/button";
-import { EmptyState } from "@/lib/components/empty-state";
-import { ConfirmDelete } from "@/lib/components/confirm-delete";
-import { CreateClientModal } from "@/lib/components/clients/create-client-modal";
-import { LoadingState } from "@/lib/components/loading-state";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/empty-state";
+import { ConfirmDelete } from "@/components/confirm-delete";
+import { CreateClientModal } from "@/components/clients/create-client-modal";
+import { LoadingState } from "@/components/loading-state";
 import { cn, capitalizeWords } from "@/lib/utils/utilities";
 import {
   deleteClient,
@@ -34,7 +24,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/lib/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { Client } from "@/lib/types";
 import {
   Table,
@@ -43,7 +33,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/lib/components/ui/table";
+} from "@/components/ui/table";
 
 export default function ClientsPage() {
   const [status, setStatus] = useState("active");
@@ -215,7 +205,7 @@ export default function ClientsPage() {
                       .map((client) => (
                         <TableRow key={client.id}>
                           <TableCell>
-                            <Link href={`/dashboard/client/${client.uuid}`}>
+                            <Link href={`/dashboard/clients/${client.uuid}`}>
                               <Button variant="link"> {client.name}</Button>
                             </Link>
                           </TableCell>

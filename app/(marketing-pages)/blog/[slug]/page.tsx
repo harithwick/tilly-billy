@@ -1,7 +1,7 @@
 "use client";
 
 import { notFound } from "next/navigation";
-import { BlogHeader } from "@/lib/components/marketing/blog-header";
+import { BlogHeader } from "@/components/marketing/blog-header";
 import { blogPosts } from "@/lib/constants/blog-posts";
 import { useParams } from "next/navigation";
 

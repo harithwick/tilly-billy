@@ -1,11 +1,11 @@
 "use client";
 
 import { notFound } from "next/navigation";
-import { Button } from "@/lib/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils/utilities";
 import { Download, CheckCircle } from "lucide-react";
 import { useState } from "react";
-import { Textarea } from "@/lib/components/ui/textarea";
+import { Textarea } from "@/components/ui/textarea";
 
 // Dummy invoice data type
 type InvoiceItem = {

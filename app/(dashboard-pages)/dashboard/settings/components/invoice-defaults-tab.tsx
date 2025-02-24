@@ -1,13 +1,8 @@
 "use client";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/lib/components/ui/card";
-import { Label } from "@/lib/components/ui/label";
-import { Switch } from "@/lib/components/ui/switch";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 export function InvoiceDefaultsTab() {
   return (

@@ -1,17 +1,14 @@
-import { Button } from "@/lib/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { ArrowRight, Code2, DollarSign, Github, Zap } from "lucide-react";
 import Link from "next/link";
-import { ContainerScroll } from "@/lib/components/ui/container-scroll-animation";
-import OpenSource from "@/lib/components/marketing/open-source";
-import {
-  Carousel,
-  Card,
-} from "@/lib/components/marketing/apple-cards-carousel";
-import { Hero } from "@/lib/components/marketing/hero";
-import { BackgroundBeams } from "@/lib/components/ui/background-beams";
-import CallToAction1 from "@/lib/components/marketing/call-to-action-1";
-import FeaturesSectionDemo from "@/lib/components/marketing/features-section-demo-3";
-import { UseCasesCards } from "@/lib/components/marketing/user-cases-cards";
+import { ContainerScroll } from "@/components/ui/container-scroll-animation";
+import OpenSource from "@/components/marketing/open-source";
+import { Carousel, Card } from "@/components/marketing/apple-cards-carousel";
+import { Hero } from "@/components/marketing/hero";
+import { BackgroundBeams } from "@/components/ui/background-beams";
+import CallToAction1 from "@/components/marketing/call-to-action-1";
+import FeaturesSectionDemo from "@/components/marketing/features-section-demo-3";
+import { UseCasesCards } from "@/components/marketing/user-cases-cards";
 
 export const metadata = {
   title: "Tilly Billy - Open SourceInvoice Generator",

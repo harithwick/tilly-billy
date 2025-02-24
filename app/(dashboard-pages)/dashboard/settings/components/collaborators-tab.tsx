@@ -1,26 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/lib/components/ui/card";
-import { Button } from "@/lib/components/ui/button";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/lib/components/ui/avatar";
-import { Badge } from "@/lib/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Plus, MoreVertical, Crown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/lib/components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { InviteCollaboratorModal } from "./invite-collaborator-modal";
 
 const collaborators = [

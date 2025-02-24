@@ -1,8 +1,8 @@
 "use client";
 
 import { Code2 } from "lucide-react";
-import { UserNav } from "@/lib/components/user-nav";
-import DashboardTopNav from "@/lib/components/dashboard-top-nav";
+import { UserNav } from "@/components/user-nav";
+import DashboardTopNav from "@/components/dashboard-top-nav";
 
 export default function ProfileLayout({
   children,

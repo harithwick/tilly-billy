@@ -88,6 +88,7 @@ export async function deleteClient(supabase: SupabaseClient, uuid: string) {
 }
 
 function structureClientData(data: any) {
+  console.log("data", data);
   return {
     name: data.name,
     email: data.email,

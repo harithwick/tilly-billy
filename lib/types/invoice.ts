@@ -1,8 +1,9 @@
 export interface Invoice {
   id: string;
+  uuid: string;
   organizationId: string;
   organizationUUID: string;
-  clientId: string;
+  clientUUID: string;
   clientName: string;
   invoiceNumber: string;
   status: InvoiceStatus;

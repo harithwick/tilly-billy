@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,7 @@ import { Suspense } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Client, Organization, AdjustmentItem } from "@/lib/types";
+import { toast } from "sonner";
 // Update the TaxItem type to become AdjustmentItem
 
 export default function StudioContent({ uuid }: { uuid?: string }) {
@@ -42,22 +43,20 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
       amount: number;
     }>
   >([]);
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [loadingModal, setLoadingModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const searchParams = useSearchParams();
   const invoiceId = searchParams.get("id");
   const { data, loading, error } = useStudio(invoiceId || null);
   const [activeView, setActiveView] = useState<"invoice" | "pdf">("pdf");
-  const [invoiceNumber, setInvoiceNumber] = useState("INV2398-08-087");
   const [notes, setNotes] = useState("");
-  const [paymentTerms, setPaymentTerms] = useState("due_on_receipt");
+  const [paymentTerms, setPaymentTerms] = useState("not_set");
   const [issueDate, setIssueDate] = useState<Date>(new Date());
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [adjustments, setAdjustments] = useState<AdjustmentItem[]>([
     { name: "Tax", value: 10, isPercentage: true },
   ]);
   const [terms, setTerms] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     if (data?.invoice) {
@@ -78,13 +77,70 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
     }
   }, [data]);
 
-  const handleConfirm = async () => {
-    setLoadingModal(true);
+  const handleSaveInvoice = async () => {
     try {
-      // await someAction();
-      setConfirmOpen(false);
-    } finally {
-      setLoadingModal(false);
+      // Validate required fields
+      if (!selectedClient) {
+        toast.error("Please select a client");
+        return;
+      }
+      if (!issueDate) {
+        toast.error("Please select an issue date");
+        return;
+      }
+      if (items.length === 0) {
+        toast.error("Please add at least one item");
+        return;
+      }
+
+      const invoiceData = {
+        clientId: selectedClient.id,
+        issueDate: issueDate.toISOString(),
+        paymentTerms,
+        items: items.map((item) => ({
+          id: item.id,
+          description: item.description,
+          quantity: item.quantity,
+          rate: item.rate,
+          discount: item.discount,
+          amount: item.amount,
+        })),
+        adjustments,
+        notes,
+        terms,
+        subtotal,
+        total,
+      };
+
+      const endpoint = uuid
+        ? `/api/invoice/studio/${uuid}`
+        : "/api/invoice/studio";
+
+      const response = await fetch(endpoint, {
+        method: uuid ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(invoiceData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to save invoice");
+      }
+
+      const data = await response.json();
+
+      toast.success(
+        uuid ? "Invoice updated successfully" : "Invoice created successfully"
+      );
+      router.push("/dashboard/invoices");
+      router.refresh();
+    } catch (error) {
+      console.error("Error saving invoice:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to save invoice"
+      );
     }
   };
 
@@ -131,7 +187,7 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
   }, 0);
   const total = subtotal + totalAdjustments;
 
-  // Add a helper function to get readable payment terms
+  // Update the getReadablePaymentTerms function
   const getReadablePaymentTerms = (terms: string) => {
     switch (terms) {
       case "due_on_receipt":
@@ -144,14 +200,18 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
         return "Net 45 Days";
       case "net_60":
         return "Net 60 Days";
-      case "custom":
-        return "Custom Terms";
+      case "not_set":
+        return "Not Set";
       default:
         return terms;
     }
   };
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
+    // First save the invoice
+    await handleSaveInvoice();
+
+    // Then generate PDF as before
     const doc = new jsPDF();
 
     // Add organization details
@@ -175,7 +235,6 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
     doc.setFont("helvetica", "bold");
     doc.text("INVOICE", 140, 20);
     doc.setFontSize(12);
-    doc.text(invoiceNumber, 140, 30);
 
     // Calculate the starting Y position based on organization and client details
     let startY = organization ? 80 : 40;
@@ -188,8 +247,8 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
       doc.setFont("helvetica", "bold");
       doc.text(selectedClient.name, 20, startY + 10);
       doc.setFont("helvetica", "normal");
-      if (selectedClient.company) {
-        doc.text(selectedClient.company, 20, startY + 17);
+      if (selectedClient.companyName) {
+        doc.text(selectedClient.companyName, 20, startY + 17);
       }
       if (selectedClient.email) {
         doc.text(selectedClient.email, 20, startY + 24);
@@ -317,7 +376,7 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
               Save Draft
             </Button>
           )} */}
-          <Button className="flex-1" onClick={generatePDF}>
+          <Button className="flex-1" onClick={handleSaveInvoice}>
             {uuid ? "Save" : "Create"}
           </Button>
         </div>
@@ -329,24 +388,13 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
           <div>
             <h2 className="text-lg font-medium mb-4">Invoice Details</h2>
 
-            {/* Invoice Number */}
-            <div className="mb-6">
-              <Label htmlFor="invoiceNumber">Invoice Number*</Label>
-              <Input
-                id="invoiceNumber"
-                value={invoiceNumber}
-                onChange={(e) => setInvoiceNumber(e.target.value)}
-                placeholder="INV2398-08-087"
-              />
-            </div>
-
             {/* Client Section */}
             <div className="mb-6">
               <Label className="mb-2">Client*</Label>
               <ClientSelector
                 clients={data?.clients || []}
                 onClientSelect={(client) => {
-                  // setSelectedClient(client);
+                  setSelectedClient(client);
                 }}
               />
             </div>
@@ -392,12 +440,12 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                   value={paymentTerms}
                   onChange={(e) => setPaymentTerms(e.target.value)}
                 >
+                  <option value="not_set">Not Set</option>
                   <option value="due_on_receipt">Due on Receipt</option>
                   <option value="net_15">Net 15</option>
                   <option value="net_30">Net 30</option>
                   <option value="net_45">Net 45</option>
                   <option value="net_60">Net 60</option>
-                  <option value="custom">Custom</option>
                 </select>
               </div>
             </div>
@@ -660,7 +708,6 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                 </Button>
               </div>
             </div>
-
             {/* Preview Content based on activeView */}
             {activeView === "pdf" && (
               <div className="space-y-4" style={{ zoom: 0.75 }}>
@@ -679,10 +726,9 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                           </div>
                         </div>
                       )}
-                      {/* Invoice Title and Number */}
+                      {/* Invoice Title only - remove number */}
                       <div className="text-right">
                         <h3 className="text-2xl font-bold mb-2">INVOICE</h3>
-                        <p className="text-lg">{invoiceNumber}</p>
                       </div>
                     </div>
 
@@ -708,8 +754,10 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                         <div className="text-right">
                           <p className="text-sm text-gray-600 mb-1">Bill To:</p>
                           <p className="font-medium">{selectedClient.name}</p>
-                          {selectedClient.company && (
-                            <p className="text-sm">{selectedClient.company}</p>
+                          {selectedClient.companyName && (
+                            <p className="text-sm">
+                              {selectedClient.companyName}
+                            </p>
                           )}
                           {selectedClient.street && (
                             <p className="text-sm">{selectedClient.street}</p>

@@ -14,8 +14,8 @@ export function useStudio(invoiceId?: string | null) {
       try {
         setLoading(true);
         const endpoint = invoiceId
-          ? `/api/studio/${invoiceId}`
-          : "/api/studio/";
+          ? `/api/invoice/studio/${invoiceId}`
+          : "/api/invoice/studio/";
 
         const data = await apiRequest<StudioData>(endpoint, HttpMethod.GET);
         setData(data);

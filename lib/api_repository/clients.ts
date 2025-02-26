@@ -25,12 +25,15 @@ export function getClientInvoices(
   );
 }
 
-export function createClient(data: Partial<Client>): Promise<Client> {
-  return apiRequest<Client>(
+export async function createClient(data: Partial<Client>): Promise<Client> {
+  return apiRequest<{ client: Client }>(
     `${API_DASHBOARD_BASE_PATH}/clients`,
     HttpMethod.POST,
     data
-  );
+  ).then((res) => {
+    console.log("res", res);
+    return res.client;
+  });
 }
 
 export function updateClient(

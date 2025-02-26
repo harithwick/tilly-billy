@@ -26,7 +26,7 @@ export const POST = apiRouteHandler({
     return NextResponse.json(
       await createClient(
         supabase,
-        request.json(),
+        await request.json(),
         activeOrgUuid!,
         supabaseUser!
       )

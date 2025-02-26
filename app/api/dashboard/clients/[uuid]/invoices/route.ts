@@ -7,7 +7,7 @@ export const GET = apiRouteHandler({
   orgUuidRequired: true,
   handler: async (request, { supabase, activeOrgUuid, params }) => {
     return NextResponse.json({
-      invoices: await getClientInvoices(supabase, params!.uuid),
+      invoices: await getClientInvoices(supabase, activeOrgUuid!, params!.uuid),
     });
   },
 });

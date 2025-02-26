@@ -180,8 +180,22 @@ export default function InvoicesPage() {
             <TableBody>
               {invoices.map((invoice) => (
                 <TableRow key={invoice.id}>
-                  <TableCell>{invoice.invoiceNumber}</TableCell>
-                  <TableCell>{invoice.clientName}</TableCell>
+                  <TableCell>
+                    <Link
+                      href={`/invoice/${invoice.uuid}`}
+                      className="hover:underline text-primary"
+                    >
+                      {invoice.invoiceNumber}
+                    </Link>
+                  </TableCell>
+                  <TableCell>
+                    <Link
+                      href={`/dashboard/clients/${invoice.clientUUID}`}
+                      className="hover:underline text-primary"
+                    >
+                      {invoice.clientName}
+                    </Link>
+                  </TableCell>
                   <TableCell>
                     {format(new Date(invoice.issueDate), "MMM d, yyyy")}
                   </TableCell>

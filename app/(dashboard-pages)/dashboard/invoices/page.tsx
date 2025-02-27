@@ -185,7 +185,7 @@ export default function InvoicesPage() {
                       href={`/invoice/${invoice.uuid}`}
                       className="hover:underline text-primary"
                     >
-                      {invoice.invoiceNumber}
+                      <Button variant="link"> {invoice.invoiceNumber}</Button>
                     </Link>
                   </TableCell>
                   <TableCell>
@@ -193,7 +193,7 @@ export default function InvoicesPage() {
                       href={`/dashboard/clients/${invoice.clientUUID}`}
                       className="hover:underline text-primary"
                     >
-                      {invoice.clientName}
+                      <Button variant="link"> {invoice.clientName}</Button>
                     </Link>
                   </TableCell>
                   <TableCell>

@@ -287,7 +287,13 @@ export default function ClientPage() {
                   <TableBody>
                     {invoices.map((invoice) => (
                       <TableRow key={invoice.id}>
-                        <TableCell>{invoice.invoiceNumber}</TableCell>
+                        <TableCell>
+                          <Link href={`/invoice/${invoice.uuid}`}>
+                            <Button variant="link">
+                              {invoice.invoiceNumber}
+                            </Button>
+                          </Link>
+                        </TableCell>
                         <TableCell>
                           {formatDate(new Date(invoice.issueDate))}
                         </TableCell>

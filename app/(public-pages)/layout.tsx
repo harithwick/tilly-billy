@@ -42,7 +42,7 @@ export default function PublicLayout({
   return (
     <div className="min-h-screen bg-slate-50">
       {user ? <DashboardTopNav organizations={[]} /> : <SiteHeader />}
-      {/* {children} */}
+      {children}
     </div>
   );
 }

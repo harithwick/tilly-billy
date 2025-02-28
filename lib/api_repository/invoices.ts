@@ -1,10 +1,20 @@
 import { Invoice } from "@/lib/types";
 import { apiRequest, HttpMethod } from "@/lib/utils/api-request";
-import { API_DASHBOARD_BASE_PATH } from "@/lib/constants/application";
+import {
+  API_DASHBOARD_BASE_PATH,
+  API_BASE_PATH,
+} from "@/lib/constants/application";
 
 export function getInvoices(): Promise<{ invoices: Invoice[] }> {
   return apiRequest<{ invoices: Invoice[] }>(
     `${API_DASHBOARD_BASE_PATH}/invoices`,
+    HttpMethod.GET
+  );
+}
+
+export function getInvoice(uuid: string): Promise<Invoice> {
+  return apiRequest<Invoice>(
+    `${API_BASE_PATH}/invoice/${uuid}`,
     HttpMethod.GET
   );
 }

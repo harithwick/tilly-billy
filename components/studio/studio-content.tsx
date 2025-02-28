@@ -134,7 +134,7 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
       toast.success(
         uuid ? "Invoice updated successfully" : "Invoice created successfully"
       );
-      router.push("/dashboard/invoices");
+      router.push(`/dashboard/invoices`);
       router.refresh();
     } catch (error) {
       console.error("Error saving invoice:", error);

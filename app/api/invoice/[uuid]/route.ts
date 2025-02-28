@@ -17,7 +17,9 @@ export const GET = apiRouteHandler({
     request,
     { supabaseUser, supabase, activeOrgUuid, params }
   ) => {
-    return NextResponse.json(await getInvoice(supabase, params!.uuid));
+    return NextResponse.json(
+      await getInvoice(supabase, activeOrgUuid!, params!.uuid)
+    );
   },
 });
 

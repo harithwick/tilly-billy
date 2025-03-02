@@ -6,7 +6,10 @@ import { errorResponse } from "@/app/api/_handlers/error-response";
 export const POST = apiRouteHandler({
   authRequired: true,
   orgUuidRequired: true,
-  handler: async (request, { supabase, activeOrgUuid, params }) => {
+  handler: async (
+    request,
+    { supabaseUser, supabase, activeOrgUuid, params }
+  ) => {
     try {
       console.log("unarchiving client", params!.uuid);
       return NextResponse.json(

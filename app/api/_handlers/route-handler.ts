@@ -11,7 +11,7 @@ type ApiHandler = (
     activeOrgUuid: string | null;
     params: { [key: string]: string } | null;
   }
-) => Promise<NextResponse> | NextResponse;
+) => Promise<NextResponse>;
 export function apiRouteHandler({
   authRequired = true,
   orgUuidRequired = true,
@@ -23,10 +23,7 @@ export function apiRouteHandler({
   requiredParams?: string[];
   handler: ApiHandler;
 }) {
-  return async (
-    request: NextRequest,
-    context?: { params: { [key: string]: string } }
-  ) => {
+  return async (request: NextRequest, context: any) => {
     try {
       const supabase = await createSupabaseServerClient(cookies());
 
@@ -77,7 +74,8 @@ export function apiRouteHandler({
         supabaseUser: user,
         supabase,
         activeOrgUuid,
-        params: resolvedParams,
+        params: null,
+        // params: resolvedParams,
       });
 
       // Ensure a response is always returned
@@ -91,13 +89,8 @@ export function apiRouteHandler({
       return response;
     } catch (error) {
       console.error("API Error:", error);
-
-      if (error && typeof error === "object" && "message" in error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-      }
-
       return NextResponse.json(
-        { error: "Internsdfsdfal server error" },
+        { error: "Internal server error" },
         { status: 500 }
       );
     }

@@ -1,8 +1,11 @@
 export interface Invoice {
   id: string;
+  uuid: string;
   organizationId: string;
   organizationUUID: string;
+  organizationName: string;
   clientId: string;
+  clientUUID: string;
   clientName: string;
   clientEmail: string;
   invoiceNumber: string;

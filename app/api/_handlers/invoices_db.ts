@@ -3,48 +3,79 @@ import { Invoice } from "@/lib/types/invoice";
 import { keysToCamelCase } from "@/lib/utils/utilities";
 import { getOrganization } from "./organization_db";
 
-export async function getInvoice(
+export async function toggleInvoicePaidStatus(
   supabase: SupabaseClient,
-  organizationUuid: string,
   uuid: string
 ) {
-  const organization = await getOrganization(supabase, organizationUuid);
-  const invoicePrefix = organization.invPrefix || "INV";
-
-  const { data: invoice, error: invoiceError } = await supabase
-    .from("view_organization_invoices")
-    .select(
-      `
-      id,
-      client_id,
-      uuid,
-      organization_uuid,
-      status,
-      issue_date,
-      due_date,
-      notes,
-      created_at,
-      updated_at,
-      invoice_products (
-        id,
-        product_id,
-        quantity,
-        discount,
-        total_price
-      ),
-      clients (
-        name,
-        uuid
-      )
-    `
-    )
+  // First get the current paid status
+  const { data: currentInvoice, error: fetchError } = await supabase
+    .from("invoices")
+    .select("paid")
     .eq("uuid", uuid)
     .single();
 
-  if (invoiceError) throw invoiceError;
+  if (fetchError) throw fetchError;
 
+  // Toggle the paid status
+  const { data, error } = await supabase
+    .from("invoices")
+    .update({ paid: !currentInvoice.paid })
+    .eq("uuid", uuid)
+    .select();
+
+  if (error) throw error;
+  return data;
+}
+
+async function getInvoiceProducts(supabase: SupabaseClient, invoiceId: string) {
+  const { data, error } = await supabase
+    .from("invoice_products")
+    .select(
+      `
+      id,
+      product_id,
+      quantity,
+      discount,
+      total_price,
+      unit_price,
+      products!inner (
+        name,
+        sku,
+        description,
+        price,
+        status,
+        created_at,
+        updated_at
+      )
+    `
+    )
+    .eq("invoice_id", invoiceId);
+
+  if (error) throw error;
+  return data.map((item: any) => ({
+    id: item.id,
+    productId: item.product_id,
+    quantity: item.quantity,
+    discount: item.discount,
+    totalPrice: item.total_price,
+    unitPrice: item.unit_price,
+    name: item.products.name,
+    description: item.products.description,
+    price: item.products.price,
+    status: item.products.status,
+    createdAt: item.products.created_at,
+    updatedAt: item.products.updated_at,
+  }));
+}
+
+function formatInvoice(
+  invoice: any,
+  invoiceProducts: any[],
+  client: any,
+  invoicePrefix: string
+) {
   const total =
-    invoice.invoice_products?.reduce(
+    invoiceProducts?.reduce(
       (sum: number, item: any) => sum + (item.quantity * item.unit_price || 0),
       0
     ) || 0;
@@ -56,89 +87,97 @@ export async function getInvoice(
     id: invoice.id,
     clientId: invoice.client_id,
     uuid: invoice.uuid,
-    organizationUUID: invoice.organization_uuid,
     status: invoice.status,
     issueDate: invoice.issue_date,
     dueDate: invoice.due_date,
     notes: invoice.notes,
     createdAt: invoice.created_at,
     updatedAt: invoice.updated_at,
-    products: invoice.invoice_products,
+    products: invoiceProducts,
     total,
     invoiceNumber,
-    clientName: invoice.clients.name,
-    clientUUID: invoice.clients.uuid,
+    clientName: client.name,
+    clientUUID: client.uuid,
+    paid: invoice.paid,
   };
 }
 
-export async function getInvoices(
+async function getInvoicesQuery(
   supabase: SupabaseClient,
-  organizationUuid: string
+  organizationId: number,
+  invoiceUuid?: string
 ) {
-  const organization = await getOrganization(supabase, organizationUuid);
-  const invoicePrefix = organization.invPrefix || "INV";
-
-  const { data: invoices, error: invoicesError } = await supabase
-    .from("view_organization_invoices")
+  const baseQuery = supabase
+    .from("invoices")
     .select(
       `
       id,
       client_id,
       uuid,
-      organization_uuid,
       status,
       issue_date,
       due_date,
       notes,
+      paid,
       created_at,
       updated_at,
-      invoice_products (
-        id,
-        product_id,
-        quantity,
-        discount,
-        total_price
-      ),
-      clients (
+      clients!inner (
+        org_id,
         name,
         uuid
       )
     `
     )
-    .eq("organization_uuid", organizationUuid)
+    .eq("clients.org_id", organizationId)
     .order("created_at", { ascending: false });
 
-  if (invoicesError) throw invoicesError;
+  if (invoiceUuid) {
+    return await baseQuery.eq("uuid", invoiceUuid).single();
+  }
 
-  const formattedInvoices = invoices.map((invoice: any) => {
-    const total =
-      invoice.invoice_products?.reduce(
-        (sum: number, item: any) =>
-          sum + (item.quantity * item.unit_price || 0),
-        0
-      ) || 0;
+  return await baseQuery;
+}
 
-    const year = new Date(invoice.created_at).getFullYear();
-    const invoiceNumber = `${invoicePrefix}-${year}-${invoice.id}`;
+export async function getInvoices(
+  supabase: SupabaseClient,
+  organizationUuid: string,
+  invoiceUuid?: string
+) {
+  const organization = await getOrganization(supabase, organizationUuid);
+  const invoicePrefix = organization.invPrefix || "INV";
 
-    return {
-      id: invoice.id,
-      clientId: invoice.client_id,
-      uuid: invoice.uuid,
-      organizationUUID: invoice.organization_uuid,
-      status: invoice.status,
-      issueDate: invoice.issue_date,
-      dueDate: invoice.due_date,
-      notes: invoice.notes,
-      createdAt: invoice.created_at,
-      updatedAt: invoice.updated_at,
-      products: invoice.invoice_products,
-      total,
-      invoiceNumber,
-      clientName: invoice.clients.name,
-      clientUUID: invoice.clients.uuid,
-    };
-  });
+  const invoicesData = await getInvoicesQuery(
+    supabase,
+    organization.id,
+    invoiceUuid
+  );
+
+  console.log("invoicesData", invoicesData.data);
+
+  // If single invoice was requested
+  if (invoiceUuid) {
+    const invoice = invoicesData.data as any;
+    const products = await getInvoiceProducts(supabase, invoice!.id);
+    return formatInvoice(
+      invoice,
+      products,
+      { name: invoice!.clients.name, uuid: invoice!.clients.uuid },
+      invoicePrefix
+    );
+  }
+
+  // If multiple invoices were requested
+  const formattedInvoices = await Promise.all(
+    (invoicesData.data as any[]).map(async (invoice: any) => {
+      const products = await getInvoiceProducts(supabase, invoice.id);
+      return formatInvoice(
+        invoice,
+        products,
+        { name: invoice.clients.name, uuid: invoice.clients.uuid },
+        invoicePrefix
+      );
+    })
+  );
 
   return formattedInvoices;
 }
@@ -151,68 +190,44 @@ export async function getClientInvoices(
   const organization = await getOrganization(supabase, organizationUuid);
   const invoicePrefix = organization.invPrefix || "INV";
 
-  const { data: invoices, error: invoicesError } = await supabase
-    .from("view_organization_invoices")
+  const { data: invoices, error } = await supabase
+    .from("invoices")
     .select(
       `
-        id,
-        client_id,
-        uuid,
-        organization_uuid,
-        status,
-        issue_date,
-        due_date,
-        notes,
-        created_at,
-        updated_at,
-        invoice_products (
-          id,
-          product_id,
-          quantity,
-          discount,
-          total_price
-        ),
-        clients (
-          name,
-          uuid
-        )
-      `
+      id,
+      client_id,
+      uuid,
+      status,
+      issue_date,
+      due_date,
+      notes,
+      paid,
+      created_at,
+      updated_at,
+      clients!inner (
+        org_id,
+        name,
+        uuid
+      )
+    `
     )
-    .eq("organization_uuid", organizationUuid)
+    .eq("clients.org_id", organization.id)
     .eq("clients.uuid", clientUuid)
     .order("created_at", { ascending: false });
 
-  if (invoicesError) throw invoicesError;
+  if (error) throw error;
 
-  const formattedInvoices = invoices.map((invoice: any) => {
-    const total =
-      invoice.invoice_products?.reduce(
-        (sum: number, item: any) =>
-          sum + (item.quantity * item.unit_price || 0),
-        0
-      ) || 0;
-
-    const year = new Date(invoice.created_at).getFullYear();
-    const invoiceNumber = `${invoicePrefix}-${year}-${invoice.id}`;
-
-    return {
-      id: invoice.id,
-      clientId: invoice.client_id,
-      uuid: invoice.uuid,
-      organizationUUID: invoice.organization_uuid,
-      status: invoice.status,
-      issueDate: invoice.issue_date,
-      dueDate: invoice.due_date,
-      notes: invoice.notes,
-      createdAt: invoice.created_at,
-      updatedAt: invoice.updated_at,
-      products: invoice.invoice_products,
-      total,
-      invoiceNumber,
-      clientName: invoice.clients.name,
-      clientUUID: invoice.clients.uuid,
-    };
-  });
+  const formattedInvoices = await Promise.all(
+    invoices.map(async (invoice: any) => {
+      const products = await getInvoiceProducts(supabase, invoice.id);
+      return formatInvoice(
+        invoice,
+        products,
+        { name: invoice.clients.name, uuid: invoice.clients.uuid },
+        invoicePrefix
+      );
+    })
+  );
 
   return formattedInvoices;
 }

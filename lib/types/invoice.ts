@@ -1,15 +1,15 @@
 export interface Invoice {
   id: string;
-  uuid: string;
   organizationId: string;
   organizationUUID: string;
-  clientUUID: string;
+  clientId: string;
   clientName: string;
   invoiceNumber: string;
   status: InvoiceStatus;
   issueDate: Date;
   dueDate: Date;
-  items: InvoiceItem[];
+  paid: boolean;
+  products: InvoiceItem[];
   subtotal: number;
   tax: number;
   total: number;
@@ -23,10 +23,16 @@ export interface InvoiceItem {
   id: string;
   invoiceId: string;
   productId?: string;
-  description: string;
   quantity: number;
-  rate: number;
-  amount: number;
+  discount: number;
+  totalPrice: number;
+  unitPrice: number;
+  name: string;
+  description: string;
+  price: number;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export type InvoiceStatus =

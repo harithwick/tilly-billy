@@ -5,7 +5,7 @@ import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 import { errorResponse } from "@/app/api/_handlers/error-response";
 import {
   deleteInvoice,
-  getInvoice,
+  getInvoices,
   updateInvoice,
 } from "@/app/api/_handlers/invoices_db";
 
@@ -18,7 +18,7 @@ export const GET = apiRouteHandler({
     { supabaseUser, supabase, activeOrgUuid, params }
   ) => {
     return NextResponse.json(
-      await getInvoice(supabase, activeOrgUuid!, params!.uuid)
+      await getInvoices(supabase, activeOrgUuid!, params!.uuid)
     );
   },
 });

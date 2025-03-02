@@ -64,16 +64,15 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
       setOrganization(data.organization);
       setDate(new Date(data.invoice.issueDate));
       // setSelectedClient(data.invoice.clientId);
-      setItems(
-        data.invoice.items.map((item) => ({
-          id: item.id,
-          description: item.description,
-          quantity: item.quantity,
-          rate: item.rate,
-          discount: 0,
-          amount: item.amount,
-        }))
-      );
+      // setItems();
+      // data.invoice.p.map((item) => ({
+      //   id: item.id,
+      //   description: item.description,
+      //   quantity: item.quantity,
+      //   rate: item.rate,
+      //   discount: 0,
+      //   amount: item.amount,
+      // }))
     }
   }, [data]);
 

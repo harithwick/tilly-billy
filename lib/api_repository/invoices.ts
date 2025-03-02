@@ -12,6 +12,13 @@ export function getInvoices(): Promise<{ invoices: Invoice[] }> {
   );
 }
 
+export function markInvoiceAsPaid(uuid: string): Promise<Invoice> {
+  return apiRequest<Invoice>(
+    `${API_BASE_PATH}/invoice/${uuid}/mark-paid`,
+    HttpMethod.POST
+  );
+}
+
 export function getInvoice(uuid: string): Promise<Invoice> {
   return apiRequest<Invoice>(
     `${API_BASE_PATH}/invoice/${uuid}`,

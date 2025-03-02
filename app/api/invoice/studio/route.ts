@@ -79,7 +79,7 @@ export const POST = apiRouteHandler({
           issue_date: data.issueDate,
           notes: data.notes,
           terms: data.terms,
-          status: "draft", // You might want to make this configurable
+          status: "active", // You might want to make this configurable
         })
         .select()
         .single();

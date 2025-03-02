@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { Invoice } from "@/lib/types/invoice";
+import { Invoice, InvoiceFeeAdjustment } from "@/lib/types/invoice";
 import { keysToCamelCase } from "@/lib/utils/utilities";
 import { getOrganization } from "./organization_db";
 
@@ -68,17 +68,58 @@ async function getInvoiceProducts(supabase: SupabaseClient, invoiceId: string) {
   }));
 }
 
+async function getInvoiceFeesAndAdjustments(
+  supabase: SupabaseClient,
+  invoiceId: string
+): Promise<InvoiceFeeAdjustment[]> {
+  const { data, error } = await supabase
+    .from("invoice_fees_adjustments")
+    .select(
+      `
+      id,
+      amount,
+      type
+    `
+    )
+    .eq("invoice_id", invoiceId);
+
+  if (error) throw error;
+  return data.map((item: any) => ({
+    id: item.id,
+    invoiceId: item.invoice_id,
+    amount: item.amount,
+    type: item.type,
+  }));
+}
+
 function formatInvoice(
   invoice: any,
   invoiceProducts: any[],
   client: any,
-  invoicePrefix: string
+  invoicePrefix: string,
+  feesAndAdjustments: InvoiceFeeAdjustment[] = []
 ) {
-  const total =
+  const subtotal =
     invoiceProducts?.reduce(
       (sum: number, item: any) => sum + (item.quantity * item.unit_price || 0),
       0
     ) || 0;
+
+  // Calculate adjustments based on type
+  const adjustmentsTotal = feesAndAdjustments.reduce(
+    (sum: number, adjustment) => {
+      if (adjustment.type === "percentage") {
+        // For percentage adjustments, calculate based on subtotal
+        return sum + subtotal * (adjustment.amount / 100);
+      } else {
+        // For currency adjustments, use the amount directly
+        return sum + adjustment.amount;
+      }
+    },
+    0
+  );
+
+  const total = subtotal + adjustmentsTotal;
 
   const year = new Date(invoice.created_at).getFullYear();
   const invoiceNumber = `${invoicePrefix}-${year}-${invoice.id}`;
@@ -94,10 +135,14 @@ function formatInvoice(
     createdAt: invoice.created_at,
     updatedAt: invoice.updated_at,
     products: invoiceProducts,
+    feesAndAdjustments,
+    subtotal,
+    adjustmentsTotal,
     total,
     invoiceNumber,
     clientName: client.name,
     clientUUID: client.uuid,
+    clientEmail: client.email,
     paid: invoice.paid,
   };
 }
@@ -124,7 +169,8 @@ async function getInvoicesQuery(
       clients!inner (
         org_id,
         name,
-        uuid
+        uuid,
+        email
       )
     `
     )
@@ -158,11 +204,20 @@ export async function getInvoices(
   if (invoiceUuid) {
     const invoice = invoicesData.data as any;
     const products = await getInvoiceProducts(supabase, invoice!.id);
+    const feesAndAdjustments = await getInvoiceFeesAndAdjustments(
+      supabase,
+      invoice!.id
+    );
     return formatInvoice(
       invoice,
       products,
-      { name: invoice!.clients.name, uuid: invoice!.clients.uuid },
-      invoicePrefix
+      {
+        name: invoice!.clients.name,
+        uuid: invoice!.clients.uuid,
+        email: invoice!.clients.email,
+      },
+      invoicePrefix,
+      feesAndAdjustments
     );
   }
 
@@ -170,11 +225,20 @@ export async function getInvoices(
   const formattedInvoices = await Promise.all(
     (invoicesData.data as any[]).map(async (invoice: any) => {
       const products = await getInvoiceProducts(supabase, invoice.id);
+      const feesAndAdjustments = await getInvoiceFeesAndAdjustments(
+        supabase,
+        invoice.id
+      );
       return formatInvoice(
         invoice,
         products,
-        { name: invoice.clients.name, uuid: invoice.clients.uuid },
-        invoicePrefix
+        {
+          name: invoice.clients.name,
+          uuid: invoice.clients.uuid,
+          email: invoice.clients.email,
+        },
+        invoicePrefix,
+        feesAndAdjustments
       );
     })
   );
@@ -220,11 +284,20 @@ export async function getClientInvoices(
   const formattedInvoices = await Promise.all(
     invoices.map(async (invoice: any) => {
       const products = await getInvoiceProducts(supabase, invoice.id);
+      const feesAndAdjustments = await getInvoiceFeesAndAdjustments(
+        supabase,
+        invoice.id
+      );
       return formatInvoice(
         invoice,
         products,
-        { name: invoice.clients.name, uuid: invoice.clients.uuid },
-        invoicePrefix
+        {
+          name: invoice.clients.name,
+          uuid: invoice.clients.uuid,
+          email: invoice.clients.email,
+        },
+        invoicePrefix,
+        feesAndAdjustments
       );
     })
   );

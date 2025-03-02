@@ -3,7 +3,7 @@
 import { notFound, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils/utilities";
-import { Download, CheckCircle, Loader2 } from "lucide-react";
+import { Download, CheckCircle, Loader2, Mail } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { getInvoice, markInvoiceAsPaid } from "@/lib/api_repository/invoices";
@@ -11,6 +11,8 @@ import { Invoice, Product, InvoiceItem } from "@/lib/types";
 import { useAuthUser } from "@/lib/hooks/use-auth-user";
 import { LoadingState } from "@/components/loading-state";
 import Link from "next/link";
+import { toast } from "sonner";
+import { sendInvoiceToClient } from "@/lib/api_repository/email";
 
 export default function InvoicePage() {
   const { user, userLoading } = useAuthUser();
@@ -18,6 +20,7 @@ export default function InvoicePage() {
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPaidStatusUpdating, setIsPaidStatusUpdating] = useState(false);
+  const [isEmailSending, setIsEmailSending] = useState(false);
 
   useEffect(() => {
     const fetchInvoiceDetails = async () => {
@@ -46,6 +49,24 @@ export default function InvoicePage() {
     }
   };
 
+  const handleSendEmail = async () => {
+    if (!invoice!.clientEmail) {
+      toast.error("No client email address available");
+      return;
+    }
+
+    try {
+      setIsEmailSending(true);
+      await sendInvoiceToClient(params.uuid);
+      toast.success(`Invoice sent to ${invoice!.clientEmail}`);
+    } catch (error) {
+      console.error("Error sending invoice:", error);
+      toast.error("Failed to send invoice");
+    } finally {
+      setIsEmailSending(false);
+    }
+  };
+
   if (userLoading || loading) {
     return <LoadingState />;
   }
@@ -57,10 +78,10 @@ export default function InvoicePage() {
   return (
     <>
       <div className="border-b bg-white">
-        <div className="container  flex items-center gap-3 py-4 mx-auto px-4">
+        <div className="container flex items-center gap-3 py-4 mx-auto px-4">
           <Button
             variant="default"
-            className="ml-auto flex items-center gap-2"
+            className="flex items-center gap-2"
             onClick={handleToggleInvoicePaidStatus}
             disabled={isPaidStatusUpdating}
           >
@@ -71,10 +92,27 @@ export default function InvoicePage() {
             )}
             Mark as {invoice.paid === true ? "Unpaid" : "Paid"}
           </Button>
-          <Button variant="outline" className="flex items-center gap-2">
-            <Download size={16} />
-            Download PDF
-          </Button>
+          <div className="ml-auto flex items-center gap-3">
+            {user && (
+              <Button
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={handleSendEmail}
+                disabled={isEmailSending}
+              >
+                {isEmailSending ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <Mail size={16} />
+                )}
+                Send Invoice
+              </Button>
+            )}
+            <Button variant="outline" className="flex items-center gap-2">
+              <Download size={16} />
+              Download PDF
+            </Button>
+          </div>
         </div>
       </div>
       {user && (
@@ -146,6 +184,7 @@ export default function InvoicePage() {
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-3">Product</th>
                   <th className="text-right py-3">Quantity</th>
+                  <th className="text-right py-3">Price</th>
                   <th className="text-right py-3">Discount</th>
                   <th className="text-right py-3">Total</th>
                 </tr>
@@ -155,6 +194,9 @@ export default function InvoicePage() {
                   <tr key={product.id} className="border-b border-gray-200">
                     <td className="py-3">{product.name}</td>
                     <td className="text-right">{product.quantity}</td>
+                    <td className="text-right">
+                      {formatCurrency(product.price)}
+                    </td>
                     <td className="text-right">{product.discount}%</td>
                     <td className="text-right">
                       {formatCurrency(product.totalPrice)}
@@ -164,7 +206,29 @@ export default function InvoicePage() {
               </tbody>
               <tfoot>
                 <tr>
-                  <td colSpan={3} className="text-right py-4 font-semibold">
+                  <td colSpan={4} className="text-right py-4">
+                    Subtotal:
+                  </td>
+                  <td className="text-right py-4">
+                    {formatCurrency(invoice.subtotal)}
+                  </td>
+                </tr>
+                {invoice.feesAndAdjustments?.map((adjustment) => (
+                  <tr key={adjustment.id}>
+                    <td colSpan={4} className="text-right py-2">
+                      Adjustment (
+                      {adjustment.type === "percentage"
+                        ? `${adjustment.amount}%`
+                        : "flat"}
+                      ):
+                    </td>
+                    <td className="text-right py-2">
+                      {formatCurrency(adjustment.amount)}
+                    </td>
+                  </tr>
+                ))}
+                <tr className="border-t border-gray-200">
+                  <td colSpan={4} className="text-right py-4 font-semibold">
                     Total:
                   </td>
                   <td className="text-right py-4 font-semibold">
@@ -178,8 +242,14 @@ export default function InvoicePage() {
           {/* Notes */}
           {invoice.notes && (
             <div className="mb-8">
-              <h2 className="text-lg font-semibold mb-2">Notes:</h2>
+              <h2 className="text-sm mb-2">Notes:</h2>
               <div className="bg-gray-50 p-4 rounded-lg">{invoice.notes}</div>
+            </div>
+          )}
+          {invoice.terms && (
+            <div className="mb-8">
+              <h2 className="text-sm mb-2">Terms:</h2>
+              <div className="bg-gray-50 p-4 rounded-lg">{invoice.terms}</div>
             </div>
           )}
         </div>

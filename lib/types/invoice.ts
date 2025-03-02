@@ -4,6 +4,7 @@ export interface Invoice {
   organizationUUID: string;
   clientId: string;
   clientName: string;
+  clientEmail: string;
   invoiceNumber: string;
   status: InvoiceStatus;
   issueDate: Date;
@@ -17,6 +18,8 @@ export interface Invoice {
   terms?: string;
   createdAt: Date;
   updatedAt: Date;
+  feesAndAdjustments?: InvoiceFeeAdjustment[];
+  adjustmentsTotal?: number;
 }
 
 export interface InvoiceItem {
@@ -42,3 +45,11 @@ export type InvoiceStatus =
   | "overdue"
   | "cancelled"
   | "pending";
+
+export type InvoiceFeeAdjustmentType = "currency" | "percentage";
+
+export interface InvoiceFeeAdjustment {
+  id: number | null;
+  amount: number;
+  type: InvoiceFeeAdjustmentType;
+}

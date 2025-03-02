@@ -53,3 +53,12 @@ export function deleteInvoice(uuid: string): Promise<void> {
     HttpMethod.DELETE
   );
 }
+
+export function sendEmailToClient(uuid: string): Promise<void> {
+  return apiRequest<void>(
+    `${API_BASE_PATH}/invoices/${uuid}/send-email`,
+    HttpMethod.POST
+  );
+}
+
+

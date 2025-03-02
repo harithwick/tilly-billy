@@ -8,6 +8,7 @@ import DashboardNav from "./dashboard-nav";
 import { useState } from "react";
 import { Organization } from "@/lib/types";
 import { Pacifico } from "next/font/google";
+import Link from "next/link";
 
 const pacifico = Pacifico({
   subsets: ["latin"],
@@ -35,9 +36,12 @@ export default function DashboardTopNav({
             <SheetContent side="left" className="w-64">
               <div className="flex items-center gap-2 pb-4 pt-4">
                 <Code2 className="h-6 w-6" />
-                <span className={`text-xl font-bold ${pacifico.className}`}>
+                <Link
+                  href="/dashboard"
+                  className={`text-xl font-bold ${pacifico.className}`}
+                >
                   Tilly Billy
-                </span>
+                </Link>
               </div>
               {organizations && organizations.length > 0 ? (
                 <OrgSwitcher organizations={organizations} className="mb-4" />
@@ -48,9 +52,12 @@ export default function DashboardTopNav({
             </SheetContent>
           </Sheet>
           <div className="flex items-center gap-2">
-            <span className={`text-xl font-thin ${pacifico.className}`}>
+            <Link
+              href="/dashboard"
+              className={`text-xl font-thin ${pacifico.className}`}
+            >
               Tilly Billy
-            </span>
+            </Link>
           </div>
         </div>
         <div className="flex items-center gap-4">

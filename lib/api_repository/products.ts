@@ -3,38 +3,38 @@ import { apiRequest, HttpMethod } from "@/lib/utils/api-request";
 import { API_DASHBOARD_BASE_PATH } from "@/lib/constants/application";
 
 export function getProducts(): Promise<Product[]> {
-  return apiRequest<Product[]>(
-    `${API_DASHBOARD_BASE_PATH}/products`,
-    HttpMethod.GET
-  );
+  return apiRequest<void, Product[]>({
+    endpoint: `${API_DASHBOARD_BASE_PATH}/products`,
+    method: HttpMethod.GET,
+  });
 }
 
 export function getProduct(id: string): Promise<Product> {
-  return apiRequest<Product>(
-    `${API_DASHBOARD_BASE_PATH}/products/${id}`,
-    HttpMethod.GET
-  );
+  return apiRequest<void, Product>({
+    endpoint: `${API_DASHBOARD_BASE_PATH}/products/${id}`,
+    method: HttpMethod.GET,
+  });
 }
 
 export function createProduct(data: any): Promise<Product> {
-  return apiRequest<Product>(
-    `${API_DASHBOARD_BASE_PATH}/products`,
-    HttpMethod.POST,
-    data
-  );
+  return apiRequest<any, Product>({
+    endpoint: `${API_DASHBOARD_BASE_PATH}/products`,
+    method: HttpMethod.POST,
+    data,
+  });
 }
 
 export function updateProduct(id: string, data: any): Promise<Product> {
-  return apiRequest<Product>(
-    `${API_DASHBOARD_BASE_PATH}/products/${id}`,
-    HttpMethod.PATCH,
-    data
-  );
+  return apiRequest<any, Product>({
+    endpoint: `${API_DASHBOARD_BASE_PATH}/products/${id}`,
+    method: HttpMethod.PATCH,
+    data,
+  });
 }
 
 export function deleteProduct(id: string): Promise<void> {
-  return apiRequest<void>(
-    `${API_DASHBOARD_BASE_PATH}/products/${id}`,
-    HttpMethod.DELETE
-  );
+  return apiRequest<void>({
+    endpoint: `${API_DASHBOARD_BASE_PATH}/products/${id}`,
+    method: HttpMethod.DELETE,
+  });
 }

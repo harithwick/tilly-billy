@@ -15,10 +15,10 @@ export function useProducts() {
     async function fetchProducts() {
       try {
         setLoading(true);
-        const data = await apiRequest<Product[]>(
-          "/api/dashboard/products",
-          HttpMethod.GET
-        );
+        const data = await apiRequest<Product[]>({
+          endpoint: "/api/dashboard/products",
+          method: HttpMethod.GET,
+        });
         setProducts(data);
       } catch (err) {
         setError(

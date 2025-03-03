@@ -34,6 +34,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { apiRequest, HttpMethod } from "@/lib/utils/api-request";
 
 export default function ClientsPage() {
   const [status, setStatus] = useState("active");
@@ -102,6 +103,13 @@ export default function ClientsPage() {
         error instanceof Error ? error.message : "Failed to unarchive client"
       );
     }
+  };
+
+  const fetchClients = async () => {
+    return apiRequest<Client[]>({
+      endpoint: "/api/dashboard/clients",
+      method: HttpMethod.GET,
+    });
   };
 
   return (

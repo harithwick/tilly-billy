@@ -5,15 +5,25 @@ export enum HttpMethod {
   DELETE = "DELETE",
 }
 
-export async function apiRequest<T>(
-  endpoint: string,
-  method: HttpMethod,
-  data?: any
-): Promise<T> {
+interface ApiRequestParams<T> {
+  endpoint: string;
+  method: HttpMethod;
+  data?: T;
+  cache?: RequestCache;
+}
+
+export async function apiRequest<T, R = any>({
+  endpoint,
+  method,
+  data,
+  cache = "force-cache",
+}: ApiRequestParams<T>): Promise<R> {
+  // add cacjom
   const response = await fetch(endpoint, {
     method,
     headers: data ? { "Content-Type": "application/json" } : undefined,
     body: data ? JSON.stringify(data) : undefined,
+    cache,
   });
 
   if (!response.ok) {

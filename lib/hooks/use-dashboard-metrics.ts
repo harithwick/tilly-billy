@@ -13,10 +13,10 @@ export function useDashboardMetrics() {
     async function fetchMetrics() {
       try {
         setLoading(true);
-        const data = await apiRequest<any>(
-          "/api/dashboard/metrics",
-          HttpMethod.GET
-        );
+        const data = await apiRequest<any>({
+          endpoint: "/api/dashboard/metrics",
+          method: HttpMethod.GET,
+        });
         setMetrics(data);
       } catch (err) {
         console.error("Error fetching dashboard metrics:", err);

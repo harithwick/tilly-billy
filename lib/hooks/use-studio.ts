@@ -13,11 +13,12 @@ export function useStudio(invoiceId?: string | null) {
     async function fetchStudioData() {
       try {
         setLoading(true);
-        const endpoint = invoiceId
-          ? `/api/invoice/studio/${invoiceId}`
-          : "/api/invoice/studio/";
-
-        const data = await apiRequest<StudioData>(endpoint, HttpMethod.GET);
+        const data = await apiRequest<StudioData>({
+          endpoint: invoiceId
+            ? `/api/invoice/studio/${invoiceId}`
+            : "/api/invoice/studio/",
+          method: HttpMethod.GET,
+        });
         setData(data);
       } catch (err) {
         console.error("Error fetching studio data:", err);

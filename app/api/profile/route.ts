@@ -3,6 +3,8 @@ import { NextResponse, NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
 import { errorResponse } from "@/app/api/_handlers/error-response";
+import { apiRequest } from "@/lib/utils/api-request";
+import { HttpMethod } from "@/lib/utils/api-request";
 
 export const GET = apiRouteHandler({
   authRequired: true,

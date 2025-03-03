@@ -22,7 +22,7 @@ import { AuthLayout } from "@/components/auth/auth-layout";
 import { SocialButton } from "@/components/auth/social-button";
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
-
+import { LoadingState } from "@/components/loading-state";
 import { signupWithEmail } from "../actions";
 
 const formSchema = z.object({
@@ -34,7 +34,7 @@ const formSchema = z.object({
 export default function SignUpPage() {
   const router = useRouter();
   return (
-    <Suspense fallback={<p>Loading...</p>}>
+    <Suspense fallback={<LoadingState />}>
       <SignUpForm router={router} />
     </Suspense>
   );

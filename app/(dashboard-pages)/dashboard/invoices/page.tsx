@@ -13,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText, DollarSign, Clock, Plus, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/empty-state";
-import { ConfirmDelete } from "@/components/confirm-delete";
+import { ConfirmDelete } from "@/components/modals/confirm-delete";
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -18,7 +18,6 @@ export async function apiRequest<T, R = any>({
   data,
   cache = "no-cache",
 }: ApiRequestParams<T>): Promise<R> {
-  // add cacjom
   const response = await fetch(endpoint, {
     method,
     headers: data ? { "Content-Type": "application/json" } : undefined,

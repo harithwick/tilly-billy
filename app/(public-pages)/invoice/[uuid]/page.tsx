@@ -32,7 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import { ConfirmDelete } from "@/components/confirm-delete";
+import { ConfirmDelete } from "@/components/modals/confirm-delete";
 
 export default function InvoicePage() {
   const { user, userLoading } = useAuthUser();

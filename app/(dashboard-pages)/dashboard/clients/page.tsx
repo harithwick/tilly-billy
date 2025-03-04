@@ -7,8 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, UserPlus, Plus, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/empty-state";
-import { ConfirmDelete } from "@/components/confirm-delete";
-import { CreateClientModal } from "@/components/clients/create-client-modal";
+import { ConfirmDelete } from "@/components/modals/confirm-delete";
+import { CreateClientModal } from "@/components/modals/create-client-modal";
 import { LoadingState } from "@/components/loading-state";
 import { cn, capitalizeWords } from "@/lib/utils/utilities";
 import {

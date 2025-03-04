@@ -1,7 +1,7 @@
 "use client";
 import { useRefreshStore } from "../stores/use-refresh-store";
 import { useState, useEffect } from "react";
-import { apiRequest, HttpMethod } from "@/lib/utils/api-request";
+import { getMetrics } from "@/lib/api_repository/metrics";
 
 export function useDashboardMetrics() {
   const [metrics, setMetrics] = useState<any>(null);
@@ -13,10 +13,8 @@ export function useDashboardMetrics() {
     async function fetchMetrics() {
       try {
         setLoading(true);
-        const data = await apiRequest<any>({
-          endpoint: "/api/dashboard/metrics",
-          method: HttpMethod.GET,
-        });
+        const data = await getMetrics();
+        console.log("Metrics data:", data);
         setMetrics(data);
       } catch (err) {
         console.error("Error fetching dashboard metrics:", err);

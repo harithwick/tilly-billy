@@ -18,7 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CreateClientModal } from "./create-client-modal";
+import { CreateClientModal } from "../modals/create-client-modal";
 import { Client } from "@/lib/types";
 import { Organization } from "@/lib/types";
 interface ClientSelectorProps {

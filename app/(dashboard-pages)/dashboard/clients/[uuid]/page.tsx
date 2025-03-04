@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { MoreVertical } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils/utilities";
 import { capitalizeWords } from "@/lib/utils/utilities";
-import { ConfirmDelete } from "@/components/confirm-delete";
+import { ConfirmDelete } from "@/components/modals/confirm-delete";
 import { deleteInvoice } from "@/lib/api_repository/invoices";
 import { toast } from "sonner";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
@@ -43,12 +43,6 @@ import {
 import { useParams } from "next/navigation";
 import { getClient } from "@/lib/api_repository/clients";
 import { getClientInvoices } from "@/lib/api_repository/clients";
-type PageProps = {
-  params: {
-    id: string;
-  };
-  searchParams?: { [key: string]: string | string[] | undefined };
-};
 
 export default function ClientPage() {
   const params = useParams<{ uuid: string }>();

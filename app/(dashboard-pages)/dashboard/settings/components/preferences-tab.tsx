@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import {
   PaymentDetailsModal,
   PaymentDetail,
-} from "@/components/studio/payment-details-modal";
+} from "@/components/modals/payment-details-modal";
 import { Plus, Check, Trash2, MoreVertical, Pencil } from "lucide-react";
 import {
   Table,

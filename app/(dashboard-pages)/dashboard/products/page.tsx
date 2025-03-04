@@ -7,8 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Package, Plus, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/empty-state";
-import { CreateProductModal } from "@/components/products/create-product-modal";
-import { ConfirmDelete } from "@/components/confirm-delete";
+import { CreateProductModal } from "@/components/modals/create-product-modal";
+import { ConfirmDelete } from "@/components/modals/confirm-delete";
 import {
   DropdownMenu,
   DropdownMenuContent,

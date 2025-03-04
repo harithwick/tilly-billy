@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { cn } from "@/lib/utils/utilities";
 import { useState } from "react";
-import { PaymentDetail } from "./payment-details-modal";
+import { PaymentDetail } from "../modals/payment-details-modal";
 
 type PaymentDetailsSelectorProps = {
   paymentDetails?: PaymentDetail[];

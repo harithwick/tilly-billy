@@ -17,7 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CreateProductModal } from "./create-product-modal";
+import { CreateProductModal } from "../modals/create-product-modal";
 import { Product } from "@/lib/types";
 
 interface ProductSelectorProps {

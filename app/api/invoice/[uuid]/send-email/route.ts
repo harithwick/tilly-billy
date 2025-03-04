@@ -13,6 +13,7 @@ export const POST = apiRouteHandler({
     request,
     { supabaseUser, supabase, activeOrgUuid, params }
   ) => {
+    console.log(params);
     await sendInvoiceByEmail(supabase, activeOrgUuid!, params!.uuid);
     return NextResponse.json({ message: "Invoice sent" });
   },
@@ -23,16 +24,15 @@ const sendInvoiceByEmail = async (
   activeOrgUuid: string,
   uuid: string
 ) => {
-  try {
-    console.log("Sending invoice by email");
-    const invoice = (await getInvoices(supabase, activeOrgUuid, uuid)) as any;
+  console.log("Sending invoice by email");
+  const invoice = (await getInvoices(supabase, activeOrgUuid, uuid)) as any;
 
-    console.log("Invoice:", invoice);
-    const clientEmail = invoice!.clientEmail!;
-    console.log("Client email:", clientEmail);
-    console.log("Invoice:", invoice);
-    const subject = `Invoice ${invoice.invoiceNumber} from ${invoice.organizationUUID}`;
-    const html = `
+  console.log("Invoice:", invoice);
+  const clientEmail = invoice!.clientEmail!;
+  console.log("Client email:", clientEmail);
+  console.log("Invoice:", invoice);
+  const subject = `Invoice ${invoice.invoiceNumber} from ${invoice.organizationUUID}`;
+  const html = `
       <!DOCTYPE html>
       <html>
         <head>
@@ -187,13 +187,9 @@ const sendInvoiceByEmail = async (
       </html>
     `;
 
-    await sendEmail({
-      to: clientEmail,
-      subject: subject,
-      html: html,
-    });
-  } catch (error) {
-    console.error("Error sending invoice email:", error);
-    throw new Error("Failed to send invoice");
-  }
+  await sendEmail({
+    to: clientEmail,
+    subject: subject,
+    html: html,
+  });
 };

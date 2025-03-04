@@ -3,16 +3,36 @@
 import { notFound, useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils/utilities";
-import { Download, CheckCircle, Loader2, Mail } from "lucide-react";
+import {
+  Download,
+  CheckCircle,
+  Loader2,
+  Mail,
+  Edit,
+  MoreVertical,
+  Trash2,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { getInvoice, markInvoiceAsPaid } from "@/lib/api_repository/invoices";
+import {
+  deleteInvoice,
+  getInvoice,
+  markInvoiceAsPaid,
+} from "@/lib/api_repository/invoices";
 import { Invoice, Product, InvoiceItem } from "@/lib/types";
 import { useAuthUser } from "@/lib/hooks/use-auth-user";
 import { LoadingState } from "@/components/loading-state";
 import Link from "next/link";
 import { toast } from "sonner";
 import { sendInvoiceToClient } from "@/lib/api_repository/email";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
+import { ConfirmDelete } from "@/components/confirm-delete";
 
 export default function InvoicePage() {
   const { user, userLoading } = useAuthUser();
@@ -21,7 +41,9 @@ export default function InvoicePage() {
   const [loading, setLoading] = useState(true);
   const [isPaidStatusUpdating, setIsPaidStatusUpdating] = useState(false);
   const [isEmailSending, setIsEmailSending] = useState(false);
-
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const router = useRouter();
   useEffect(() => {
     const fetchInvoiceDetails = async () => {
       try {
@@ -67,6 +89,20 @@ export default function InvoicePage() {
     }
   };
 
+  const handleDeleteInvoice = async () => {
+    try {
+      setIsDeleting(true);
+      await deleteInvoice(params.uuid);
+      toast.success("Invoice deleted successfully");
+      router.push("/dashboard/invoices");
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      toast.error("Failed to delete invoice");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (userLoading || loading) {
     return <LoadingState />;
   }
@@ -79,39 +115,142 @@ export default function InvoicePage() {
     <>
       <div className="border-b bg-white">
         <div className="container flex items-center gap-3 py-4 mx-auto px-4">
-          <Button
-            variant="default"
-            className="flex items-center gap-2"
-            onClick={handleToggleInvoicePaidStatus}
-            disabled={isPaidStatusUpdating}
-          >
-            {isPaidStatusUpdating ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <CheckCircle size={16} />
-            )}
-            Mark as {invoice.paid === true ? "Unpaid" : "Paid"}
-          </Button>
-          <div className="ml-auto flex items-center gap-3">
-            {user && (
-              <Button
-                variant="outline"
-                className="flex items-center gap-2"
-                onClick={handleSendEmail}
-                disabled={isEmailSending}
-              >
-                {isEmailSending ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  <Mail size={16} />
-                )}
-                Send Invoice
-              </Button>
-            )}
-            <Button variant="outline" className="flex items-center gap-2">
-              <Download size={16} />
-              Download PDF
+          {/* Desktop View */}
+          <div className="hidden sm:flex items-center gap-3 w-full">
+            <Button
+              variant={invoice.paid ? "outline" : "default"}
+              className="flex items-center gap-2"
+              onClick={handleToggleInvoicePaidStatus}
+              disabled={isPaidStatusUpdating}
+            >
+              {isPaidStatusUpdating ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <CheckCircle size={16} />
+              )}
+              Mark as {invoice.paid ? "Unpaid" : "Paid"}
             </Button>
+            <div className="ml-auto flex items-center gap-3">
+              {user && (
+                <>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={handleSendEmail}
+                    disabled={isEmailSending}
+                  >
+                    {isEmailSending ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <Mail size={16} />
+                    )}
+                    Send Invoice
+                  </Button>
+                  <Link href={`/dashboard/studio/${params.uuid}`}>
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <Edit size={16} />
+                      Edit Invoice
+                    </Button>
+                  </Link>
+                </>
+              )}
+              <Button variant="outline" className="flex items-center gap-2">
+                <Download size={16} />
+                Download PDF
+              </Button>
+              {user && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <MoreVertical size={16} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        setShowDeleteDialog(true);
+                      }}
+                      className="text-red-600 focus:text-red-600 flex items-center gap-2"
+                    >
+                      <Trash2 size={16} />
+                      Delete Invoice
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+          </div>
+
+          {/* Mobile View */}
+          <div className="sm:hidden flex items-center w-full">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="ml-auto">
+                  <MoreVertical size={16} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem
+                  onClick={handleToggleInvoicePaidStatus}
+                  disabled={isPaidStatusUpdating}
+                  className={`flex items-center gap-2 ${
+                    invoice.paid ? "text-gray-600" : "text-green-600"
+                  }`}
+                >
+                  {isPaidStatusUpdating ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    <CheckCircle size={16} />
+                  )}
+                  Mark as {invoice.paid ? "Unpaid" : "Paid"}
+                </DropdownMenuItem>
+                {user && (
+                  <>
+                    <DropdownMenuItem
+                      onClick={handleSendEmail}
+                      disabled={isEmailSending}
+                      className="flex items-center gap-2"
+                    >
+                      {isEmailSending ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <Mail size={16} />
+                      )}
+                      Send Invoice
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link
+                        href={`/dashboard/studio/${params.uuid}`}
+                        className="flex items-center gap-2"
+                      >
+                        <Edit size={16} />
+                        Edit Invoice
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
+                <DropdownMenuItem className="flex items-center gap-2">
+                  <Download size={16} />
+                  Download PDF
+                </DropdownMenuItem>
+                {user && (
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      setShowDeleteDialog(true);
+                    }}
+                    className="text-red-600 focus:text-red-600 flex items-center gap-2"
+                  >
+                    <Trash2 size={16} />
+                    Delete Invoice
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
@@ -254,6 +393,14 @@ export default function InvoicePage() {
           )}
         </div>
       </div>
+
+      <ConfirmDelete
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        onConfirm={() => handleDeleteInvoice()}
+        title="Delete Invoice"
+        description="Are you sure you want to delete this invoice? This action cannot be undone."
+      />
     </>
   );
 }

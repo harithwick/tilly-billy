@@ -49,7 +49,7 @@ export function updateInvoice(
 
 export function deleteInvoice(uuid: string): Promise<void> {
   return apiRequest<void>({
-    endpoint: `${API_DASHBOARD_BASE_PATH}/invoices/${uuid}`,
+    endpoint: `${API_BASE_PATH}/invoice/${uuid}`,
     method: HttpMethod.DELETE,
   });
 }

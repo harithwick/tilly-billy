@@ -334,6 +334,7 @@ export async function updateInvoice(
 }
 
 export async function deleteInvoice(supabase: SupabaseClient, uuid: string) {
+  console.log("Deleting invoice with UUID:", uuid);
   const { data: invoice, error: invoiceError } = await supabase
     .from("invoices")
     .delete()

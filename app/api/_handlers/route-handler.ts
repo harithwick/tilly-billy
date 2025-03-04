@@ -37,7 +37,9 @@ export function apiRouteHandler({
       }
 
       let resolvedParams: { [key: string]: string } | null =
-        context && context.params ? await context!.params : null;
+        context && context.params ? await context.params : null;
+
+      console.log("Resolved params:", resolvedParams);
 
       if (requiredParams.length > 0) {
         if (!resolvedParams) {
@@ -48,7 +50,7 @@ export function apiRouteHandler({
         }
 
         for (const param of requiredParams) {
-          if (!resolvedParams[param]) {
+          if (!(param in resolvedParams) || !resolvedParams[param]) {
             return NextResponse.json(
               { error: `Missing required parameter: ${param}` },
               { status: 400 }
@@ -74,8 +76,7 @@ export function apiRouteHandler({
         supabaseUser: user,
         supabase,
         activeOrgUuid,
-        params: null,
-        // params: resolvedParams,
+        params: resolvedParams,
       });
 
       // Ensure a response is always returned

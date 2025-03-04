@@ -33,7 +33,7 @@ import { useRouter } from "next/navigation";
 export default function InvoicesPage() {
   const router = useRouter();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(
+  const [selectedInvoiceUuid, setSelectedInvoiceUuid] = useState<string | null>(
     null
   );
   const { invoices, loading, error } = useInvoices();
@@ -57,16 +57,17 @@ export default function InvoicesPage() {
     router.push("/studio");
   };
 
-  const handleDeleteClick = async (invoiceId: number) => {
-    setSelectedInvoiceId(invoiceId);
+  const handleDeleteClick = async (uuid: string) => {
+    setSelectedInvoiceUuid(uuid);
     setDeleteDialogOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!selectedInvoiceId) return;
+    console.log("Deleting invoice with UUID:", selectedInvoiceUuid);
+    if (!selectedInvoiceUuid) return;
 
     try {
-      await deleteInvoice(selectedInvoiceId.toString());
+      await deleteInvoice(selectedInvoiceUuid);
       toast.success("Invoice deleted successfully");
       triggerRefresh();
     } catch (error) {
@@ -75,7 +76,7 @@ export default function InvoicesPage() {
       );
     } finally {
       setDeleteDialogOpen(false);
-      setSelectedInvoiceId(null);
+      setSelectedInvoiceUuid(null);
     }
   };
 
@@ -213,7 +214,7 @@ export default function InvoicesPage() {
                         <DropdownMenuItem>View PDF</DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"
-                          onClick={() => handleDeleteClick(Number(invoice.id))}
+                          onClick={() => handleDeleteClick(invoice.uuid)}
                         >
                           Delete
                         </DropdownMenuItem>
@@ -229,7 +230,9 @@ export default function InvoicesPage() {
       <ConfirmDelete
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        onConfirm={handleDeleteConfirm}
+        onConfirm={() => handleDeleteConfirm()}
+        title="Are you sure you want to delete this invoice?"
+        description="This action cannot be undone."
       />
     </div>
   );

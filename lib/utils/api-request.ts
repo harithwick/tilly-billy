@@ -16,7 +16,7 @@ export async function apiRequest<T, R = any>({
   endpoint,
   method,
   data,
-  cache = "no-cache",
+  cache = "force-cache",
 }: ApiRequestParams<T>): Promise<R> {
   const response = await fetch(endpoint, {
     method,

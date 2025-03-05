@@ -1,37 +1,76 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { StudioData } from "@/lib/types/studio";
+import { Client, Organization, Invoice } from "@/lib/types";
 import { apiRequest, HttpMethod } from "@/lib/utils/api-request";
 
-export function useStudio(invoiceId?: string | null) {
+interface StudioData {
+  invoice?: {
+    id: string;
+    issueDate: string;
+    paymentTerms: string;
+    notes: string;
+    terms: string;
+    client: Client;
+    items: Array<{
+      id: string;
+      description: string;
+      quantity: number;
+      rate: number;
+      discount: number;
+      amount: number;
+    }>;
+    adjustments: Array<{
+      name: string;
+      value: number;
+      isPercentage: boolean;
+    }>;
+  };
+  organization?: Organization;
+  clients: Client[];
+  products: Array<{
+    id: string;
+    name: string;
+    price: number;
+  }>;
+}
+
+export function useStudio(uuid: string | null) {
   const [data, setData] = useState<StudioData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchStudioData() {
+    async function fetchData() {
       try {
         setLoading(true);
-        const data = await apiRequest<StudioData>({
-          endpoint: invoiceId
-            ? `/api/invoice/studio/${invoiceId}`
-            : "/api/invoice/studio/",
-          method: HttpMethod.GET,
-        });
-        setData(data);
+
+        // Fetch base data (clients and products)
+        const baseResponse = await fetch("/api/invoice/studio");
+        const baseData = await baseResponse.json();
+
+        if (uuid) {
+          // If we have an invoiceId, fetch the invoice details
+          const invoiceResponse = await fetch(`/api/invoice/studio/${uuid}`);
+          const invoiceData = await invoiceResponse.json();
+
+          setData({
+            ...baseData,
+            invoice: invoiceData.invoice,
+          });
+        } else {
+          setData(baseData);
+        }
+
+        setLoading(false);
       } catch (err) {
-        console.error("Error fetching studio data:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch studio data"
-        );
-      } finally {
+        setError(err instanceof Error ? err.message : "An error occurred");
         setLoading(false);
       }
     }
 
-    fetchStudioData();
-  }, [invoiceId]);
+    fetchData();
+  }, [uuid]);
 
   return { data, loading, error };
 }

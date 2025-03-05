@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { getOrganizationIdFromUuid } from "@/lib/utils/organizations";
 import { apiRouteHandler } from "@/app/api/_handlers/route-handler";
-
+import { getInvoices } from "@/app/api/_handlers/invoices_db";
+import { getClients } from "@/app/api/_handlers/clients_db";
+import { getProducts } from "@/app/api/_handlers/products_db";
+import { getOrganization } from "@/app/api/_handlers/organization_db";
 export const GET = apiRouteHandler({
   authRequired: true,
   orgUuidRequired: false,
@@ -12,81 +15,23 @@ export const GET = apiRouteHandler({
     try {
       const invoiceUuid = params!.uuid;
 
-      const organizationId = await getOrganizationIdFromUuid(
+      let organization = await getOrganization(supabase, activeOrgUuid!);
+
+      let invoiceDetails = await getInvoices(
         supabase,
-        activeOrgUuid!
+        activeOrgUuid!,
+        params!.uuid
       );
 
-      // Get organization details
-      const { data: organization, error: orgError } = await supabase
-        .from("organizations")
-        .select("*")
-        .eq("id", organizationId)
-        .single();
+      let clientDetails = await getClients(supabase, false, activeOrgUuid!);
 
-      if (orgError) {
-        return NextResponse.json(
-          { error: "Failed to fetch organization details" },
-          { status: 500 }
-        );
-      }
-
-      // Get active clients
-      const { data: clients, error: clientsError } = await supabase
-        .from("clients")
-        .select("*")
-        .eq("org_id", organizationId)
-        .eq("status", "active");
-
-      if (clientsError) {
-        return NextResponse.json(
-          { error: "Failed to fetch clients" },
-          { status: 500 }
-        );
-      }
-
-      // Get active products
-      const { data: products, error: productsError } = await supabase
-        .from("products")
-        .select("*")
-        .eq("org_id", organizationId)
-        .eq("status", "active");
-
-      if (productsError) {
-        return NextResponse.json(
-          { error: "Failed to fetch products" },
-          { status: 500 }
-        );
-      }
-
-      // Get invoice details by UUID
-      const { data: invoice, error: invoiceError } = await supabase
-        .from("invoices")
-        .select(
-          `
-          *,
-          invoice_items (
-            *,
-            product:products (*)
-          ),
-          client:clients (*)
-        `
-        )
-        .eq("uuid", invoiceUuid)
-        .single();
-
-      if (invoiceError) {
-        return NextResponse.json(
-          { error: "Invoice not found" },
-          { status: 404 }
-        );
-      }
+      let productDetails = await getProducts(supabase, activeOrgUuid!);
 
       return NextResponse.json({
-        organization,
-        clients,
-        products,
-        invoice,
+        ...organization,
+        clients: clientDetails,
+        products: productDetails,
+        invoice: invoiceDetails,
       });
     } catch (error) {
       console.error("Error in studio/[uuid] endpoint:", error);

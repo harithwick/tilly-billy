@@ -146,7 +146,7 @@ export default function InvoicePage() {
                     )}
                     Send Invoice
                   </Button>
-                  <Link href={`/dashboard/studio/${params.uuid}`}>
+                  <Link href={`/studio/${params.uuid}`}>
                     <Button
                       variant="outline"
                       className="flex items-center gap-2"

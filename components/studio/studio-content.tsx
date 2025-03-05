@@ -45,8 +45,7 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
   >([]);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const searchParams = useSearchParams();
-  const invoiceId = searchParams.get("id");
-  const { data, loading, error } = useStudio(invoiceId || null);
+  const { data, loading, error } = useStudio(uuid || null);
   const [activeView, setActiveView] = useState<"invoice" | "pdf">("pdf");
   const [notes, setNotes] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("not_set");
@@ -61,18 +60,37 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
   useEffect(() => {
     if (data?.invoice) {
       // Populate form with invoice data
-      setOrganization(data.organization);
-      setDate(new Date(data.invoice.issueDate));
-      // setSelectedClient(data.invoice.clientId);
-      // setItems();
-      // data.invoice.p.map((item) => ({
-      //   id: item.id,
-      //   description: item.description,
-      //   quantity: item.quantity,
-      //   rate: item.rate,
-      //   discount: 0,
-      //   amount: item.amount,
-      // }))
+      setOrganization(data.organization || null);
+      setIssueDate(new Date(data.invoice.issueDate));
+      setSelectedClient(data.invoice.client); // Assuming client data is included
+      setPaymentTerms(data.invoice.paymentTerms || "not_set");
+      setNotes(data.invoice.notes || "");
+      setTerms(data.invoice.terms || "");
+
+      // Set items with proper structure
+      if (data.invoice.items) {
+        setItems(
+          data.invoice.items.map((item) => ({
+            id: item.id,
+            description: item.description,
+            quantity: item.quantity,
+            rate: item.rate,
+            discount: item.discount || 0,
+            amount: item.amount,
+          }))
+        );
+      }
+
+      // Set adjustments if they exist
+      if (data.invoice.adjustments) {
+        setAdjustments(
+          data.invoice.adjustments.map((adjustment) => ({
+            name: adjustment.name,
+            value: adjustment.value,
+            isPercentage: adjustment.isPercentage,
+          }))
+        );
+      }
     }
   }, [data]);
 
@@ -491,7 +509,8 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                 <div className="flex-1 w-full">
                   <div className="md:hidden mobile-label">Item</div>
                   <ProductSelector
-                    products={data?.products || []}
+                    // products={data?.products || []}
+                    products={[]}
                     selectedProductId={item.id}
                     onProductSelect={(product) => {
                       const newItems = [...items];

@@ -210,7 +210,11 @@ export default function InvoicesPage() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => router.push(`/studio/${invoice.uuid}`)}
+                        >
+                          Edit
+                        </DropdownMenuItem>
                         <DropdownMenuItem>View PDF</DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-destructive"

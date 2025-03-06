@@ -113,147 +113,12 @@ export default function InvoicePage() {
 
   return (
     <>
-      <div className="border-b bg-white">
+      {/* <div className="border-b bg-white">
         <div className="container flex items-center gap-3 py-4 mx-auto px-4">
-          {/* Desktop View */}
-          <div className="hidden sm:flex items-center gap-3 w-full">
-            <Button
-              variant={invoice.paid ? "outline" : "default"}
-              className="flex items-center gap-2"
-              onClick={handleToggleInvoicePaidStatus}
-              disabled={isPaidStatusUpdating}
-            >
-              {isPaidStatusUpdating ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <CheckCircle size={16} />
-              )}
-              Mark as {invoice.paid ? "Unpaid" : "Paid"}
-            </Button>
-            <div className="ml-auto flex items-center gap-3">
-              {user && (
-                <>
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-2"
-                    onClick={handleSendEmail}
-                    disabled={isEmailSending}
-                  >
-                    {isEmailSending ? (
-                      <Loader2 size={16} className="animate-spin" />
-                    ) : (
-                      <Mail size={16} />
-                    )}
-                    Send Invoice
-                  </Button>
-                  <Link href={`/studio/${params.uuid}`}>
-                    <Button
-                      variant="outline"
-                      className="flex items-center gap-2"
-                    >
-                      <Edit size={16} />
-                      Edit Invoice
-                    </Button>
-                  </Link>
-                </>
-              )}
-              <Button variant="outline" className="flex items-center gap-2">
-                <Download size={16} />
-                Download PDF
-              </Button>
-              {user && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <MoreVertical size={16} />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      onSelect={(e) => {
-                        e.preventDefault();
-                        setShowDeleteDialog(true);
-                      }}
-                      className="text-red-600 focus:text-red-600 flex items-center gap-2"
-                    >
-                      <Trash2 size={16} />
-                      Delete Invoice
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </div>
-          </div>
-
-          {/* Mobile View */}
-          <div className="sm:hidden flex items-center w-full">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="ml-auto">
-                  <MoreVertical size={16} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem
-                  onClick={handleToggleInvoicePaidStatus}
-                  disabled={isPaidStatusUpdating}
-                  className={`flex items-center gap-2 ${
-                    invoice.paid ? "text-gray-600" : "text-green-600"
-                  }`}
-                >
-                  {isPaidStatusUpdating ? (
-                    <Loader2 size={16} className="animate-spin" />
-                  ) : (
-                    <CheckCircle size={16} />
-                  )}
-                  Mark as {invoice.paid ? "Unpaid" : "Paid"}
-                </DropdownMenuItem>
-                {user && (
-                  <>
-                    <DropdownMenuItem
-                      onClick={handleSendEmail}
-                      disabled={isEmailSending}
-                      className="flex items-center gap-2"
-                    >
-                      {isEmailSending ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <Mail size={16} />
-                      )}
-                      Send Invoice
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link
-                        href={`/dashboard/studio/${params.uuid}`}
-                        className="flex items-center gap-2"
-                      >
-                        <Edit size={16} />
-                        Edit Invoice
-                      </Link>
-                    </DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuItem className="flex items-center gap-2">
-                  <Download size={16} />
-                  Download PDF
-                </DropdownMenuItem>
-                {user && (
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      setShowDeleteDialog(true);
-                    }}
-                    className="text-red-600 focus:text-red-600 flex items-center gap-2"
-                  >
-                    <Trash2 size={16} />
-                    Delete Invoice
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          // ... all the desktop and mobile view code ...
         </div>
-      </div>
+      </div> */}
+
       {user && (
         <div className="bg-gray-50">
           <div className="container mx-auto px-4 py-2">
@@ -285,110 +150,212 @@ export default function InvoicePage() {
       )}
 
       <div className="container py-8 mx-auto">
-        <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-8">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              {invoice.invoiceNumber}
-            </h1>
-            <p className="text-gray-500 mt-1">
-              Status: <span className="capitalize">{invoice.status}</span>
-            </p>
-          </div>
-
-          {/* Dates and Client Info */}
-          <div className="grid grid-cols-2 gap-8 mb-8">
-            <div>
-              <h2 className="text-lg font-semibold mb-2">Bill To:</h2>
-              <p className="text-gray-700">{invoice.clientName}</p>
+        <div className="flex flex-col lg:flex-row gap-8 max-w-[1280px] mx-auto">
+          <div className="flex-1 max-w-[800px] bg-white rounded-lg shadow-sm p-8">
+            {/* Header */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-gray-900">
+                {invoice.invoiceNumber}
+              </h1>
+              <p className="text-gray-500 mt-1">
+                Status: <span className="capitalize">{invoice.status}</span>
+              </p>
             </div>
-            <div className="space-y-2">
+
+            {/* Dates and Client Info */}
+            <div className="grid grid-cols-2 gap-8 mb-8">
               <div>
-                <span className="font-medium">Issue Date: </span>
-                <span>{new Date(invoice.issueDate).toLocaleDateString()}</span>
+                <h2 className="text-lg font-semibold mb-2">Bill To:</h2>
+                <p className="text-gray-700">{invoice.clientName}</p>
               </div>
-              {invoice.dueDate && (
+              <div className="space-y-2">
                 <div>
-                  <span className="font-medium">Due Date: </span>
-                  <span>{new Date(invoice.dueDate).toLocaleDateString()}</span>
+                  <span className="font-medium">Issue Date: </span>
+                  <span>
+                    {new Date(invoice.issueDate).toLocaleDateString()}
+                  </span>
                 </div>
-              )}
+                {invoice.dueDate && (
+                  <div>
+                    <span className="font-medium">Due Date: </span>
+                    <span>
+                      {new Date(invoice.dueDate).toLocaleDateString()}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Products Table */}
-          <div className="mb-8">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3">Product</th>
-                  <th className="text-right py-3">Quantity</th>
-                  <th className="text-right py-3">Price</th>
-                  <th className="text-right py-3">Discount</th>
-                  <th className="text-right py-3">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoice.products.map((product: InvoiceItem) => (
-                  <tr key={product.id} className="border-b border-gray-200">
-                    <td className="py-3">{product.name}</td>
-                    <td className="text-right">{product.quantity}</td>
-                    <td className="text-right">
-                      {formatCurrency(product.price)}
+            {/* Products Table */}
+            <div className="mb-8">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-3">Product</th>
+                    <th className="text-right py-3">Quantity</th>
+                    <th className="text-right py-3">Price</th>
+                    <th className="text-right py-3">Discount</th>
+                    <th className="text-right py-3">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {invoice.products.map((product: InvoiceItem) => (
+                    <tr key={product.id} className="border-b border-gray-200">
+                      <td className="py-3">{product.name}</td>
+                      <td className="text-right">{product.quantity}</td>
+                      <td className="text-right">
+                        {formatCurrency(product.price)}
+                      </td>
+                      <td className="text-right">{product.discount}%</td>
+                      <td className="text-right">
+                        {formatCurrency(product.totalPrice)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colSpan={4} className="text-right py-4">
+                      Subtotal:
                     </td>
-                    <td className="text-right">{product.discount}%</td>
-                    <td className="text-right">
-                      {formatCurrency(product.totalPrice)}
+                    <td className="text-right py-4">
+                      {formatCurrency(invoice.subtotal)}
                     </td>
                   </tr>
-                ))}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td colSpan={4} className="text-right py-4">
-                    Subtotal:
-                  </td>
-                  <td className="text-right py-4">
-                    {formatCurrency(invoice.subtotal)}
-                  </td>
-                </tr>
-                {invoice.feesAndAdjustments?.map((adjustment) => (
-                  <tr key={adjustment.id}>
-                    <td colSpan={4} className="text-right py-2">
-                      Adjustment (
-                      {adjustment.type === "percentage"
-                        ? `${adjustment.amount}%`
-                        : "flat"}
-                      ):
+                  {invoice.feesAndAdjustments?.map((adjustment) => (
+                    <tr key={adjustment.id}>
+                      <td colSpan={4} className="text-right py-2">
+                        Adjustment (
+                        {adjustment.type === "percentage"
+                          ? `${adjustment.amount}%`
+                          : "flat"}
+                        ):
+                      </td>
+                      <td className="text-right py-2">
+                        {formatCurrency(adjustment.amount)}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="border-t border-gray-200">
+                    <td colSpan={4} className="text-right py-4 font-semibold">
+                      Total:
                     </td>
-                    <td className="text-right py-2">
-                      {formatCurrency(adjustment.amount)}
+                    <td className="text-right py-4 font-semibold">
+                      {formatCurrency(invoice.total)}
                     </td>
                   </tr>
-                ))}
-                <tr className="border-t border-gray-200">
-                  <td colSpan={4} className="text-right py-4 font-semibold">
-                    Total:
-                  </td>
-                  <td className="text-right py-4 font-semibold">
-                    {formatCurrency(invoice.total)}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
+                </tfoot>
+              </table>
+            </div>
+
+            {/* Notes */}
+            {invoice.notes && (
+              <div className="mb-8">
+                <h2 className="text-sm mb-2">Notes:</h2>
+                <div className="bg-gray-50 p-4 rounded-lg">{invoice.notes}</div>
+              </div>
+            )}
+            {invoice.terms && (
+              <div className="mb-8">
+                <h2 className="text-sm mb-2">Terms:</h2>
+                <div className="bg-gray-50 p-4 rounded-lg">{invoice.terms}</div>
+              </div>
+            )}
           </div>
 
-          {/* Notes */}
-          {invoice.notes && (
-            <div className="mb-8">
-              <h2 className="text-sm mb-2">Notes:</h2>
-              <div className="bg-gray-50 p-4 rounded-lg">{invoice.notes}</div>
-            </div>
-          )}
-          {invoice.terms && (
-            <div className="mb-8">
-              <h2 className="text-sm mb-2">Terms:</h2>
-              <div className="bg-gray-50 p-4 rounded-lg">{invoice.terms}</div>
+          {/* Right Panel - now visible on mobile */}
+          {user && (
+            <div className="lg:w-[400px] space-y-4">
+              {/* Actions Card */}
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h3 className="font-medium mb-4">Actions</h3>
+                <div className="space-y-3">
+                  <Button
+                    variant={invoice.paid ? "outline" : "default"}
+                    className="w-full flex items-center justify-center gap-2"
+                    onClick={handleToggleInvoicePaidStatus}
+                    disabled={isPaidStatusUpdating}
+                  >
+                    {isPaidStatusUpdating ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <CheckCircle size={16} />
+                    )}
+                    Mark as {invoice.paid ? "Unpaid" : "Paid"}
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    className="w-full flex items-center justify-center gap-2"
+                    onClick={handleSendEmail}
+                    disabled={isEmailSending}
+                  >
+                    {isEmailSending ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <Mail size={16} />
+                    )}
+                    Send Invoice
+                  </Button>
+
+                  <Link href={`/studio/${params.uuid}`} className="block">
+                    <Button
+                      variant="outline"
+                      className="w-full flex items-center justify-center gap-2"
+                    >
+                      <Edit size={16} />
+                      Edit Invoice
+                    </Button>
+                  </Link>
+
+                  <Button
+                    variant="outline"
+                    className="w-full flex items-center justify-center gap-2"
+                  >
+                    <Download size={16} />
+                    Download PDF
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    className="w-full flex items-center justify-center gap-2 text-red-600 hover:text-red-700 hover:bg-red-50"
+                    onClick={() => setShowDeleteDialog(true)}
+                  >
+                    <Trash2 size={16} />
+                    Delete Invoice
+                  </Button>
+                </div>
+              </div>
+
+              {/* Share Card */}
+              <div className="bg-white rounded-lg shadow-sm p-6 lg:sticky lg:top-8">
+                <h3 className="font-medium mb-4">Share Invoice</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm text-gray-500 block mb-1">
+                      Invoice Link
+                    </label>
+                    <div className="space-y-2">
+                      <code className="text-sm block w-full bg-gray-50 p-3 rounded">
+                        {`${window.location.origin}/invoice/${params.uuid}`}
+                      </code>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            `${window.location.origin}/invoice/${params.uuid}`
+                          );
+                          toast.success("Link copied to clipboard");
+                        }}
+                      >
+                        Copy Link
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>

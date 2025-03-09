@@ -20,7 +20,7 @@ export const GET = apiRouteHandler({
       let invoiceDetails = await getInvoices(
         supabase,
         activeOrgUuid!,
-        params!.uuid
+        invoiceUuid
       );
 
       let clientDetails = await getClients(supabase, false, activeOrgUuid!);
@@ -149,7 +149,7 @@ export const PUT = apiRouteHandler({
         invoice_id: existingInvoice.id,
         name: adjustment.name,
         type: adjustment.isPercentage ? "percentage" : "currency",
-        value: adjustment.value,
+        value: adjustment.amount,
       }));
 
       const { error: adjustmentsError } = await supabase

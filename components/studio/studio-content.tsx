@@ -52,7 +52,7 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
   const [issueDate, setIssueDate] = useState<Date>(new Date());
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [adjustments, setAdjustments] = useState<AdjustmentItem[]>([
-    { name: "Tax", value: 10, isPercentage: true },
+    { id: null, name: "Tax", amount: 10, type: "percentage" },
   ]);
   const [terms, setTerms] = useState("");
   const router = useRouter();
@@ -68,26 +68,18 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
       setTerms(data.invoice.terms || "");
 
       // Set items with proper structure
-      if (data.invoice.items) {
-        setItems(
-          data.invoice.items.map((item) => ({
-            id: item.id,
-            description: item.description,
-            quantity: item.quantity,
-            rate: item.rate,
-            discount: item.discount || 0,
-            amount: item.amount,
-          }))
-        );
+      if (data.invoice.products) {
+        setItems(data.invoice.products);
       }
 
       // Set adjustments if they exist
-      if (data.invoice.adjustments) {
+      if (data.invoice.feesAndAdjustments) {
         setAdjustments(
-          data.invoice.adjustments.map((adjustment) => ({
+          data.invoice.feesAndAdjustments.map((adjustment) => ({
+            id: adjustment.id,
             name: adjustment.name,
-            value: adjustment.value,
-            isPercentage: adjustment.isPercentage,
+            amount: adjustment.amount,
+            type: adjustment.type,
           }))
         );
       }
@@ -197,9 +189,9 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
   const totalAdjustments = adjustments.reduce((acc, adjustment) => {
     return (
       acc +
-      (adjustment.isPercentage
-        ? subtotal * (adjustment.value / 100)
-        : adjustment.value)
+      (adjustment.type === "percentage"
+        ? subtotal * (adjustment.amount / 100)
+        : adjustment.amount)
     );
   }, 0);
   const total = subtotal + totalAdjustments;
@@ -318,7 +310,7 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
       head: [["Adjustment", "Value"]],
       body: adjustments.map((adjustment) => [
         adjustment.name,
-        adjustment.value.toString(),
+        adjustment.amount.toString(),
       ]),
       styles: { fontSize: 10 },
       headStyles: { fillColor: [66, 66, 66] },
@@ -333,9 +325,9 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
 
     adjustments.forEach((adjustment, index) => {
       currentY += 10;
-      doc.text(`${adjustment.name} (${adjustment.value}%):`, 140, currentY);
+      doc.text(`${adjustment.name} (${adjustment.amount}%):`, 140, currentY);
       doc.text(
-        (subtotal * (adjustment.value / 100)).toFixed(2),
+        (subtotal * (adjustment.amount / 100)).toFixed(2),
         170,
         currentY,
         {
@@ -623,8 +615,18 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                   setAdjustments([
                     ...adjustments,
                     adjustments.length === 0
-                      ? { name: "Tax", value: 10, isPercentage: true }
-                      : { name: "Adjustment", value: 0, isPercentage: true },
+                      ? {
+                          name: "Tax",
+                          id: null,
+                          amount: 10,
+                          type: "percentage",
+                        }
+                      : {
+                          name: "Adjustment",
+                          id: null,
+                          amount: 0,
+                          type: "currency",
+                        },
                   ])
                 }
               >
@@ -651,12 +653,12 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                   <Input
                     type="number"
                     min="0"
-                    value={adjustment.value}
+                    value={adjustment.amount}
                     onChange={(e) => {
                       const newAdjustments = [...adjustments];
                       newAdjustments[index] = {
                         ...adjustment,
-                        value: Number(e.target.value),
+                        amount: Number(e.target.value),
                       };
                       setAdjustments(newAdjustments);
                     }}
@@ -669,12 +671,15 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                       const newAdjustments = [...adjustments];
                       newAdjustments[index] = {
                         ...adjustment,
-                        isPercentage: !adjustment.isPercentage,
+                        type:
+                          adjustment.type === "percentage"
+                            ? "currency"
+                            : "percentage",
                       };
                       setAdjustments(newAdjustments);
                     }}
                   >
-                    {adjustment.isPercentage ? "%" : "$"}
+                    {adjustment.type === "percentage" ? "%" : "$"}
                   </Button>
                 </div>
                 <Button
@@ -760,10 +765,12 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                             : "Not set"}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-sm text-gray-600">Payment Terms</p>
-                        <p>{getReadablePaymentTerms(paymentTerms)}</p>
-                      </div>
+                      {paymentTerms !== "not_set" && (
+                        <div>
+                          <p className="text-sm text-gray-600">Payment Terms</p>
+                          <p>{getReadablePaymentTerms(paymentTerms)}</p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Client Details */}
@@ -830,14 +837,16 @@ export default function StudioContent({ uuid }: { uuid?: string }) {
                         <div key={index} className="flex justify-between mb-2">
                           <span>
                             {adjustment.name}{" "}
-                            {adjustment.isPercentage
-                              ? `(${adjustment.value}%)`
+                            {adjustment.type === "percentage"
+                              ? `(${adjustment.amount}%)`
                               : ""}
                           </span>
                           <span>
-                            {adjustment.isPercentage
-                              ? (subtotal * (adjustment.value / 100)).toFixed(2)
-                              : adjustment.value.toFixed(2)}
+                            {adjustment.type === "percentage"
+                              ? (subtotal * (adjustment.amount / 100)).toFixed(
+                                  2
+                                )
+                              : adjustment.amount.toFixed(2)}
                           </span>
                         </div>
                       ))}

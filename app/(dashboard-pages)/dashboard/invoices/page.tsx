@@ -30,6 +30,8 @@ import {
 } from "@/components/ui/table";
 import { useRefreshStore } from "@/lib/stores/use-refresh-store";
 import { useRouter } from "next/navigation";
+import { RecurringInvoiceModal } from "@/components/invoices/recurring-invoice-modal";
+
 export default function InvoicesPage() {
   const router = useRouter();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -38,6 +40,10 @@ export default function InvoicesPage() {
   );
   const { invoices, loading, error } = useInvoices();
   const triggerRefresh = useRefreshStore((state) => state.triggerRefresh);
+  const [recurringModalOpen, setRecurringModalOpen] = useState(false);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<number | null>(
+    null
+  );
 
   if (loading) {
     return <LoadingState />;
@@ -77,6 +83,46 @@ export default function InvoicesPage() {
     } finally {
       setDeleteDialogOpen(false);
       setSelectedInvoiceUuid(null);
+    }
+  };
+
+  const handleMakeRecurring = (invoiceId: number) => {
+    setSelectedInvoiceId(invoiceId);
+    setRecurringModalOpen(true);
+  };
+
+  const handleRecurringSubmit = async (data: {
+    frequency: string;
+    startDate: Date;
+    endDate?: Date;
+  }) => {
+    if (!selectedInvoiceId) return;
+
+    try {
+      const response = await fetch("/api/dashboard/invoices/recurring", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          invoiceId: selectedInvoiceId,
+          frequency: data.frequency,
+          startDate: data.startDate.toISOString(),
+          endDate: data.endDate?.toISOString(),
+          status: "ACTIVE",
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to create recurring invoice");
+
+      toast.success("Recurring invoice created successfully");
+      setSelectedInvoiceId(null);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to create recurring invoice"
+      );
     }
   };
 
@@ -217,6 +263,13 @@ export default function InvoicesPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem>View PDF</DropdownMenuItem>
                         <DropdownMenuItem
+                          onClick={() =>
+                            handleMakeRecurring(Number(invoice.id))
+                          }
+                        >
+                          Make Recurring
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => handleDeleteClick(invoice.uuid)}
                         >
@@ -237,6 +290,11 @@ export default function InvoicesPage() {
         onConfirm={() => handleDeleteConfirm()}
         title="Are you sure you want to delete this invoice?"
         description="This action cannot be undone."
+      />
+      <RecurringInvoiceModal
+        open={recurringModalOpen}
+        onOpenChange={setRecurringModalOpen}
+        onSubmit={handleRecurringSubmit}
       />
     </div>
   );

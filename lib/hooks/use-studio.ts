@@ -1,39 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Client, Organization, Invoice } from "@/lib/types";
+import { Client, Organization, Invoice, AdjustmentItem } from "@/lib/types";
 import { apiRequest, HttpMethod } from "@/lib/utils/api-request";
-
-interface StudioData {
-  invoice?: {
-    id: string;
-    issueDate: string;
-    paymentTerms: string;
-    notes: string;
-    terms: string;
-    client: Client;
-    items: Array<{
-      id: string;
-      description: string;
-      quantity: number;
-      rate: number;
-      discount: number;
-      amount: number;
-    }>;
-    adjustments: Array<{
-      name: string;
-      value: number;
-      isPercentage: boolean;
-    }>;
-  };
-  organization?: Organization;
-  clients: Client[];
-  products: Array<{
-    id: string;
-    name: string;
-    price: number;
-  }>;
-}
+import { Product } from "@/lib/types/product";
+import { StudioData } from "@/lib/types/studio-data";
 
 export function useStudio(uuid: string | null) {
   const [data, setData] = useState<StudioData | null>(null);

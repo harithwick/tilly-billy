@@ -14,3 +14,15 @@ interface AuthResultError {
 }
 
 export type AuthResult = AuthResultSuccess | AuthResultError;
+
+export const mapAuthResultSuccess = (raw: any): AuthResultSuccess => ({
+  error: false,
+  organizationId: raw.organizationId,
+  supabase: raw.supabase,
+  user: raw.user,
+});
+
+export const mapAuthResultError = (raw: any): AuthResultError => ({
+  error: true,
+  response: raw.response,
+});

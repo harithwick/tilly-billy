@@ -71,7 +71,7 @@
     "moment-timezone": "^0.5.46",
     "next": "15.1.0",
     "next-themes": "^0.3.0",
-    "postcss": "8.4.30",
+    "postcss": "7.0.39",
     "react": "18.2.0",
     "react-canvas-confetti": "^2.0.7",
     "react-confetti": "^6.3.0",

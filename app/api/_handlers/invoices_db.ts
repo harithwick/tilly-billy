@@ -126,7 +126,6 @@ function formatInvoice(
 
   return {
     id: invoice.id,
-    clientId: invoice.client_id,
     uuid: invoice.uuid,
     status: invoice.status,
     issueDate: invoice.issue_date,
@@ -140,9 +139,7 @@ function formatInvoice(
     adjustmentsTotal,
     total,
     invoiceNumber,
-    clientName: client.name,
-    clientUUID: client.uuid,
-    clientEmail: client.email,
+    client: keysToCamelCase(invoice.clients),
     paid: invoice.paid,
   };
 }
@@ -166,12 +163,7 @@ async function getInvoicesQuery(
       paid,
       created_at,
       updated_at,
-      clients!inner (
-        org_id,
-        name,
-        uuid,
-        email
-      )
+      clients!inner (*)
     `
     )
     .eq("clients.org_id", organizationId)
@@ -268,11 +260,7 @@ export async function getClientInvoices(
       paid,
       created_at,
       updated_at,
-      clients!inner (
-        org_id,
-        name,
-        uuid
-      )
+      clients!inner (*)
     `
     )
     .eq("clients.org_id", organization.id)
@@ -341,4 +329,95 @@ export async function deleteInvoice(supabase: SupabaseClient, uuid: string) {
     .eq("uuid", uuid);
 
   if (invoiceError) throw invoiceError;
+}
+
+export interface RecurringInvoice {
+  id?: number;
+  invoiceId: number;
+  frequency:
+    | "DAILY"
+    | "WEEKLY"
+    | "FORTNIGHTLY"
+    | "MONTHLY"
+    | "QUARTERLY"
+    | "YEARLY";
+  startDate: string;
+  endDate?: string;
+  status: "ACTIVE" | "PAUSED" | "ARCHIVED";
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export async function getRecurringInvoices(
+  supabase: SupabaseClient,
+  recurringInvoiceId?: number
+) {
+  const query = supabase.from("recurring_invoices").select(`
+      id,
+      invoice_id,
+      frequency,
+      start_date,
+      end_date,
+      status,
+      created_at,
+      updated_at
+    `);
+
+  if (recurringInvoiceId) {
+    const { data, error } = await query.eq("id", recurringInvoiceId).single();
+    if (error) throw error;
+    return keysToCamelCase(data);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data.map((item) => keysToCamelCase(item));
+}
+
+export async function createRecurringInvoice(
+  supabase: SupabaseClient,
+  data: Omit<RecurringInvoice, "id" | "createdAt" | "updatedAt">
+) {
+  console.log("Creating recurring invoice with data:", data);
+  const { data: recurringInvoice, error } = await supabase
+    .from("recurring_invoices")
+    .insert({
+      invoice_id: data.invoiceId,
+      frequency: data.frequency,
+      start_date: data.startDate,
+      end_date: data.endDate,
+      status: data.status,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
+  return keysToCamelCase(recurringInvoice);
+}
+
+export async function updateRecurringInvoice(
+  supabase: SupabaseClient,
+  id: number,
+  data: Partial<RecurringInvoice>
+) {
+  const { data: recurringInvoice, error } = await supabase
+    .from("recurring_invoices")
+    .update(data)
+    .eq("id", id)
+    .select();
+
+  if (error) throw error;
+  return keysToCamelCase(recurringInvoice);
+}
+
+export async function deleteRecurringInvoice(
+  supabase: SupabaseClient,
+  id: number
+) {
+  const { error } = await supabase
+    .from("recurring_invoices")
+    .delete()
+    .eq("id", id);
+
+  if (error) throw error;
 }

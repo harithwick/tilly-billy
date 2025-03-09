@@ -56,3 +56,54 @@ export interface InvoiceFeeAdjustment {
   amount: number;
   type: InvoiceFeeAdjustmentType;
 }
+
+export const mapInvoice = (raw: any): Invoice => ({
+  id: raw.id,
+  uuid: raw.uuid,
+  organizationId: raw.organizationId,
+  organizationUUID: raw.organizationUUID,
+  organizationName: raw.organizationName,
+  clientId: raw.clientId,
+  clientUUID: raw.clientUUID,
+  clientName: raw.clientName,
+  clientEmail: raw.clientEmail,
+  invoiceNumber: raw.invoiceNumber,
+  status: raw.status,
+  issueDate: new Date(raw.issueDate),
+  dueDate: new Date(raw.dueDate),
+  paid: raw.paid,
+  products: Array.isArray(raw.products) ? raw.products.map(mapInvoiceItem) : [],
+  subtotal: raw.subtotal,
+  tax: raw.tax,
+  total: raw.total,
+  notes: raw.notes,
+  terms: raw.terms,
+  createdAt: new Date(raw.createdAt),
+  updatedAt: new Date(raw.updatedAt),
+  feesAndAdjustments: Array.isArray(raw.feesAndAdjustments)
+    ? raw.feesAndAdjustments.map(mapInvoiceFeeAdjustment)
+    : undefined,
+  adjustmentsTotal: raw.adjustmentsTotal,
+});
+
+export const mapInvoiceItem = (raw: any): InvoiceItem => ({
+  id: raw.id,
+  invoiceId: raw.invoiceId,
+  productId: raw.productId,
+  quantity: raw.quantity,
+  discount: raw.discount,
+  totalPrice: raw.totalPrice,
+  unitPrice: raw.unitPrice,
+  name: raw.name,
+  description: raw.description,
+  price: raw.price,
+  status: raw.status,
+  createdAt: new Date(raw.createdAt),
+  updatedAt: new Date(raw.updatedAt),
+});
+
+export const mapInvoiceFeeAdjustment = (raw: any): InvoiceFeeAdjustment => ({
+  id: raw.id,
+  amount: raw.amount,
+  type: raw.type,
+});

@@ -112,8 +112,8 @@ export const POST = apiRouteHandler({
       const invoiceAdjustments = data.adjustments.map((adjustment: any) => ({
         invoice_id: invoice.id,
         name: adjustment.name,
-        type: adjustment.isPercentage ? "percentage" : "currency",
-        amount: adjustment.value,
+        type: adjustment.type,
+        amount: adjustment.amount,
       }));
 
       const { error: adjustmentsError } = await supabase
